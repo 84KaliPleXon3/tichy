@@ -1,0 +1,131 @@
+
+fonts {
+   font: "DejaVuSans-Bold.ttf" "Sans";
+}
+
+styles {
+   style {
+      name: "char_style";
+      base: "font=Sans font_size=36 color=#fff wrap=char outline_color=#000 style=soft_outline tabstops=60";
+      tag:  "br" "  \n";
+      tag:  "tab" "  \t";
+   }
+}
+
+collections {
+    group {
+        name: "test";
+        parts {
+            part {
+                name: "background";
+                type: RECT;
+                description {
+                    state: "default" 0.0;
+                    color: 0 0 0 255;
+                }
+            }
+        
+        
+            part {
+                name: "main-menu";
+                type: SWALLOW;
+                description {
+                    state: "default" 0.0;
+                    rel1 {
+                        relative: 0.1 0.1;
+                        offset: 0 0;
+                    }
+                    rel2 {
+                        relative: 0.9 0.9;
+                        offset: 0 0;
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    group {
+        name: "label";
+        min: 200 80;
+	    max: 440 80;
+        parts {
+            part {
+                name: "label";
+                type: TEXT;
+                description {
+                    fixed: 1 1;
+                    text {
+					    align: 0.0 0.5;
+					    min: 1 1;
+					    size: 32;
+					    text: "Hello";
+					    font: "Sans";
+				    }
+                    rel1 {
+                        relative: 0.1 0.1;
+                        offset: 0 0;
+                    }
+                    rel2 {
+                        relative: 0.9 0.9;
+                        offset: 0 0;
+                    }
+                    state: "default" 0.0;
+                    color: 255 255 255 255;
+                }
+            }
+        }
+    }
+    
+    group {
+        name: "button";
+        min: 440 80;
+	    max: 440 80;
+        parts {
+            part {
+                name: "rect";
+                type: RECT;
+                mouse_events: 1;
+                description {
+                    rel1 {
+                        relative: 0.1 0.1;
+                        offset: 0 0;
+                    }
+                    rel2 {
+                        relative: 0.9 0.9;
+                        offset: 0 0;
+                    }
+                    state: "default" 0.0;
+                    color: 255 0 0 128;
+                }
+            }
+        }
+    }
+    
+    
+    group {
+        name: "frame";
+        min: 440 80;
+//	    max: 440 80;
+        parts {
+            part {
+                name: "rect";
+                type: RECT;
+                description {
+                    rel1 {
+                        relative: 0.1 0.1;
+                        offset: 0 0;
+                    }
+                    rel2 {
+                        relative: 0.9 0.9;
+                        offset: 0 0;
+                    }
+                    state: "default" 0.0;
+                    color: 255 0 0 255;
+                }
+            }
+        }
+    }
+}
+
+

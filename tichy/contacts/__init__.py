@@ -1,0 +1,2 @@
+
+from contacts import Contact

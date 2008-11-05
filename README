@@ -1,0 +1,73 @@
+       _       _           
+   _  (_)     | |          
+ _| |_ _  ____| |__  _   _ 
+(_   _) |/ ___)  _ \| | | |
+  | |_| ( (___| | | | |_| |
+   \__)_|\____)_| |_|\__  |
+                    (____/ 
+
+Tichy
+copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+
+This file is part of Tichy.
+
+Tichy is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Tichy is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
+
+== ABOUT ==
+    This is a python applets manager.
+    My goal is to make a very simple environment for people who want to write applications for OpenMoko.
+    The approach is very different from what we can get in the currents available images for OM.
+    I came to the conclusion that the current way of writing applications for desktop computer is not suitable for mobile phone, where applications need to be very tightly connected to each other.
+    
+    The main ideas of tichy are :
+    * Everything is written in python (Or cython/pyrex if we need speed). So there is no choice of the language here, all the applets have to be written in python. It is still possible to start external applications, but they won't be able to communicate with the rest of the system.
+    * All the applications run in the same python interpreter. Once again it is possible to start external applications that will run in separate process, but they won't be able to communicate with the system.
+    * Everything is plug-in. Even the most fundamental services (like file browser, keyboard, etc) are defined into plug-in.
+    * Plugins can register and request for services. A service is just a python object with a defined interface.
+    * All the plugins share the same mainloop. They can't block and have to use callback instead. To eas things, I implemented a tasklet system that allow us to use the yield syntax of python to write callback code that looks like threaded code.
+    * The plugins should only describe the items they act on, and not the way they show it. The design itself is controled by the 'Design' service. This allow us to have many different kind of design for the same applications.
+
+
+== INSTALL ==
+    If you just want to try tichy on your destop, the simpler is to directly run it from the location where it has been downoaded. Thatr is:
+    cd into "test/", and run "python tichy"
+
+    To make it run faster, you can compile the cython version of the gui module :
+    Go into ./tichy/guic
+    type:
+        make
+    
+    That should create all the .so files, then the execution is much faster.
+    
+== RUN ON OPENMOKO ==
+    This is a little bit tricky, I won't explain the steps in details, contact me if you have problems
+    # Get the FSO image
+    # Install python-pygame 
+    # Compile the files in guic using OM Toolchain
+    # Copy everything on the OM
+    # export DISPLAY=:0
+    # go into tichy/test
+    # ./tichy
+    
+== Graphic backends ==
+    By default tichy will try to use tichy/guic as the widgets library. If it can't load it (c files no compliled), it will try to use tichy/guip.
+    There are also experimental backends for gtk and edje (guig end guie.) To try it out, edit tichy/gui.py file.
+
+== AUTHORS ==
+    * Guillaume "Charlie" Chereau, main developer. charlie@openmoko.org
+    * Michael "Goodwill", openmoko /a/ webhippo.org
+
+
+    

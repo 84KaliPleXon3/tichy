@@ -1,0 +1,169 @@
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+    def __init__(self, pos, size):
+        self.pos = Vect(pos[0], pos[1])
+        self.size = Vect(size[0], size[1])
+        
+    property pos:
+        def __get__(self): return c_vect_to_py(&self.c_value.pos)
+                                              ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:79:47: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        
+    property pos:
+        def __get__(self): return c_vect_to_py(&self.c_value.pos)
+        def __set__(self, Vect value): self.c_value.pos = value.c_value
+    property size:
+        def __get__(self): return c_vect_to_py(&self.c_value.size)
+                                              ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:82:47: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        
+    def is_empty(self):
+        return self.size.x == self.size.y == 0
+        
+    def __contains__(self, Vect v):
+        return c_rect_contains(&self.c_value, &v.c_value)
+                              ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:113:31: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        
+    def is_empty(self):
+        return self.size.x == self.size.y == 0
+        
+    def __contains__(self, Vect v):
+        return c_rect_contains(&self.c_value, &v.c_value)
+                                             ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:113:46: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+    def __contains__(self, Vect v):
+        return c_rect_contains(&self.c_value, &v.c_value)
+        
+    cpdef Rect clip(self, Rect r):
+        cdef c_Rect ret
+        c_rect_clip(&self.c_value, &r.c_value, &ret)
+                   ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:117:20: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+    def __contains__(self, Vect v):
+        return c_rect_contains(&self.c_value, &v.c_value)
+        
+    cpdef Rect clip(self, Rect r):
+        cdef c_Rect ret
+        c_rect_clip(&self.c_value, &r.c_value, &ret)
+                                  ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:117:35: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        c_rect_clip(&self.c_value, &r.c_value, &ret)
+        return c_rect_to_py(&ret)
+        
+    cpdef Rect merge(self, Rect r):
+        cdef c_Rect ret
+        c_rect_merge(&self.c_value, &r.c_value, &ret)
+                    ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:122:21: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        c_rect_clip(&self.c_value, &r.c_value, &ret)
+        return c_rect_to_py(&ret)
+        
+    cpdef Rect merge(self, Rect r):
+        cdef c_Rect ret
+        c_rect_merge(&self.c_value, &r.c_value, &ret)
+                                   ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:122:36: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        cdef c_Rect ret
+        c_rect_merge(&self.c_value, &r.c_value, &ret)
+        return c_rect_to_py(&ret)
+        
+    cpdef int intersect(self, Rect r):
+        return c_rect_intersect(&self.c_value, &r.c_value)
+                               ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:126:32: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        cdef c_Rect ret
+        c_rect_merge(&self.c_value, &r.c_value, &ret)
+        return c_rect_to_py(&ret)
+        
+    cpdef int intersect(self, Rect r):
+        return c_rect_intersect(&self.c_value, &r.c_value)
+                                              ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:126:47: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        return c_rect_intersect(&self.c_value, &r.c_value)
+               
+    cpdef Rect inside(self, Rect r):
+        """Return a rect of the same size put inside the rect r"""
+        cdef c_Rect ret
+        c_rect_inside(&self.c_value, &r.c_value, &ret)
+                     ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:131:22: Cannot take address of Python variable
+
+Error converting Pyrex file to C:
+------------------------------------------------------------
+...
+        return c_rect_intersect(&self.c_value, &r.c_value)
+               
+    cpdef Rect inside(self, Rect r):
+        """Return a rect of the same size put inside the rect r"""
+        cdef c_Rect ret
+        c_rect_inside(&self.c_value, &r.c_value, &ret)
+                                    ^
+------------------------------------------------------------
+
+/home/charlie/Work/tichy/tichy/guic/src/geo.pyx:131:37: Cannot take address of Python variable
+make: *** [src/geo.c] Error 1

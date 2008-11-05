@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+#    Tichy
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
+# This is to solve a bug in neo where sdl on the framebuffer doesn't work
+# XXX: we should solve the real issue instead of using this hack
+import os
+os.environ['SDL_VIDEODRIVER'] = 'x11'
+
+import sys
+sys.path.insert(0, '../')
+
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(name)-8s %(levelname)-8s %(message)s'
+)
+logger = logging.getLogger('')
+
+import time
+
+# Import all the stuffs we need...
+import tichy
+import tichy.gui as gui
+from tichy.style import Style
+from tichy.tasklet import Tasklet, Wait
+from tichy.application import Application
+import tichy.plugins as plugins
+from tichy.gui import Vect, Rect
+from tichy.service import Service
+from tichy.text import Text
+from tichy.list import ActorList
+
+class RunTopBarClock(Tasklet):
+    def run(self, clock_display):
+        time_service = Service('Time')
+        while True:
+            yield Wait(time_service, 'time-changed')
+            clock_display.value = \
+                time.strftime("%H:%M:%S",time.localtime())
+
+class AutoAnswerCall(Application):
+    def run(self, window):
+        # We don't create any window, just run in the background...
+        gsm_service = Service('GSM')
+        while True:
+            call = yield Wait(gsm_service, 'incoming-call')
+            caller_service = Service('Caller')
+            yield caller_service.call(window, call)
+
+class TopBar(Application):
+    """This is the application that is going to run on the top window"""
+    def run(self, parent):
+        from tichy.phone import GSMService
+        
+        # The top window application need to print various informations...
+        hbox = gui.Box(parent, axis=0)
+
+        # Add a few 'Gadgets'
+        tichy.Gadget.find_by_name('GSM')(hbox).start()
+        tichy.Gadget.find_by_name('Network')(hbox).start()
+        tichy.Gadget.find_by_name('Battery')(hbox).start()
+        tichy.Gadget.find_by_name('Clock')(hbox).start()
+
+        yield Wait(parent, 'destroyed')
+        
+class Main(Application):
+    def run(self, window):
+        vbox = gui.Box(window, axis = 1, border = 0, spacing = 0)
+        # The main application
+        top_window = gui.Window(vbox, optimal_size = gui.Vect(480, 64), modal=False)
+        content_window = gui.Window(vbox, min_size = gui.Vect(480, 0), modal=False, expand=True)
+        AutoAnswerCall(content_window).start()
+        TopBar(top_window).start()
+        launcher = Application.find_by_name('Launcher')
+        yield launcher(content_window)
+
+
+# We import all the modules into the plugin directory
+plugins.import_all('plugins')
+plugins.import_all('/usr/share/tichy/plugins')
+plugins.import_all('/usr/tichy/plugins')
+
+# TODO: at least remove the create invocation !
+style = Style.find_by_name("black style").create()
+
+# We set the default design
+tichy.Service.set_default('Design', 'Default')
+# tichy.Service.set_default('Design', 'Grid')
+
+fullscreen = '--fullscreen' in sys.argv
+
+# The backend SDL painter
+painter = gui.Painter((480, 640), fullscreen=fullscreen)
+
+# Create the screen
+screen = gui.Screen(tichy.mainloop, painter, style=style)
+
+def on_quit(v):
+    logger.info("quit mainloop")
+    tichy.mainloop.quit()
+
+# Start the application, and attach a callback on it
+Main(screen).start(on_quit)
+tichy.mainloop.run()
+logger.info("quit")
+
+
