@@ -92,9 +92,13 @@ class Main(Application):
 
 
 # We import all the modules into the plugin directory
-plugins.import_all('plugins')
-plugins.import_all('/usr/share/tichy/plugins')
-plugins.import_all('/usr/tichy/plugins')
+for plugins_dir in ['plugins', '/usr/share/tichy/plugins', '/usr/tichy/plugins']:
+    try:
+        logger.info("try to load plugins in %s", plugins_dir)
+        plugins.import_all(plugins_dir)
+        break
+    except IOError:
+        logger.info("failed to load plugins in %s", plugins_dir)
 
 # TODO: at least remove the create invocation !
 style = Style.find_by_name("black style").create()

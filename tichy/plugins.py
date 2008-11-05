@@ -34,7 +34,7 @@ def import_all(dir):
     logger.info("import_all %s", dir)
     if not os.path.exists(dir):
         logger.info("path does not exist")
-        return
+        raise IOError
     for path in get_all_module_paths(dir):
         import_single(path)
         
