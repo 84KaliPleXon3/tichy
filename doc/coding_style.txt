@@ -28,8 +28,8 @@ Use list comprehension instead of loops if possible
 
 Use properties instead of get_ and set_ methods.
 
-Use nested functions when a function is only used by an other functions. That is,
-don't pollute the namespace of a class or a module by functions that are not
+Use nested functions when a function is only used by an other functions. That
+is, don't pollute the namespace of a class or a module by functions that are not
 used at this scope.
 
 Use the python logging module for logging and debuging informations. Never put
@@ -43,3 +43,6 @@ an already existing python module.
 Every function that is longer than 20 lines is probably messy and should be
 reconsidered. (Except in case the function is just a long list of attributes
 setting or a switch cases.
+
+When committing using git, prefix the description by the name of the module that
+is being modified, followed by a colon. Then one blank line followed by the
