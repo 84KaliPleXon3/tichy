@@ -10,7 +10,7 @@ from pygame import *
 
 class SpecialKeys(object):
     pass
-K_SWITCH_LAYOUT = SpecialKeys()
+K_NEXT_LAYOUT = SpecialKeys()
     
 def unicode(key, mod):
     """Return the unicode associated with a key and a modifier"""

@@ -24,6 +24,8 @@ import tichy.key
 
 from layout import lowercase_layout, uppercase_layout, number_layout, punctuation_layout, Key
 
+# TODO: Make the keyboard faster !!!
+
 class Keyboard(tichy.Item):    
     def __init__(self, layouts=[lowercase_layout, uppercase_layout, number_layout, punctuation_layout]):
         super(Keyboard, self).__init__()
@@ -37,6 +39,13 @@ class Keyboard(tichy.Item):
         KeyboardWidget(ret, item=self, preview=preview, **kargs)
         return ret
         
+    def next_layout(self): 	 
+        for i,l in enumerate(self.layouts): 	 
+            if l is self.layout: 	 
+                break 	 
+        i = (i+1) % len(self.layouts) 	 
+        self.set_layout(self.layouts[i])
+        
     def set_layout(self, layout):
         self.layout = layout
         self.emit('layout-changed')
@@ -46,7 +55,7 @@ class Keyboard(tichy.Item):
             self.set_layout(number_layout)
             
 class KeyboardWidget(gui.Fixed):
-    def __init__(self, parent, preview=None, item = None, min_size = Vect(56 * 8, 56 * 4), **kargs):
+    def __init__(self, parent, preview=None, item = None, min_size = Vect(64 * 7, 64 * 5), **kargs):
         super(KeyboardWidget, self).__init__(parent, item=item, min_size=min_size, **kargs)
         self.keys = []
         self.preview = preview
@@ -65,28 +74,18 @@ class KeyboardWidget(gui.Fixed):
         # We create all the keys
         for i, key in enumerate(layout.keys):
             view = key.view(self, same_as=view)
-            if key.key == tichy.key.K_SWITCH_LAYOUT:
-                toggle_view = view
-                toggle_actor = key.actor  
-                continue
             self.keys.append(view)
-        
-
-        for i,l in enumerate(self.item.layouts):
-            change_layout = toggle_actor.new_action(l.name)
-            change_layout.connect('activated', self.on_set_layout, l,
-                                  toggle_view)
 
         # We connect all the keys
         for key in self.keys:
             key.connect('clicked', self.on_click)
 
-    def on_set_layout(self, action, item, window, layout, parent_view):
-        parent_view.emit('clicked')
-        self.item.set_layout(layout)
 
     def on_click(self, key):
         key = key.item
+        if key.key == tichy.key.K_NEXT_LAYOUT: 	 
+             self.item.next_layout() 	 
+             return
         # XXX: this should be done in a backend agnostic way !!!
         import pygame
         pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=key.key, mod=key.mod, unicode=key.unicode))
