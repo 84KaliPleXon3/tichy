@@ -24,6 +24,7 @@ import tichy
 
 import logging
 logger = logging.getLogger('SIM')
+logger.setLevel(logging.DEBUG)
 
 class FreeSmartPhoneSim(tichy.Service):
     service = 'SIM'
@@ -33,7 +34,8 @@ class FreeSmartPhoneSim(tichy.Service):
         try:
             # We create the dbus interfaces to org.freesmarphone
             bus = dbus.SystemBus()
-            self.gsm = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            self.gsm = bus.get_object('org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device')
+            self.gsm_sim = dbus.Interface(self.gsm, 'org.freesmartphone.GSM.SIM')
         except Exception, e:
             logger.warning("can't use freesmartphone GSM : %s", e)
             self.gsm = None
@@ -41,7 +43,8 @@ class FreeSmartPhoneSim(tichy.Service):
     
     def get_contacts(self):
         logger.info("Retrieve Phonebook")
-        ret = self.gsm.RetrievePhonebook()
+        ret = self.gsm_sim.RetrievePhonebook('contacts')
+        logger.debug('get contacts : %s', ret)
         ret = [(unicode(s[1]), str(s[2])) for s in ret]
         yield ret
         

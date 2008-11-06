@@ -54,7 +54,11 @@ class FreeSmartPhoneGSM(GSMService):
         try:
             # We create the dbus interfaces to org.freesmarphone
             bus = dbus.SystemBus()
-            self.gsm = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            self.ousage = bus.get_object('org.freesmartphone.ousaged', '/org/freesmartphone/Usage')
+            self.ousage = dbus.Interface(self.ousage, 'org.freesmartphone.Usage')
+            self.gsm = bus.get_object('org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device')
+            self.gsm_device = dbus.Interface(self.gsm, 'org.freesmartphone.GSM.Device')
+            self.gsm_network = dbus.Interface(self.gsm, 'org.freesmartphone.GSM.Network')
             self.gsm.connect_to_signal("Status", self.on_status)
             self.gsm.connect_to_signal("CallStatus", self.on_call_status)
         except Exception, e:
@@ -70,22 +74,32 @@ class FreeSmartPhoneGSM(GSMService):
     def get_provider(self):
         return self.provider
         
-    def register(self, on_step = None):
-        """Tasklet that registers on the network""" 
+    def register(self, on_step=None):
+        """Tasklet that registers on the network
+        
+        on_step : a callback function that take a string argument that will be
+                  called at every step of the registration procedure.
+        """ 
         def default_on_step(msg):
             pass
         on_step = on_step or default_on_step
         
         try:
-            logger.info("Turn on antenna power")
-            on_step("Turn on antenna power")
-            yield tichy.tasklet.WaitDBus(self.gsm.SetAntennaPower, True)
+            logger.info("Request the GSM resource")
+            on_step("Request the GSM resource")
+            yield tichy.tasklet.WaitDBus(self.ousage.RequestResource, 'GSM')
+            power = yield tichy.tasklet.WaitDBus(self.gsm_device.GetAntennaPower)
+            logger.info("antenna power is %d", power)
+            if not power:
+                on_step("Turn on antenna power")
+                yield tichy.tasklet.WaitDBus(self.gsm_device.SetAntennaPower, True)
             on_step("Register on the network")
             logger.info("register on the network")
-            yield tichy.tasklet.WaitDBus(self.gsm.Register)
+            yield tichy.tasklet.WaitDBus(self.gsm_network.Register)
             yield tichy.tasklet.Wait(self, 'provider-modified')
         except Exception, e:
             logger.error("Error : %s", e)
+            print type(e)
             raise
         
     def on_call_status(self, call_id, status, properties ):
