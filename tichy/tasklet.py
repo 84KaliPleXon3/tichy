@@ -184,7 +184,7 @@ class Wait(Tasklet):
         # We can finally call our real callback
         try:
             self.callback(*args)
-        except:
+        except Exception:
             self.err_callback(*sys.exc_info())
 
         # We give a hint to the garbage collector

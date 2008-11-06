@@ -27,6 +27,6 @@ logger = logging.getLogger('')
 
 try:
     from guic import *
-except:
+except Exception:
     logger.warning("can't use guic, using guip")
     from guip import *

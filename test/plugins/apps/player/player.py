@@ -78,7 +78,7 @@ class Player(tichy.Application):
             imagesink.set_property("force-aspect-ratio", True)
             try:
                 imagesink.set_xwindow_id(self.x_window.id)
-            except:
+            except Exception:
                 logger.error("can't prepare-xwindow")
         
     def create_player(self):
