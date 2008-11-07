@@ -56,9 +56,10 @@ class FreeSmartPhoneSMS(tichy.Service):
             bus = dbus.SystemBus()
             gsm = bus.get_object('org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device')
             self.sim_iface = dbus.Interface(gsm, 'org.freesmartphone.GSM.SIM')
-            self.sim_iface.connect_to_signal("IncomingMessage", self.on_incoming_message)
+            logger.info("Listening to incoming SMS")
+            self.sim_iface.connect_to_signal("IncomingStoredMessage", self.on_incoming_message)
         except Exception, e:
-            logger.warning("can't use freesmartphone GSM : %s", e)
+            logger.warning("can't use freesmartphone SMS : %s", e)
             self.sim_iface = None
             raise tichy.ServiceUnusable
         self.outbox = tichy.List()

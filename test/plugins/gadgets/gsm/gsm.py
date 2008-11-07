@@ -27,6 +27,7 @@ class GSM(tichy.Gadget):
         
         gsm_service = tichy.Service('GSM')
         sim_service = tichy.Service('SIM')
+        sms_service = tichy.Service('SMS')
         gsm_service.connect('provider-modified', on_provider_modified)
         try:
             yield gsm_service.register(on_step)  # start the registration process
