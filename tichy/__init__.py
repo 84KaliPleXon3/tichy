@@ -37,11 +37,10 @@ from image import Image
 
 from message import Message
 
-
-# TODO: move those service into the plugin directory
 import phone
 import contacts
 import prefs
+import notifications
 
 # The mainloop is defined here !
 # We can use it to access to the timeout_add method

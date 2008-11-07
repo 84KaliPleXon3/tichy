@@ -93,6 +93,8 @@ class FreeSmartPhoneSMS(tichy.Service):
         
     def on_incoming_message(self, index):
         logger.info("Incoming message %d", index)
+        notifications = tichy.Service('Notifications')
+        notifications.notify('new message')
         
 class TestSms(tichy.Service):
     service = 'SMS'
