@@ -82,7 +82,7 @@ class FreeSmartPhoneSMS(tichy.Service):
             
     def send(self, sms):
         logger.info("Storing message to %s", sms.number)
-        message_id = yield tichy.tasklet.WaitDBus(self.sim_iface.StoreMessage, str(sms.number), unicode(sms.text))
+        message_id = yield tichy.tasklet.WaitDBus(self.sim_iface.StoreMessage, str(sms.number), unicode(sms.text), {})
         logger.info("Done, id : %s", message_id)
         logger.info("Sending message")
         yield tichy.tasklet.WaitDBus(self.sim_iface.SendStoredMessage, message_id)
