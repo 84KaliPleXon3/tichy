@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -23,9 +24,9 @@ from label import Label
 from button import Button
 
 class Painter(object):
-    """ This class is used to draw all the widgets
+    """This class is used to draw all the widgets
         
-        Te idea is to subclass it when we want special drawing style.
+    The idea is to subclass it when we want special drawing style.
     """
     def __init__(self, pos = None, mask = None):
         self.pos = pos or Vect(0,0)
@@ -63,7 +64,9 @@ class Painter(object):
         self.mask = self.mask.clip(r)
     
     def to_surface(self, surface):
-        """Return a engine similar to this one but drawing into a given surface"""
+        """Return a engine similar to this one but drawing into a given
+        surface
+        """
         raise NotImplementedError
     
     def surface_from_size(self, size):

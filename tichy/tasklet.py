@@ -1,25 +1,26 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 The tasklet module is a very powerfull tool that allow us to write
-functions that look like thread (with blocking call), but are in fact using
-callback.
+functions that look like thread (with blocking call), but are in fact
+using callback.
 """
 
 __docformat__ = "restructuredtext en"
@@ -28,7 +29,8 @@ import sys
 from types import GeneratorType
 
 def tasklet(func):
-    """Decorator that turns a generator function into a tasklet instance"""
+    """Decorator that turns a generator function into a tasklet instance
+    """
     def ret(*args, **kargs):
         return Tasklet( generator=func(*args, **kargs) )
     ret.__dict__ = func.__dict__
@@ -37,12 +39,11 @@ def tasklet(func):
     return ret
 
 class Tasklet(object):
-    """
-    This class can be used to write easy callback style functions using the 'yield'
-    python expression.
+    """This class can be used to write easy callback style functions using
+    the 'yield' python expression.
         
-    It is usefull in some cases where callback functions are the right thing to do,
-    but make the code too messy
+    It is usefull in some cases where callback functions are the right
+    thing to do, but make the code too messy
         
     This class is largely inspired by python PEP 0342:
     http://www.python.org/dev/peps/pep-0342/
@@ -65,20 +66,31 @@ class Tasklet(object):
         
     def start(self, callback = None, err_callback = None, *args, **kargs):
         """
-        Start the tasklet, connected to a callback and an error callback
+        Start the tasklet, connected to a callback and an error
+        callback
         
         :Parameters:
-        - `callback`: a function that will be called with the 
-          returned value as argument
-        - `err_callback`: a function that is called if the tasklet raises an exception.
-          The function take 3 arguments as parameters, that are the standard python exception arguments.
-        - `*args`: any argument that will be passed to the callback function as well
-        - `**kargs`: any kargs argument that will be passed to the callback function as well 
+
+        - `callback`: a function that will be called with the returned
+          value as argument
+
+        - `err_callback`: a function that is called if the tasklet
+          raises an exception.  The function take 3 arguments as
+          parameters, that are the standard python exception
+          arguments.
+
+        - `*args`: any argument that will be passed to the callback
+          function as well
+
+        - `**kargs`: any kargs argument that will be passed to the
+          callback function as well
         """
         self.callback = callback or self.default_callback
         self.err_callback = err_callback or self.default_err_callback
-        self.args = args    # possible additional args that will be passed to the callback
-        self.kargs = kargs  # possible additional keywords args that will be passed to the callback
+        self.args = args    # possible additional args that will be
+                            # passed to the callback
+        self.kargs = kargs  # possible additional keywords args that
+                            # will be passed to the callback
         self.send(None)     # And now we can initiate the task
             
     def default_callback(self, value):
@@ -89,8 +101,9 @@ class Tasklet(object):
         """The default error call back if None is specified"""
         if type is GeneratorExit:
             return
-        # If a task generates a exception without having an error callback we kill tichy.
-        # It is not very nice, but the only way to avoid blocking tichy.
+        # If a task generates a exception without having an error
+        # callback we kill tichy.  It is not very nice, but the only
+        # way to avoid blocking tichy.
         import traceback as tb
         import sys
         tb.print_exception(*sys.exc_info())
@@ -104,15 +117,16 @@ class Tasklet(object):
         self.generator.close()
         self.closed = True
         
-    def exit(self): # TODO: is this really useful, or should we use close here ?
+    def exit(self):
+        # TODO: is this really useful, or should we use close here ?
         e = GeneratorExit()
         self.err_callback(type(e), e, sys.exc_info()[2])
         
     def send(self, value = None, *args):
         """Resume and send a value into the tasklet generator
         """
-        # This somehow complicated try switch is used to handle all possible return and exception
-        # from the generator function
+        # This somehow complicated try switch is used to handle all
+        # possible return and exception from the generator function
         assert self.closed == False, "Trying to send to a closed tasklet"
         try:
             value = self.generator.send(value)
@@ -121,7 +135,8 @@ class Tasklet(object):
             self.close()
             value = None
         except Exception:
-            self.close() # This is very important, cause we need to make sure we free the memory of the callback !
+            # Make sure we free the memory
+            self.close()
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
@@ -136,7 +151,8 @@ class Tasklet(object):
             value = None
         except Exception:
             self.err_callback(*sys.exc_info())
-            self.close() # This is very important, cause we need to make sure we free the memory of the callback !
+            # Make sure we free the memory
+            self.close()
             return
         self.handle_yielded_value(value)
         
@@ -144,10 +160,12 @@ class Tasklet(object):
         """This method is called after the waiting tasklet yielded a value
         
            We have to take care of two cases:
-           - If the value is a Tasklet : we start it and connect the call back
-             to the 'parent' Tasklet send and throw hooks
-           - Otherwise, we consider that the tasklet finished, and we can call
-             our callback function
+
+           - If the value is a Tasklet : we start it and connect the
+             call back to the 'parent' Tasklet send and throw hooks
+
+           - Otherwise, we consider that the tasklet finished, and we
+             can call our callback function
         """
         if isinstance(value, GeneratorType):
             value = Tasklet(generator = value)
@@ -161,8 +179,9 @@ class Wait(Tasklet):
     """
     A special tasklet that wait for an event to be emitted
     
-    If o is an Object that can emit a signal 'signal', then we can create a
-    tasklet that waits for this event like this : Wait(o, 'signal') 
+    If o is an Object that can emit a signal 'signal', then we can
+    create a tasklet that waits for this event like this : Wait(o,
+    'signal')
     """
     def __init__(self, obj, event):
         assert obj is not None
@@ -176,8 +195,8 @@ class Wait(Tasklet):
         assert o is self.obj
         
         if not self.connect_id:
-            return # We have been closed already
-        # We need to remember to disconnect to the signal
+            return # We have been closed already We need to remember
+                   # to disconnect to the signal
         o.disconnect(self.connect_id)
         self.connect_id = None
         
@@ -190,13 +209,13 @@ class Wait(Tasklet):
         # We give a hint to the garbage collector
         self.obj = self.callback = None
         return False
-        
+
     def start(self, callback, err_callback, *args):
         assert hasattr(self.obj, 'connect'), self.obj
         self.callback = callback
         self.err_callback = err_callback
         self.connect_id = self.obj.connect(self.event, self._callback, *args)
-        
+
     def close(self):
         # It is very important to disconnect the callback here !
         if self.connect_id:
@@ -204,8 +223,7 @@ class Wait(Tasklet):
         self.obj = self.callback = self.connect_id = None
             
 class WaitFirst(Tasklet):
-    """
-    A special tasklet that waits for the first to return of a list of tasklets.
+    """Waits for the first to return of a list of tasklets.
     """
     def __init__(self, *tasklets):
         super(WaitFirst, self).__init__()
@@ -241,7 +259,10 @@ class WaitDBus(Tasklet):
     def start(self, callback, err_callback):    
         self.callback = callback
         self.err_callback = err_callback
-        kargs = {'reply_handler':self._callback, 'error_handler':self._err_callback}
+        kargs = {
+            'reply_handler':self._callback,
+            'error_handler':self._err_callback
+            }
         self.method(*self.args, **kargs)
     def _callback(self, *args):
         self.callback(*args)
@@ -249,21 +270,19 @@ class WaitDBus(Tasklet):
         self.err_callback(type(e), e, sys.exc_info()[2])
 
 class Producer(Tasklet):
-    """
-    A Producer is a modified Tasklet that is not automatically closed after
-    returing a value.
+    """A Producer is a modified Tasklet that is not automatically closed
+    after returing a value.
     
     This is still expermimental...
     """
     def send(self, value = None, *args):
-        """Resume and send a value into the tasklet generator
-        """
-        # This somehow complicated try switch is used to handle all possible return and exception
-        # from the generator function
+        """Resume and send a value into the tasklet generator"""
+        # This somehow complicated try switch is used to handle all
+        # possible return and exception from the generator function
         try:
             value = self.generator.send(value)
         except Exception:
-            self.close() # This is very important, cause we need to make sure we free the memory of the callback !
+            self.close()
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
@@ -273,7 +292,7 @@ class Producer(Tasklet):
         try:
             value = self.generator.throw(type, value, traceback)
         except Exception:
-            self.close() # This is very important, cause we need to make sure we free the memory of the callback !
+            self.close()
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
@@ -285,7 +304,8 @@ if __name__ == '__main__':
     
     
     class WaitSomething(Tasklet):
-        """ This is a 'primitive' tasklet that will trigger our call back after a short time
+        """This is a 'primitive' tasklet that will trigger our call back after
+        a short time
         """
         def __init__(self, time):
             """This tasklet has one parameter"""
@@ -371,7 +391,7 @@ if __name__ == '__main__':
                 yield WaitSomething(1000)
             except GeneratorExit:
                 print "Executed before the task is canceled"
-                raise 
+                raise
             print "task stopped"
             loop.quit()
         task = Tasklet(generator=task())

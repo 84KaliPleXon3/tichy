@@ -3,15 +3,15 @@
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -29,12 +29,12 @@ logger.setLevel(logging.DEBUG)
 class Player(tichy.Application):
     name = "Player"
     icon = 'play.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'general'
     
     player = None # The gstreamer player instance
      
     def run(self, parent):
-        self.window = gui.Window(parent, modal = True)   # We run into a new modal window
+        self.window = gui.Window(parent, modal = True)
         frame = self.view(self.window, back_button=True)
         
         vbox = gui.Box(frame, axis = 1)
@@ -64,8 +64,8 @@ class Player(tichy.Application):
         open_button.connect('clicked', self.on_open)
         
         frame.actor.new_action("Open").connect('activated', self.on_open)
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
+        yield tichy.Wait(frame, 'back')
+        self.window.destroy()
         
     def on_sync_message(self, bus, message):
         logger.debug("sync message : %s", message)

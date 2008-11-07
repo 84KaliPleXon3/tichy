@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -43,8 +44,9 @@ class Conf(tichy.Application):
         list.view(vbox)
         gui.Spring(vbox, axis = 1)
         
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
+        # Wait until the quit button is clicked
+        yield tichy.Wait(frame, 'back')
+        self.window.destroy()
         
         
 class StyleConf(tichy.Application):
@@ -65,11 +67,9 @@ class StyleConf(tichy.Application):
             styles_list.append(actor)
         styles_list.view(vbox)
         
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
+        yield tichy.Wait(frame, 'back')
+        self.window.destroy()
         
     def on_use_style(self, action, style, window):
         screen = window.screen
         screen.style = style
-
-

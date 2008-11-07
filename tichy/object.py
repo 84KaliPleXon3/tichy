@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -24,21 +25,22 @@ from tasklet import Tasklet
 class Object(object):
     """This class implements the observer patern
     
-        I could use gobject.GObject instead.
-        But i think gobject may be overkill there... still thinking about it...
+        I could use gobject.GObject instead.  But i think gobject may
+        be overkill there... still thinking about it...
     """
     def __new__(cls, *args, **kargs):
         ret = object.__new__(cls)
         ret.__listeners = {}
         return ret
         
-    def __init__(self, *kargs): # TODO: see why I hava to use __init__ even with the __new__
+    def __init__(self, *kargs): # TODO: see why I hava to use __init__
+                                # even with the __new__
         if not hasattr(self, '_Object__listeners'):
             self.__listeners = {}
         
     # XXX: this path method sucks
     @classmethod
-    def path(cls, path = None):
+    def path(cls, path=None):
         module_str = cls.__module__
         module = __import__(module_str)
         ret = os.path.dirname(module.__file__)

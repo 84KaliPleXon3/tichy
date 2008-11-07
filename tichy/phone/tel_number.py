@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -21,10 +22,11 @@ import tichy
 class TelNumber(tichy.Text):
     def __init__(self, text):
         super(TelNumber, self).__init__(text)
-        # This is the text that is used for the view of the number
-        # It can be either the number, either the name of the contact
-        # TODO: we could not do like this but instead have the get_text method return a basestring object
-        #       and then connect the actor view to the modified signal
+        # This is the text that is used for the view of the number It
+        # can be either the number, either the name of the contact
+        # TODO: we could not do like this but instead have the
+        # get_text method return a basestring object and then connect
+        # the actor view to the modified signal
         self.view_text = tichy.Text(text)
         self.connect('modified', TelNumber.update_view_text)
 
@@ -36,8 +38,8 @@ class TelNumber(tichy.Text):
         return self.view_text
         
     def update_view_text(self):
-        # We check if the number is from a contact
-        # If so we set the view text
+        # We check if the number is from a contact.  If so we set the
+        # view text
         contacts_service = tichy.Service('Contacts')
         contact = contacts_service.find_by_number(self.value)
         if contact:

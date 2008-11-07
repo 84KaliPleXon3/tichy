@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -55,7 +56,7 @@ class Keyboard(tichy.Item):
             self.set_layout(number_layout)
             
 class KeyboardWidget(gui.Fixed):
-    def __init__(self, parent, preview=None, item = None, min_size = Vect(64 * 7, 64 * 5), **kargs):
+    def __init__(self, parent, preview=None, item=None, min_size=Vect(64 * 7, 64 * 5), **kargs):
         super(KeyboardWidget, self).__init__(parent, item=item, min_size=min_size, **kargs)
         self.keys = []
         self.preview = preview
@@ -83,7 +84,7 @@ class KeyboardWidget(gui.Fixed):
 
     def on_click(self, key):
         key = key.item
-        if key.key == tichy.key.K_NEXT_LAYOUT: 	 
+        if key.key == tichy.key.K_NEXT_LAYOUT:
              self.item.next_layout() 	 
              return
         # XXX: this should be done in a backend agnostic way !!!
@@ -92,8 +93,9 @@ class KeyboardWidget(gui.Fixed):
         self.preview.value = ''
         
     def mouse_motion(self, pos):
-        # We don't do it the normal way for the keyboard
-        # Because we want the user to be able to stay clicked and move the mouse to press any of the keys
+        # We don't do it the normal way for the keyboard because we
+        # want the user to be able to stay clicked and move the mouse
+        # to press any of the keys.
         super(KeyboardWidget, self).mouse_motion(pos)
         if self.focused and not pos - self.focused.pos in self.focused.rect:
             self.focused.mouse_down_cancel()
@@ -119,5 +121,3 @@ class KeyboardService(tichy.Service):
     service = 'Keyboard'
     def get(self):
         return Keyboard()
-        
-        

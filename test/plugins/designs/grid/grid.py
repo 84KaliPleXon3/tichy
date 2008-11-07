@@ -1,3 +1,21 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import sin, cos, pi
 
@@ -22,6 +40,12 @@ class ActorView(gui.Button):
         actor.get_text().view(box)
 
 class GridDesign(tichy.Service):
+    """Grid Design Service
+
+    This design is similar to the default design, except that the
+    Actor List objects will be shown in a grid view instead of a
+    sliding list.
+    """
     enabled = True
     service = 'Design'
     name = 'Grid'
@@ -33,14 +57,16 @@ class GridDesign(tichy.Service):
         for actor in actors:
             view = ActorView(box, actor)
             def on_clicked(b, actor):
-                # This method is defined in the default design
-                # It will put the actors action in the application frame
+                # This method is defined in the default design. It
+                # will put the actors action in the application frame
                 self.select_actor(actor, b)
             view.connect('clicked', on_clicked, actor)
         return ret
         
         
     def __getattr__(self, name):
-        # This is a hack to use the Default Design service methods if the methid is not defined
-        # I which I could instead declare the class like : class WheelDesign(Service("Default"))
+        # XXX: This is a hack to use the Default Design service
+        #      methods if the method is not defined I which I could
+        #      instead declare the class like : class
+        #      WheelDesign(Service("Default")).
         return getattr(tichy.Service('Design', 'Default'), name)

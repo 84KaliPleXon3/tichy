@@ -3,15 +3,15 @@
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -29,7 +29,7 @@ class TextEdit(tichy.Application):
     def __init__(self, *args, **kargs):
         super(TextEdit, self).__init__(*args, **kargs)
     def run(self, parent, text = "", name = None, input_method = None):
-        if isinstance(text, (str, unicode)):    # TODO use a correct test
+        if isinstance(text, (str, unicode)): # TODO use a correct test
             text = tichy.Text(text)
         w = gui.Window(parent, modal = True)
         
@@ -46,8 +46,8 @@ class TextEdit(tichy.Application):
             
         self.keyboard.view(vbox)
         
-        yield tichy.Wait(frame, 'back')     # Wait until the back button is clicked
-        w.destroy()                   # Don't forget to close the window
+        yield tichy.Wait(frame, 'back')
+        w.destroy()
         yield self.text.value
     
     def on_set_input(self, action, item, w, input):
@@ -57,10 +57,10 @@ class TextEdit(tichy.Application):
         print 'TEST KEY DOWN', key
         
 class MyTextEditService(tichy.Service):
-    """We implement a service to edit text
+    """Service to edit text
     
-        By creating this service class, we allow any application in need of a text editor to use the
-        applicaton we defined previously.
+    By creating this service class, we allow any application in need
+    of a text editor to use the applicaton we defined previously.
     """
     service = 'TextEdit'
     def edit(self, parent, text, name = None, input_method = None):

@@ -1,3 +1,21 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 from .item import Item
 from .service import Service
@@ -28,10 +46,13 @@ class List(list, Item):
         return design.view_list(parent, self, **kargs)
             
     def actors_view(self, parent, can_delete = True):
-        """Return a view that contains actors view to all the elements of this list
+        """Return a view that contains actors view to all the elements of this
+        list
         
-           arguments:
-             can_delete - if true we add a "Delete" action to every elements of the list
+        arguments:
+
+        can_delete - if true we add a "Delete" action to every
+        elements of the list
         """
         # This methid is tricky. Modify with care
         actors = ActorList()
@@ -54,7 +75,8 @@ class List(list, Item):
         on_modified(self)
         view = actors.view(parent)
         
-        # This is super important because otherwise the connection is never deleted
+        # This is super important because otherwise the connection is
+        # never deleted
         def on_destroyed(view, connection):
             self.disconnect(connection)
         

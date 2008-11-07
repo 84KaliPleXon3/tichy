@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -34,6 +35,7 @@ import pygame
 import time
     
 # Experimental support for XWindow
+#
 # XXX: we have a few busy wait in this class
 class XWindow(Widget):
     def __init__(self, parent, expand=True, **kargs):
@@ -73,7 +75,8 @@ class XWindow(Widget):
         # Do a busy wait for X reply
         while True:
             event = self.x_display.next_event()
-            if event.type == Xlib.X.MapNotify and event.window == self.x_window:
+            if event.type == Xlib.X.MapNotify and \
+                    event.window == self.x_window:
                 break
         self.x_display.sync()
         
@@ -86,7 +89,8 @@ class XWindow(Widget):
             # Do a busy wait for X reply
             while 1:
                 event = self.x_display.next_event()
-                if event.type == Xlib.X.DestroyNotify and event.window == self.x_window:
+                if event.type == Xlib.X.DestroyNotify and \
+                        event.window == self.x_window:
                     break
         self.x_window = None
             
@@ -102,18 +106,21 @@ class XWindow(Widget):
         super(XWindow, self).destroy()
         
     def key_down(self, key):
-        # If a key down event arrives, we send it to the x_window
-        # (in fact here we just send it to X and assume that the x window has the focus. I am not sure it is the best way...)
+        # If a key down event arrives, we send it to the x_window (in
+        # fact here we just send it to X and assume that the x window
+        # has the focus. I am not sure it is the best way...)
         if not key.key:
             return
-        # We need to check the modifiers to simulate the proper key press events
+        # We need to check the modifiers to simulate the proper key
+        # press events
         if key.mod == 1:
             modifier = self.x_display.keysym_to_keycode(Xlib.XK.XK_Shift_L)
         else:
             modifier = None
         keycode = self.x_display.keysym_to_keycode(key.key)
         if modifier:
-            Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyPress, modifier)
+            Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyPress,
+                                      modifier)
             self.x_display.sync()
         Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyPress, keycode)
         self.x_display.sync()
@@ -121,33 +128,36 @@ class XWindow(Widget):
         
         if modifier:
             self.x_display.sync()
-            Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyRelease, modifier)
+            Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyRelease,
+                                      modifier)
         return True
 
     def start_app(self, *cmd):
-        # XXX: This only works if we run with NO windows manager
-        #      I need to find a way to make it work even with a window manager,
-        #      Or at least write a warning if there is a WM running.
+        # XXX: This only works if we run with NO windows manager I
+        #      need to find a way to make it work even with a window
+        #      manager, Or at least write a warning if there is a WM
+        #      running.
         import subprocess
         
-        self.x_screen.root.change_attributes(event_mask=Xlib.X.SubstructureNotifyMask)
+        self.x_screen.root.change_attributes(
+            event_mask=Xlib.X.SubstructureNotifyMask)
         self.x_display.sync()
         
         process = subprocess.Popen(*cmd)
     
         while True:
             event = self.x_display.next_event()
-            if event.type == Xlib.X.CreateNotify and event.parent == self.x_screen.root:
+            if event.type == Xlib.X.CreateNotify and \
+                    event.parent == self.x_screen.root:
                 event.window.reparent(self.x_window, 0, 0)
                 event.window.map()
                 self.x_display.sync()
-                # TODO: We shouldn't give the focus to this XWindow
-                # We should send the vent in the key_down method
-                self.x_display.set_input_focus(event.window, Xlib.X.RevertToParent, Xlib.X.CurrentTime)
+                # TODO: We shouldn't give the focus to this XWindow We
+                #       should send the vent in the key_down method
+                self.x_display.set_input_focus(
+                    event.window, Xlib.X.RevertToParent, Xlib.X.CurrentTime)
                 break
                 
         self.x_screen.root.change_attributes(event_mask=Xlib.X.NONE)
                 
         return process
-
-            

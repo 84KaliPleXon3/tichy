@@ -1,3 +1,22 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
 from tichy.key import *
 from tichy import gui
 import tichy.item as item
@@ -16,11 +35,12 @@ class Key(item.Item):
         size = Vect(self.rect[2] * 64, self.rect[3] * 64)
         pos = Vect(self.rect[0] * 64, self.rect[1] * 64)
         ret = gui.Button(parent, item=self, min_size=size, optimal_size=size, pos=pos, same_as=same_as)
-        # If we provided a widget for optimization,
-        # then we can also use the widget child for next view
+        # If we provided a widget for optimization, then we can also
+        # use the widget child for next view
         if same_as is not None:
             same_as = same_as.children[0]
-        gui.Label(ret, self.text, min_size=size, optimal_size=size, same_as=same_as)
+        gui.Label(ret, self.text, min_size=size, optimal_size=size,
+                  same_as=same_as)
         return ret
 
 class Layout(object):

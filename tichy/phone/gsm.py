@@ -1,19 +1,20 @@
 #!/usr/bin/env python
-
+#
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -33,9 +34,10 @@ class GSMService(tichy.Service):
     """GSM Service base class
     
     signals :
-    * provider-modified(string name)
-    * incoming-call(call)
     
+    provider-modified(string name)
+    
+    incoming-call(call)
     """
     def register(self):
         """This must return a Tasklet"""
@@ -54,11 +56,16 @@ class FreeSmartPhoneGSM(GSMService):
         try:
             # We create the dbus interfaces to org.freesmarphone
             bus = dbus.SystemBus()
-            self.ousage = bus.get_object('org.freesmartphone.ousaged', '/org/freesmartphone/Usage')
-            self.ousage = dbus.Interface(self.ousage, 'org.freesmartphone.Usage')
-            self.gsm = bus.get_object('org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device')
-            self.gsm_device = dbus.Interface(self.gsm, 'org.freesmartphone.GSM.Device')
-            self.gsm_network = dbus.Interface(self.gsm, 'org.freesmartphone.GSM.Network')
+            self.ousage = bus.get_object('org.freesmartphone.ousaged',
+                                         '/org/freesmartphone/Usage')
+            self.ousage = dbus.Interface(self.ousage,
+                                         'org.freesmartphone.Usage')
+            self.gsm = bus.get_object('org.freesmartphone.ogsmd',
+                                      '/org/freesmartphone/GSM/Device')
+            self.gsm_device = dbus.Interface(self.gsm,
+                                             'org.freesmartphone.GSM.Device')
+            self.gsm_network = dbus.Interface(self.gsm,
+                                              'org.freesmartphone.GSM.Network')
             self.gsm.connect_to_signal("Status", self.on_status)
             self.gsm.connect_to_signal("CallStatus", self.on_call_status)
         except Exception, e:
@@ -77,8 +84,9 @@ class FreeSmartPhoneGSM(GSMService):
     def register(self, on_step=None):
         """Tasklet that registers on the network
         
-        on_step : a callback function that take a string argument that will be
-                  called at every step of the registration procedure.
+        on_step : a callback function that take a string argument that
+                  will be called at every step of the registration
+                  procedure.
         """ 
         def default_on_step(msg):
             pass
@@ -109,9 +117,12 @@ class FreeSmartPhoneGSM(GSMService):
         
         if status == 'incoming':
             logger.info("incoming call")
-            if call_id in self.lines:    # XXX: should use an assert, but it doesn't work on neo :O
+            # XXX: should use an assert, but it doesn't work on neo :O
+            if call_id in self.lines:
                 logger.warning("WARNING : line already present %s %s", call_id, self.lines)
-                return  # XXX : I just ignore the message, because the framework send it twice !! Bug in the framework ?
+                # XXX : I just ignore the message, because the
+                # framework send it twice !! Bug in the framework ?
+                return
                 # raise Exception("call already present")
             peer_number = str(properties.get('peer', "Unknown"))
             
@@ -170,7 +181,7 @@ class FreeSmartPhoneGSM(GSMService):
 
         
 class TestGsm(tichy.Service):
-    """This is just a fake service that can be use to test without GSM drivers"""
+    """Fake service that can be use to test without GSM drivers"""
     service = 'GSM'
     
     def __init__(self):
@@ -203,6 +214,3 @@ class TestGsm(tichy.Service):
     
     def get_provider(self):
         return 'Charlie Telecom'
-
-        
-

@@ -1,21 +1,21 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
-
 
 import tichy
 import tichy.gui as gui
@@ -40,8 +40,8 @@ class Contacts(tichy.Application):
         new_menu = frame.actor.new_action('New')
         new_menu.connect('activated', self.on_new)
         
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
+        yield tichy.Wait(frame, 'back') # Wait until the quit button is clicked
+        self.window.destroy()   # Don't forget to close the window
         
     def on_new(self, *args):
         contact = self.contacts_service.create()
@@ -54,8 +54,8 @@ class ContactAttrItem(tichy.Item):
         self.name = name
         self.value = value
     
-    # We override item.get_text cause we want to use our own view method
-    # Instead ot relying on the item name
+    # We override item.get_text cause we want to use our own view
+    # method Instead ot relying on the item name
     def get_text(self):
         return self
         
@@ -145,7 +145,8 @@ class SelectContactApp(tichy.Application):
             contact.get_text().view(button)
             button.connect('clicked', self.on_select, contact)
         
-        yield tichy.Wait(self.window, 'destroyed')     # Wait until the quit button is clicked
+        # Wait until the quit button is clicked
+        yield tichy.Wait(self.window, 'destroyed')
         yield self.ret
     
     def on_select(self, b, contact):
@@ -162,4 +163,3 @@ class EditContactService(tichy.Service):
     service = 'EditContact'
     def edit(self, contact, window):
         yield Contact(window, contact) 
-        

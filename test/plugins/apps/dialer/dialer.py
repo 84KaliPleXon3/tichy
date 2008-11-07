@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -26,14 +27,15 @@ from tichy.gui import Vect
 class Keyboard(gui.Table):
     """Special widget for dialer keyboard
         
-        It emit the 'key-pressed' signal
+    It emit the 'key-pressed' signal
     """
     def __init__(self, parent, **kargs):
         super(Keyboard, self).__init__(parent, axis=1, nb=3, spacing=0, **kargs)
         self.keys = []
         for i, line in enumerate(['123', '456', '789', '*0+']):
             for j, key in enumerate(line):
-                w = gui.Button(self, min_size = Vect(144, 72), optimal_size = Vect(144, 72))
+                w = gui.Button(self, min_size = Vect(144, 72),
+                               optimal_size = Vect(144, 72))
                 w.connect('clicked', self.on_click, key)
                 gui.Label(w, key)
                 self.keys.append(w)
@@ -71,10 +73,10 @@ class DialerApp(tichy.Application):
         # quit_item = frame.actor.new_action('Quit')
      
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()                   # Don't forget to close the window
+        self.window.destroy()   # Don't forget to close the window
         
     def on_key(self, w, k):
-        self.text.value += k        # The view will automatically be updated
+        self.text.value += k  # The view will automatically be updated
         
     def on_del(self, w):
         self.text.value = self.text.value[:-1]
@@ -83,11 +85,11 @@ class DialerApp(tichy.Application):
         yield Caller(self.window, self.text.value)
             
         
-# TODO: make the Caller app better, using John idea :
-#       we define for every call status the status of the gui.
-#       Then we just wait for status change and set up the gui in consequence
-#       It means we have an automaton with a single state,
-#       much simpler to deal with that what we have now
+# TODO: ??? make the Caller app better, using John idea : we define
+#       for every call status the status of the gui.  Then we just
+#       wait for status change and set up the gui in consequence It
+#       means we have an automaton with a single state, much simpler
+#       to deal with that what we have now
 class Caller(tichy.Application):
     """This is the application that deal with the calling sequence
     """
@@ -103,7 +105,8 @@ class Caller(tichy.Application):
         
         try:
             gsm_service = tichy.Service('GSM')
-            if isinstance(number, tichy.phone.Call): # The case when we have an incoming call
+            # The case when we have an incoming call
+            if isinstance(number, tichy.phone.Call):
                 call = number
                 
                 text.value = "incoming %s" % call.number
@@ -125,7 +128,8 @@ class Caller(tichy.Application):
                 # Now the call is active
                 text.value = "calling %s" % call.number
                 button_label.text = "hang up"
-                i,args = yield tichy.WaitFirst(tichy.Wait(button, 'clicked'), tichy.Wait(call, 'released'))
+                i,args = yield tichy.WaitFirst(tichy.Wait(button, 'clicked'),
+                                               tichy.Wait(call, 'released'))
             
             if call.status not in ['released', 'releasing']:
                 text.value = "releasing %s" % call.number

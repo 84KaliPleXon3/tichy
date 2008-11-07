@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -27,11 +28,16 @@ from distutils.extension import Extension
 from glob import glob
 import commands
 
-# After too many troubles I decided to stop using cython in the build process 
-#from Cython.Distutils import build_ext
+# After too many troubles I decided to stop using cython in the build
+# process from Cython.Distutils import build_ext
 
 def plugins_files():
-    """generate the plugins data files list"""
+    """generate the plugins data files list
+
+    It works by adding all the files ending with a set of specified
+    extension to the data. So we have to be careful when adding files
+    with new extension we have to add it here as well.
+    """
     ret = []
     for root, dirs, files in os.walk('./test/plugins/'):
         if root.endswith('.svn'):
@@ -52,9 +58,11 @@ def make_extension(name):
     """
     flags_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
     
-    # I copied all this stuff from python-etk serup file
-    # I should do it a better way
-    # What we do here is parsing the output of pkg-config to get the Extension arguments
+    # I copied all this stuff from python-etk serup file I should do
+    # it a better way. What we do here is parsing the output of
+    # pkg-config to get the Extension arguments
+    #
+    # TODO: clean this
     cmdline = 'pkg-config --libs --cflags sdl'
     status, output = commands.getstatusoutput(cmdline)
     if status != 0:

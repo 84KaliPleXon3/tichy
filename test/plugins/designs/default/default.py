@@ -1,3 +1,21 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 import tichy
 from tichy.service import Service
@@ -17,8 +35,11 @@ class ListView(gui.Scrollable):
         for item in list:
             item.view(vbox)
         
-        # This is important, we need to disconnect all the connections we make when the view is destroyed
-        # TODO: could be cool to have this automated. But how to do it ?
+        # This is important, we need to disconnect all the connections
+        # we make when the view is destroyed
+        #
+        # TODO: could be cool to have this automated. But how to do it
+        # ?
         connections = [
             list.connect('appened', self.on_appened, vbox),
             list.connect('removed', self.on_removed, vbox),
@@ -45,6 +66,14 @@ class ListView(gui.Scrollable):
 
 
 class Default(Service):
+    """Default Design service
+
+    This design relies on tichy.gui module. It will draw list in a
+    sliding list view.
+
+    An actor will be seen as a button, pressing the button will make
+    the list of actions appear on the bottom of the window.
+    """
     enabled = True
     service = 'Design'
     name = 'Default'
@@ -79,7 +108,8 @@ class Default(Service):
         return ret
         
     def select_actor(self, actor, view, use_default=True):
-        # If the actor has a default action and it is the only one, then we start it
+        # If the actor has a default action and it is the only one,
+        # then we start it
         if view == self.selected:
             action_bar = view.parent_as(ApplicationFrame).action_bar
             action_bar.clear()
@@ -94,12 +124,13 @@ class Default(Service):
             return
         self.selected = view
         view.add_tag('selected')
-        # Otherwise we put the possible actions in the application action_bar
+        # Otherwise we put the possible actions in the application
+        # action_bar
         action_bar = view.parent_as(ApplicationFrame).action_bar
         action_bar.set_actor(actor, view)
         
-        # We have to make sure we remove the reference to this view if it get destroyed
-        # this is a little tricky...
+        # We have to make sure we remove the reference to this view if
+        # it get destroyed this is a little tricky...
         def on_destroy(b):
             self.selected = None
         self.selected.connect('destroyed', on_destroy)

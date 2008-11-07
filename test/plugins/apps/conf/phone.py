@@ -3,15 +3,15 @@
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -26,8 +26,8 @@ class ParamItem(tichy.Item):
         self.service = service
         self.key = key
         
-    # We override item.get_text cause we want to use our own view method
-    # Instead ot relying on the item name
+    # We override item.get_text cause we want to use our own view
+    # method instead ot relying on the item name
     def get_text(self):
         return self
     def view(self, parent):
@@ -57,6 +57,5 @@ class PhoneConf(tichy.Application):
             self.params_list.append(actor)
         self.params_list.view(vbox)
         
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
-        
+        yield tichy.Wait(frame, 'back')
+        self.window.destroy()

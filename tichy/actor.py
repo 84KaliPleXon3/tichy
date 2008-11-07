@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -20,25 +21,27 @@
 Define the Actor and Action classes
 
 In tichy everything is an Item (contact, phone number, text, etc...)
-Somethime we need to let the user act on an Item. To do this we can use the
-Actor class. an Actor is an item that represents an item and a list of
-actions that we can perform on this item.
+Somethime we need to let the user act on an Item. To do this we can
+use the Actor class. an Actor is an item that represents an item and a
+list of actions that we can perform on this item.
 
-For example, if `contact` is a Contact Item, We want to provide a way for the user
-to perform a few action on the contacts (the default actions beeing 'Call' and 'Edit'.
+For example, if `contact` is a Contact Item, We want to provide a way
+for the user to perform a few action on the contacts (the default
+actions beeing 'Call' and 'Edit'.
 
 actor = contact.create_actor()
 actor.view(parent)
 
-If we want to add some specific actions to the actor, we can use the new_action
-method :
+If we want to add some specific actions to the actor, we can use the
+new_action method :
 
 def on_my_action(item, contact, view):
     print 'my action on', contact
 actor.new_action('my-action-name').connect('activated', on_my_action)
 
-An action can also have sub-actions, this is useful for creating a tree of actions
-To create sub-actions just use the new_action on an Action instance.
+An action can also have sub-actions, this is useful for creating a
+tree of actions To create sub-actions just use the new_action on an
+Action instance.
 """
 
 import tichy
@@ -53,7 +56,8 @@ class Action(Object):
     def __init__(self, actor, name):
         """Create a new action into `actor`.
         
-        You shouldn't call this method, but use the Actor.new_action method instead.
+        You shouldn't call this method, but use the Actor.new_action
+        method instead.
         
         :Parameters:
         - `actor`: the parent actor
@@ -68,14 +72,16 @@ class Action(Object):
     def activate(self, view = None):
         """trigger the action
         
-            :Parameters:
-           - `view`: the widget from wich the action was activated.
-              It is useful to retreive the window if we want to start new applications
+        :Parameters:
+        - `view`: the widget from wich the action was activated.
+        It is useful to retreive the window if we want to start
+        new applications
         """
         if self.sub_actor:
-            # This mean that this action is in fact a menu of other actions...
-            # The sub actions are into a single actor, so we can just ask the Design
-            # To do whatever is needed to select this actor...
+            # This mean that this action is in fact a menu of other
+            # actions...  The sub actions are into a single actor, so
+            # we can just ask the Design To do whatever is needed to
+            # select this actor...
             design = Service('Design')
             design.select_actor(self.sub_actor, view)
         else:
@@ -88,17 +94,20 @@ class Action(Object):
         return self.sub_actor.new_action(name)
 
 class Actor(tichy.Item):
-    """
-    An actor is a special item that represent a list of action on an item OR an Item class
+    """Special item that represent a list of action on an item OR an Item
+class
     
-    It is very usefull, because it abstract all the mechanism to select an action on an item.
-    You just need to create a actor on an object, maybe add a few specific action depending on the context,
-    and then you add a view of this actor in your gui, and that's it.
+    It is very usefull, because it abstract all the mechanism to
+    select an action on an item.  You just need to create a actor on
+    an object, maybe add a few specific action depending on the
+    context, and then you add a view of this actor in your gui, and
+    that's it.
     """
     def __init__(self, item):
         """Create a new Actor on an given Item
         
-        You shouldn't call this directly but use the Item.create_actor() method
+        You shouldn't call this directly but use the
+        Item.create_actor() method
         
         :Parameters:
         - `item`: the item the actor represents 
@@ -108,9 +117,9 @@ class Actor(tichy.Item):
         self.actions = []
         self.default_action = None
         
-    # The item name of the actor is the same than the item name
-    # XXX: we should be able to only override the get_name method
-    #       cause the name attribute is not supposed to be used anymore 
+    # The item name of the actor is the same than the item name XXX:
+    # we should be able to only override the get_name method cause the
+    # name attribute is not supposed to be used anymore
     def __get_name(self):
         return self.item.name
     name = property(__get_name)

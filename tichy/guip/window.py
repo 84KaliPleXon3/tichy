@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -24,10 +25,11 @@ import logging
 logger = logging.getLogger('gui.Window')
 
 class Window(Widget):
-    """ Special widget that can receive events from an external source
+    """Special widget that can receive events from an external source
         
-        A window can also be an event source for other sub window. We can also block the events to all but one
-        child, making it a modal dialog.
+    A window can also be an event source for other sub window. We can
+    also block the events to all but one child, making it a modal
+    dialog.
     """
     def __init__(self, parent, modal = True, events_source = None, **kargs):
         super(Window, self).__init__(parent, **kargs)
@@ -47,9 +49,9 @@ class Window(Widget):
             self.modal_child = None
             
     def sorted_children(self):
-        # Since the children can overlap in a window
-        # We define that the last window added is on the top
-        # Maybe we need to have a z sorting in the future...
+        # Since the children can overlap in a window We define that
+        # the last window added is on the top Maybe we need to have a
+        # z sorting in the future...
         if self.modal_child:
             return [self.modal_child]
         return list(reversed(self.children))
@@ -99,7 +101,3 @@ class Window(Widget):
             self.modal_child.tick()
 
         self.emit('tick')
-        
-
-        
-            

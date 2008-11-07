@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -25,10 +26,10 @@ from tichy.text import Text
 import tichy.key
 
 class Edit(Label, Button):
-    def __init__(self, parent, item = None, auto_keyboard = True, **kargs):
+    def __init__(self, parent, item=None, auto_keyboard=True, **kargs):
         assert item is not None
         text = item.value
-        super(Edit, self).__init__(parent, text = text, item = item, **kargs)
+        super(Edit, self).__init__(parent, text=text, item=item, **kargs)
         self.auto_keyboard = auto_keyboard
         
     def click(self):

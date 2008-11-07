@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -24,30 +25,43 @@ from ..object import Object
 class Widget(Object):
     """Base class for all the widgets
     
-        This is really similar to gtk.widget, except lighter.
+    This is really similar to gtk.widget, except lighter.
     """
     def __init__(
-            self, parent, style = None, optimal_size = None,
-            min_size = None, expand = False, item = None, 
-            same_as = None, tags=[], pos=None, **kargs):
+            self, parent, style=None, optimal_size=None,
+            min_size=None, expand=False, item=None, 
+            same_as=None, tags=[], pos=None, **kargs):
         """Create a new Widget
         
-            parameters:
-            - parent        The parent widget where we put this widget
-            - style         The style associated with this widget
-                            The style is not compulsory, it is only something that can be used by the Design
-            - optimal_size  The size requested for the widget
-            - min_size      The minimum size requested for the widget
-            - expand    If true the widget will try to take all the place it can
-            - item          What is the item associated with this widget (None if not)
-                            This is only used for the style rules
-            - same_as       This can be used to pass an other widget instance that we know has the same style than this one
-                            It is only used for optimazation when we want to show a huge number of similar widgets
-            - tags          A list of string, Can be used by the style rules
+        parameters:
+
+        - parent The parent widget where we put this widget
+
+        - style The style associated with this widget The style is not
+          compulsory, it is only something that can be used by the
+          Design
+
+        - optimal_size The size requested for the widget
+
+        - min_size The minimum size requested for the widget
+
+        - expand If true the widget will try to take all the place it
+          can
+
+        - item What is the item associated with this widget (None if
+          not) This is only used for the style rules
+
+        - same_as This can be used to pass an other widget instance
+          that we know has the same style than this one It is only
+          used for optimazation when we want to show a huge number of
+          similar widgets
+
+        - tags A list of string, Can be used by the style rules
         """
         super(Widget, self).__init__()
         self.children = []
-        self.item = item    # Set to None if the object is not a view on an item
+        self.item = item    # Set to None if the object is not a view
+                            # on an item
         parent = parent.get_contents_child() if parent else None
         self.parent = parent
         
@@ -76,8 +90,11 @@ class Widget(Object):
         
         self.focused = None
         self.clickable = False
-        self.surface = None     # This is used for the widget that keep a copy of there surface for optimisation
-        self.store_surface = False   # Set to true for the widget to keep a memory of it own surface
+        self.surface = None     # This is used for the widget that
+                                # keep a copy of there surface for
+                                # optimisation
+        self.store_surface = False   # Set to true for the widget to
+                                     # keep a memory of it own surface
         
         if parent:
             parent.add(self)
@@ -96,7 +113,7 @@ class Widget(Object):
             else:
                 self.__style = self.parent.style
         self.style_dict = self.__style.apply(self)
-        children_style = self.__style if 'children-style' not in self.style_dict else  self.style_dict['children-style']
+        children_style = self.__style if 'children-style' not in self.style_dict else self.style_dict['children-style']
         for c in self.children:
             c.style = children_style
         self.need_redraw(self.rect)
@@ -252,7 +269,8 @@ class Widget(Object):
     def draw(self, painter):
         """Draw the widget on a painter object
         
-            Ths position where we paint is stored in the painter itself (opengl style) 
+        The position where we paint is stored in the painter itself
+        (opengl style)
         """
         if self.store_surface and self.surface is None:
             surface = painter.surface_from_size(self.size)
@@ -286,7 +304,8 @@ class Widget(Object):
             
     def organize(self):
         """Set all children size and position"""
-        # By default all the children are the same size than the widget
+        # By default all the children are the same size than the
+        # widget
         for c in self.children:
             c.pos = self.contents_pos
             c.size = self.contents_size
@@ -307,7 +326,8 @@ class Widget(Object):
             
     def sorted_children(self):
         """Return the children, sorted with the one on top first"""
-        # For the moment I suppose that none of the children overlap, so we don't sort anything
+        # For the moment I suppose that none of the children overlap,
+        # so we don't sort anything
         return self.children
             
     def mouse_down(self, pos):
@@ -326,8 +346,10 @@ class Widget(Object):
     def mouse_down_cancel(self):
         """Cancel the last mouse down event
         
-            This function is mainly used for scrollable area, where we don't know from the beginning
-            if we are clicking a widget, or just moving the area. """
+        This function is mainly used for scrollable area, where we
+        don't know from the beginning if we are clicking a widget, or
+        just moving the area.
+        """
         if self.focused:
             self.focused.mouse_down_cancel()
             self.focused = None

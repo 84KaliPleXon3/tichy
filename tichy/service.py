@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -23,7 +24,18 @@ from item import Item, ItemMetaClass
 import logging
 logger = logging.getLogger('Service')
 
+# TODO : Try to fix the mess with the way services work internaly. In
+#        the best case I shoud be able to create a new service by
+#        giving an other service as a parent class : e.g : class
+#        TestGSM(Service(GSM)): pass. But I don't know how to do that
+#        correctly...
+
 class BaseService(Item):
+    """Base class for all services
+
+    This class is used to have a common class associated with all
+    service with the same 'service' attribute
+    """
     def __init__(self, service):
         self.service = service
 
@@ -31,6 +43,8 @@ class BaseService(Item):
 class ServiceMetaClass(ItemMetaClass):
     """The meta class for Service class"""
     def __init__(cls, name, bases, dict):
+        """Register a service class
+        """
         if 'service' in dict:
             service_name = dict['service']
             if not cls.name:
@@ -46,18 +60,37 @@ class ServiceMetaClass(ItemMetaClass):
         ItemMetaClass.__init__(cls, name, bases, dict)
         
 class ServiceUnusable(Exception):
+    """Exception raised by a service if it not usable
+    
+    The service module will then try to use an other service.
+    """
     def __init__(self, msg = None):
         super(ServiceUnusable, self).__init__(msg)
 
 class Service(Item):
+    """Service base class
+
+    The service class is used by plugin to expose some functionalities
+    that could be used by other plugins.
+
+    A given service is defined by its `service` attribute, wich should
+    be a string. All the services sharing the same name should have
+    the same interface. When a plugin wants to use a service, it can
+    get the most suitable service available by using the Service
+    function (thanks to some python magic, Service can be used bot as
+    a class name and a function).
+
+    A service is also an item, so it can have a `name` attribute.
+    """
     __metaclass__ = ServiceMetaClass
     # This attribute is a dict of list : (service_name -> [service_cls])
     __all_services = {}
     # A dict of the form (service_name -> service)
     __defaults = {}
-    # Every service has a base service object associated
-    # This is used to have a common object associated with all service of the same group
-    # This object is put into the `base` attribute of every service classes
+    # Every service has a base service object associated This is used
+    # to have a common object associated with all service of the same
+    # group This object is put into the `base` attribute of every
+    # service classes. That is a little bit tricky !
     __bases = {}
     
     # This is used to store the sigleton value of the service
@@ -76,6 +109,12 @@ class Service(Item):
         
     @classmethod
     def get_all(cls, name):
+        """return all the service that have a given name
+
+        :Params:
+
+        name - the name of the service
+        """
         ret = []
         for service in Service.__all_services.get(name, []):
             try:
@@ -88,6 +127,14 @@ class Service(Item):
         return ret
 
     def __new__(cls, service = None, name = None):
+        """Return a service instance that implement a given service
+ 
+        :Parameters:
+
+        service : string giving the service name
+
+        name : if given, we specify the actual service namee we want
+        """
         logger.debug("try to get service %s", service)
         
         if service is None:
@@ -118,6 +165,7 @@ class Service(Item):
 
     @classmethod
     def __get(cls):
+        """return the single service instance"""
         if cls.__singleton is None:
             singleton = cls()
             singleton.__init()

@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -44,9 +45,11 @@ class Scrollable(Widget):
         child = self.children[0]
         click_pos = pos[self.axis] - child.pos[self.axis]
     
-        # First we wait to move more than move_distance before we actually move the child
+        # First we wait to move more than move_distance before we
+        # actually move the child
         while True:
-            e, args = yield WaitFirst(Wait(self, 'mouse-up'), Wait(self, 'mouse-motion'))
+            e, args = yield WaitFirst(Wait(self, 'mouse-up'),
+                                      Wait(self, 'mouse-motion'))
             pos = args[0]
             if e == 0:
                 child.mouse_up(pos)
@@ -61,12 +64,14 @@ class Scrollable(Widget):
         # child.store_surface = True
         last_dist = None
         while True:
-            e, args = yield WaitFirst(Wait(self, 'mouse-up'), Wait(self, 'mouse-motion'))
+            e, args = yield WaitFirst(Wait(self, 'mouse-up'),
+                                      Wait(self, 'mouse-motion'))
             pos = args[0]
             if e == 0:
                 break
             if e == 1:
-                dist = (pos[self.axis] - self.click_pos) / 8 * 8    # We use a step of 8
+                # We use a step of 8
+                dist = (pos[self.axis] - self.click_pos) / 8 * 8
                 if dist == last_dist:
                     continue
                 last_dist = dist

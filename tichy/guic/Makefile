@@ -4,8 +4,7 @@
 # I use this on my machine to compile for the OpenMoko :
 # I need to use the ToolChain header files
 
-PYTHON_CFLAGS = -I/home/charlie/Work/moko_old/tmp/staging/arm-angstrom-linux-gnueabi/usr/include/python2.5/ \
-      -I/home/charlie/Work/moko_old/tmp/work/armv4t-angstrom-linux-gnueabi/python-pygame-1.7.1-ml2/install/python-pygame-dev/usr/include/python2.5/
+PYTHON_CFLAGS = -I/usr/local/openmoko/arm/arm-angstrom-linux-gnueabi/usr/include/python2.5
 
 # PYTHON_CFLAGS = -I/usr/include/python2.5/
 

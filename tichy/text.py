@@ -1,3 +1,20 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
 
 from .item import Item
 from .service import Service
@@ -40,7 +57,7 @@ class Text(Item):
             ret = Label(parent, self.__value, **kargs)
         else:
             ret = Edit(parent, item = self, **kargs)
-            
+        
         connection = self.connect('modified', Text.on_modified, ret)
         ret.connect('destroyed', self.on_view_destroyed, connection)
         return ret
@@ -49,14 +66,15 @@ class Text(Item):
         # first we get the appropriate TextEdit Service
         text_edit = Service('TextEdit')
         # Then we call the service with our text
-        return text_edit.edit(window, self, input_method = self.input_method(), **kargs)
-        
+        return text_edit.edit(
+            window, self, input_method=self.input_method(), **kargs)
+
     def on_modified(self, view):
         view.text = self.__value
-        
+
     def on_view_destroyed(self, view, connection):
         self.disconnect(connection)
-        
+
     def create_actor(self):
         from actor import Actor
         ret = Actor(self)
@@ -64,4 +82,3 @@ class Text(Item):
             yield item.edit(view.window)
         ret.new_action("Edit").connect('activated', on_edit)
         return ret
-        

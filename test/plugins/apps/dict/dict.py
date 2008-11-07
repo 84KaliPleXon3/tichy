@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
+#
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -37,9 +39,10 @@ class Entrie(object):
         
 class Dict(object):
     def __init__(self, path):
-        # All the dicts are sorted so that we can use bisect to find element quickly
-        # We only read the lines of the dictionaries and don't try to prcess them before we actually need them
-        # otherwise it takes too much time
+        # All the dicts are sorted so that we can use bisect to find
+        # element quickly We only read the lines of the dictionaries
+        # and don't try to prcess them before we actually need them
+        # otherwise it takes too much time.
         print "read entries"
         file = open(os.path.join(path, 'dict.txt'), 'r')
         self.entries = file.readlines()
@@ -70,7 +73,8 @@ class Dict(object):
             ch = entrie[0]
             pinying = u""
             for c in ch:
-                # We have to rencode because the lines in the lists are not encoded
+                # We have to re-encode because the lines in the lists
+                # are not encoded
                 p = bisect.bisect(self.pinyings, c.encode('utf-8'))
                 line = self.pinyings[p]
                 pinying += line.split()[1]
@@ -83,7 +87,7 @@ class DictApp(tichy.Application):
     category = 'general'
 
     def run(self, window):
-        self.window = gui.Window(window, modal = True)   # We run into a new modal window
+        self.window = gui.Window(window, modal = True)
         frame = self.view(self.window, back_button=True)
         vbox = gui.Box(frame, axis=1)
         # The search entry

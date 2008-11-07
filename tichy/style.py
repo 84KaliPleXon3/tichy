@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -44,7 +45,8 @@ class Font(object):
         return self.font.render(text, color, length)
         
     def resize(self, size):
-        """Create a new font identical to this one but with a different size"""
+        """Create a new font identical to this one but with a different size
+        """
         return Font(self.file, size)
 
 class Filter(object):
@@ -67,7 +69,9 @@ class TypeFilter(Filter):
     def __repr__(self):
         return self.type.__name__
     def __cmp__(self, v):
-        """We define the cmp method so that the more general rules are 'lower' than more 'specifics'"""
+        """We define the cmp method so that the more general rules are 'lower'
+        than more 'specifics'
+        """
         if isinstance(v, TypeFilter):
             if self.type == v.type: return 0
             if issubclass(self.type, v.type): return 1
@@ -82,28 +86,37 @@ class ItemTypeFilter(Filter):
 
     	
 class Style(dict, Item):
-    """ A Style is a dictionary of key -> values with parenting property
-    
-        When you apply a style to a widget, you get the actual style dictionary
-        that can be used by any painter to draw the wiget.
-        Here are the rules :
-        - first the style tries to get the attributes form the sub-styles
-        - then it gets its own attributes
-        - finally it gets the attributes from its parent style
+    """A Style is a dictionary of key -> values with parenting property
+
+    Styles are usefull to give some properties to widgets that can be
+    used by the Design service to know how to draw them.
+
+    When you apply a style to a widget, you get the actual style
+    dictionary that can be used by any painter to draw the wiget.
+
+    Here are the rules :
+
+    - first the style tries to get the attributes form the sub-styles
+
+    - then it gets its own attributes
+
+    - finally it gets the attributes from its parent style
     """
     def __init__(self, parent = None):
         super(Style, self).__init__()
         self.parent = parent
         self.parts = []
-        
-    @classmethod    # TODO: this is not really good, we shouldn't have to call this 
+
+    # TODO: this is not really good, we shouldn't have to call this 
+    @classmethod
     def create(cls):
         return cls.from_dict(None, cls.code())
         
     def add_part(self, filter, style):
         self.parts.append((filter, style))
         
-    def apply(self, widget, up = True): # XXX: also apply to Style attribute (children-style, etc..)
+    # XXX: also apply to Style attribute (children-style, etc..)
+    def apply(self, widget, up = True):
         ret = {}
         if up and self.parent is not None:
             ret.update(self.parent.apply(widget))
@@ -132,10 +145,8 @@ class Style(dict, Item):
             elif issubclass(k, Item):
                 style = cls.from_dict(ret, v)
                 ret.add_part(ItemTypeFilter(k), style)
-        # sort the parts do that the more general are at the beginning at will be overriden by the more specific ones
+        # sort the parts do that the more general are at the beginning
+        # at will be overriden by the more specific ones
         ret.parts = sorted(ret.parts)
         return ret
-                
-
-        
 

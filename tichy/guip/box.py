@@ -1,17 +1,18 @@
 #    Tichy
+#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
 #
-#    Tichy is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    Tichy is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
@@ -22,9 +23,9 @@ from frame import Frame
 from geo import Vect, Rect
 
 class Box(Frame):
-    """ Box layout widget, similar to gtk boxes
+    """Box layout widget, similar to gtk boxes
     
-        This widget can be used to organize widgets into space
+    This widget can be used to organize widgets into space
     """
     def __init__(self, parent, axis = 0, spacing = None, **kargs):
         self.axis = axis
@@ -107,6 +108,3 @@ class Fixed(Widget):
         for c in self.children:
             c.size = c.optimal_size
             c.do_organize()
-        
-            
-
