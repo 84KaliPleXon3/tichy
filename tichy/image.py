@@ -21,7 +21,7 @@ import tichy
 class Image(tichy.Item):
     def __init__(self, path, size = None):
         super(Image, self).__init__()
-        assert isinstance(path, basestring)
+        assert isinstance(path, basestring), type(path)
         self.__path = path
         self.surf = None
         self.size = size
