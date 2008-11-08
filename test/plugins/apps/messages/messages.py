@@ -73,7 +73,7 @@ class Edit(tichy.Application):
             yield self.sms.send()
         except Exception, e:
             logger.error("Error: %s", e)
-            yield tichy.Message(view.window, "Error", e)
+            yield tichy.Dialog(view.window, "Error", e)
         
 class New(tichy.Application):
     name = 'New'
@@ -102,7 +102,7 @@ class Inbox(tichy.Application):
             yield sms_service.update()
         except Exception, e:
             logger.error("Error : %s", e)
-            yield tichy.Message(w, "Error", e)
+            yield tichy.Dialog(w, "Error", e)
         
         # We create a view on actors of every items in the outbox
         sms_service.inbox.actors_view(vbox)

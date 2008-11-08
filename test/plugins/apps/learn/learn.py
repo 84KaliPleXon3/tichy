@@ -110,9 +110,9 @@ class Learn(tichy.Application):
         ret = answers[ret[0]]
         if ret == card.a:
             # Correct answer
-            yield tichy.Message(self.window, "Correct", "%s : %s" % (card.a, card.comment or ''))
+            yield tichy.Dialog(self.window, "Correct", "%s : %s" % (card.a, card.comment or ''))
             yield True
         else:
-            yield tichy.Message(self.window, "Wrong Answer", "")
+            yield tichy.Dialog(self.window, "Wrong Answer", "")
             yield False
         

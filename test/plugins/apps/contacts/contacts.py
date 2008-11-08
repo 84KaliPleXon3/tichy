@@ -126,7 +126,7 @@ class Contact(tichy.Application):
         
     def on_delete_attr(self, action, attr, view):
         if attr.name == 'name':
-            yield tichy.Message(view.window, "Error", "Can't delete name")
+            yield tichy.Dialog(view.window, "Error", "Can't delete name")
         else:
             self.attr_list.remove(action.actor)
             del self.contact[attr.name]

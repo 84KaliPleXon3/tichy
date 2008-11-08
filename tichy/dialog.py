@@ -17,18 +17,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Dialog module"""
+
 from tichy.tasklet import Tasklet, Wait
-import tichy.application
+import tichy
 import tichy.gui as gui
 
-class Message(tichy.application.Application):
+class Dialog(tichy.Application):
     def run(self, parent, title, msg):
         w = gui.Window(parent)
-        
+
         frame = self.view(w, title=title)
         vbox = gui.Box(frame, axis=1, expand=True)
         gui.Label(vbox, msg, expand=True)
-    
+
         b = gui.Button(vbox)
         gui.Label(b, 'OK')
         yield Wait(b, 'clicked')

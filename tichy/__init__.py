@@ -35,7 +35,7 @@ from actor import Actor
 from style import Style
 from image import Image
 
-from message import Message
+from dialog import Dialog
 
 import phone
 import contacts

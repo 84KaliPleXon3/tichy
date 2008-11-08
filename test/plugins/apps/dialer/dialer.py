@@ -139,7 +139,7 @@ class Caller(tichy.Application):
         except Exception, e:
             import traceback
             logger.error("%s, %s", e, traceback.format_exc())
-            yield tichy.Message(self.window, "Error", e.message)
+            yield tichy.Dialog(self.window, "Error", e.message)
             
         self.window.destroy()
         

@@ -133,7 +133,7 @@ class DrawingApp(tichy.Application):
             size_item.connect('activated', on_size, s)
         
         def on_about(action, item, w):
-            yield tichy.Message(self.window, "About", "Just a test")
+            yield tichy.Dialog(self.window, "About", "Just a test")
         about_item = actor.new_action('About')
         about_item.connect('activated', on_about)
         
