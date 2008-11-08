@@ -76,6 +76,7 @@ class TopBar(Application):
         # Add a few 'Gadgets'
         tichy.Gadget.find_by_name('GSM')(hbox).start()
         tichy.Gadget.find_by_name('Network')(hbox).start()
+        tichy.Gadget.find_by_name('Notifications')(hbox).start()
         tichy.Gadget.find_by_name('Battery')(hbox).start()
         tichy.Gadget.find_by_name('Clock')(hbox).start()
 
