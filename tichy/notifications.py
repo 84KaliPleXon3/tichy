@@ -25,15 +25,40 @@ logger = logging.getLogger('notifications')
 import tichy
 
 class Notification(tichy.Item):
+    """Notification class
+
+    Notifications can be used by plugin to notify the user of an event
+    or a condition. A typical example is to signal an unread message.
+
+    The plugin should use the 'Notifications' service to create new
+    notifications.
+
+    Signals:
+
+    - released : emitted when the notification is released and
+      shouldn't be taken care of anymore.
+    """
     def __init__(self, service, msg, icon=None):
-        super(Notification, selfg).__init__()
+        super(Notification, self).__init__()
         self.service = service
         self.msg = msg
         self.icon = icon
 
+    def __repr__(self):
+        return str(self.msg)
+
+    def notify(self):
+        """"Notify the notification, if it is not already the case"""
+        if self.service.notifications:
+            return
+        self.service._add(self)
+
     def release(self):
         """To be called when the notification can be removed"""
+        if self not in self.service.notifications:
+            return
         self.service._remove(self)
+        self.emit('released')
 
 class Notifications(tichy.Service):
     """Notification service
@@ -47,13 +72,24 @@ class Notifications(tichy.Service):
 
     :Signals:
 
-    - new-notification(notification) : emmited when a new notification
+    - new-notification(notification) : emitted when a new notification
       arrives
     """
     service = 'Notifications'
 
     def __init__(self):
         self.notifications = []
+
+    def create(self, msg, icon=None):
+        """Create a new initially disabled notification
+
+        :Parameters:
+
+        - msg : the message of the notification
+
+        - icon : an optional icon for the notification
+        """
+        return Notification(self, msg, icon)
 
     def notify(self, msg, icon=None):
         """add a new notification
@@ -64,10 +100,14 @@ class Notifications(tichy.Service):
         
         - icon : an optional icon for the notification
         """
-        logger.info("New notification : %s", msg)
-        notification = Notification(msg, icon)
+        notification = self.create(msg, icon)
+        notification.notify()
+
+    def _add(self, notification):
         self.notifications.append(notification)
+        logger.info("Notify : %s", notification)
         self.emit('new-notification', notification)
 
     def _remove(self, notification):
+        logger.info("Remove : %s", notification)
         self.notifications.remove(notification)
