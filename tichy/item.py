@@ -75,7 +75,7 @@ class Item(tichy.Object):
         for s in cls.subclasses:
             if s.name == name:
                 return s
-        assert KeyError
+        raise KeyError(name)
 
     def __init__(self):
         super(Item, self).__init__()
