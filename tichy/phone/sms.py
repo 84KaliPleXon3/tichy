@@ -48,7 +48,7 @@ class SMS(tichy.Item):
 
 class FreeSmartPhoneSMS(tichy.Service):
     service = 'SMS'
-    
+
     def __init__(self):
         logger.info("connecting to freesmartphone.GSM dbus interface")
         try:
@@ -62,9 +62,15 @@ class FreeSmartPhoneSMS(tichy.Service):
             logger.warning("can't use freesmartphone SMS : %s", e)
             self.sim_iface = None
             raise tichy.ServiceUnusable
+        # XXX: This should be put into an other service, or at least
+        # in the base service...
         self.outbox = tichy.List()
         self.inbox = tichy.List()
-        
+        # Prepare the future notification
+        notifications = tichy.Service('Notifications')
+        icon = tichy.Image(self.path('pics/message.png'), (32, 32))
+        self.notification = notifications.create('new sms', icon)
+
     def update(self):
         logger.info("update sms inbox")
         status = yield tichy.tasklet.WaitDBus(self.sim_iface.GetSimReady)
@@ -75,12 +81,12 @@ class FreeSmartPhoneSMS(tichy.Service):
         for msg in messages:
             id, status, number, text = msg
             self.inbox.append(self.create(str(number), unicode(text)))
-            
+
     def create(self, number = '', text = ''):
         number = tichy.phone.TelNumber(number)
         text = tichy.Text(text)
         return SMS(number, text)
-            
+
     def send(self, sms):
         logger.info("Storing message to %s", sms.number)
         message_id = yield tichy.tasklet.WaitDBus(self.sim_iface.StoreMessage, str(sms.number), unicode(sms.text), {})
@@ -91,29 +97,37 @@ class FreeSmartPhoneSMS(tichy.Service):
         # We store a copy cause we don't want to modify the stored sms.
         logger.info("Store message into outbox")
         self.outbox.append(SMS(sms.number, sms.text))
-        
+
     def on_incoming_message(self, index):
         logger.info("Incoming message %d", index)
-        notifications = tichy.Service('Notifications')
-        notifications.notify('new message')
-        
+        self.notification.notify()
+
 class TestSms(tichy.Service):
     service = 'SMS'
-    
+    name = 'Test'
+
     def __init__(self):
         self.outbox = tichy.List()
         self.outbox.append(self.create('09230984', "A test"))
         self.inbox = tichy.List()
-        
+        # Prepare the future notification
+        notifications = tichy.Service('Notifications')
+        icon = tichy.Image(self.path('pics/message.png'), (32, 32))
+        self.notification = notifications.create('new sms', icon)
+
     def create(self, number = '', text = ''):
         number = tichy.phone.TelNumber(number)
         text = tichy.Text(text)
         return SMS(number, text)
-        
+
     def update(self):
         yield None
-    
+
     def send(self, sms):
         logger.info("Sending message to %s", sms.number)
         self.outbox.append(SMS(sms.number, sms.text))
         yield None
+
+    def fake_incoming_message(self, msg):
+        logger.info("Incoming message %d", 0)
+        self.notification.notify()
