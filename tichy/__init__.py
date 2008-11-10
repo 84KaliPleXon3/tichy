@@ -34,9 +34,11 @@ from item import Item
 from actor import Actor
 from style import Style
 from image import Image
+from message import Message
 
 from dialog import Dialog
 
+# All the service we want to use
 import phone
 import contacts
 import prefs
