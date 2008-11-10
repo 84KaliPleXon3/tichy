@@ -95,17 +95,9 @@ class Inbox(tichy.Application):
         frame = self.view(w, title="Inbox", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         
-        sms_service = tichy.Service('SMS')
-        try:
-            # This is just for testing...
-            # The update method will try to get the messages from the sim
-            yield sms_service.update()
-        except Exception, e:
-            logger.error("Error : %s", e)
-            yield tichy.Dialog(w, "Error", e)
-        
+        messages_service = tichy.Service('Messages')
         # We create a view on actors of every items in the outbox
-        sms_service.inbox.actors_view(vbox)
+        messages_service.inbox.actors_view(vbox)
         
         yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
         w.destroy()
@@ -120,9 +112,9 @@ class Outbox(tichy.Application):
         frame = self.view(w, title="Outbox", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         
-        sms_service = tichy.Service('SMS')
+        messages_service = tichy.Service('Messages')
         # We create a view on actors of every items in the outbox
-        sms_service.outbox.actors_view(vbox)
+        messages_service.outbox.actors_view(vbox)
         
         yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
         w.destroy()
