@@ -20,23 +20,27 @@
 import tichy
 import tichy.gui as gui
 
+
 class SettingItem(tichy.Item):
+
     def __init__(self, name):
         self.name = name
 
+
 class ScreenLockConf(tichy.Application):
+
     name = 'Screen Lock'
-     
+
     def run(self, parent):
         self.srvc = tichy.Service('ScreenLock')
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        
+
         self.current_text = tichy.Text("Current : %s" % self.srvc.pattern)
         self.current_text.view(vbox)
-        
+
         patterns_list = tichy.ActorList()
         # We get all the patterns services
         for pattern_name in self.srvc.patterns:
@@ -47,11 +51,10 @@ class ScreenLockConf(tichy.Application):
             patterns_list.append(actor)
 
         patterns_list.view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         self.window.destroy()
-        
+
     def on_use_pattern(self, action, pattern, window):
         self.srvc.pattern = pattern.name
         self.current_text.value = "Current : %s" % pattern
-

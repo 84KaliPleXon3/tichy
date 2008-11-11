@@ -30,8 +30,7 @@ sys.path.insert(0, '../')
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(name)-8s %(levelname)-8s %(message)s'
-)
+    format='%(name)-8s %(levelname)-8s %(message)s')
 logger = logging.getLogger('')
 
 import time
@@ -48,15 +47,18 @@ from tichy.service import Service
 from tichy.text import Text
 from tichy.list import ActorList
 
+
 class RunTopBarClock(Tasklet):
+
     def run(self, clock_display):
         time_service = Service('Time')
         while True:
             yield Wait(time_service, 'time-changed')
-            clock_display.value = \
-                time.strftime("%H:%M:%S",time.localtime())
+            clock_display.value = time.strftime("%H:%M:%S", time.localtime())
+
 
 class AutoAnswerCall(Application):
+
     def run(self, window):
         # We don't create any window, just run in the background...
         gsm_service = Service('GSM')
@@ -65,11 +67,13 @@ class AutoAnswerCall(Application):
             caller_service = Service('Caller')
             yield caller_service.call(window, call)
 
+
 class TopBar(Application):
     """This is the application that is going to run on the top window"""
+
     def run(self, parent):
         from tichy.phone import GSMService
-        
+
         # The top window application need to print various informations...
         hbox = gui.Box(parent, axis=0)
 
@@ -81,50 +85,53 @@ class TopBar(Application):
         tichy.Gadget.find_by_name('Clock')(hbox).start()
 
         yield Wait(parent, 'destroyed')
-        
+
+
 class Main(Application):
+
     def run(self, window):
-        vbox = gui.Box(window, axis = 1, border = 0, spacing = 0)
+        vbox = gui.Box(window, axis=1, border=0, spacing=0)
         # The main application
-        top_window = gui.Window(vbox, optimal_size = gui.Vect(480, 64), modal=False)
-        content_window = gui.Window(vbox, min_size = gui.Vect(480, 0), modal=False, expand=True)
+        top_window = gui.Window(vbox, optimal_size=gui.Vect(480, 64),
+                                modal=False)
+        content_window = gui.Window(vbox, min_size=gui.Vect(480, 0),
+                                    modal=False, expand=True)
         AutoAnswerCall(content_window).start()
         TopBar(top_window).start()
         launcher = Application.find_by_name('Launcher')
         yield launcher(content_window)
 
+if __name__ == '__main__':
+    # We import all the modules into the plugin directory
+    for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
+                        '/usr/tichy/plugins']:
+        try:
+            logger.info("try to load plugins in %s", plugins_dir)
+            plugins.import_all(plugins_dir)
+            break
+        except IOError:
+            logger.info("failed to load plugins in %s", plugins_dir)
 
-# We import all the modules into the plugin directory
-for plugins_dir in ['plugins', '/usr/share/tichy/plugins', '/usr/tichy/plugins']:
-    try:
-        logger.info("try to load plugins in %s", plugins_dir)
-        plugins.import_all(plugins_dir)
-        break
-    except IOError:
-        logger.info("failed to load plugins in %s", plugins_dir)
+    # TODO: at least remove the create invocation !
+    style = Style.find_by_name("black style").create()
 
-# TODO: at least remove the create invocation !
-style = Style.find_by_name("black style").create()
+    # We set the default design
+    tichy.Service.set_default('Design', 'Default')
+    # tichy.Service.set_default('Design', 'Grid')
 
-# We set the default design
-tichy.Service.set_default('Design', 'Default')
-# tichy.Service.set_default('Design', 'Grid')
+    fullscreen = '--fullscreen' in sys.argv
 
-fullscreen = '--fullscreen' in sys.argv
+    # The backend SDL painter
+    painter = gui.Painter((480, 640), fullscreen=fullscreen)
 
-# The backend SDL painter
-painter = gui.Painter((480, 640), fullscreen=fullscreen)
+    # Create the screen
+    screen = gui.Screen(tichy.mainloop, painter, style=style)
 
-# Create the screen
-screen = gui.Screen(tichy.mainloop, painter, style=style)
+    def on_quit(v):
+        logger.info("quit mainloop")
+        tichy.mainloop.quit()
 
-def on_quit(v):
-    logger.info("quit mainloop")
-    tichy.mainloop.quit()
-
-# Start the application, and attach a callback on it
-Main(screen).start(on_quit)
-tichy.mainloop.run()
-logger.info("quit")
-
-
+    # Start the application, and attach a callback on it
+    Main(screen).start(on_quit)
+    tichy.mainloop.run()
+    logger.info("quit")

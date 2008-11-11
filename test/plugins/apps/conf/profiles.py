@@ -16,29 +16,35 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+logger = logging.getLogger('app.dict')
 
 import tichy
 import tichy.gui as gui
 
+
 class ProfileItem(tichy.Item):
+
     def __init__(self, name):
         self.name = name
-        
+
 
 class ProfilesConf(tichy.Application):
+
     name = 'Profiles'
-     
+
     def run(self, parent):
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        
+
         self.prefs = tichy.Service('Prefs')
-        
-        self.current_text = tichy.Text("current : %s" % self.prefs.get_profile())
+
+        self.current_text = tichy.Text("current : %s" % \
+                                           self.prefs.get_profile())
         self.current_text.view(vbox)
-        
+
         # We create the list of all the profiles
         profiles_list = tichy.ActorList()
         for profile in self.prefs.get_profiles():
@@ -47,14 +53,13 @@ class ProfilesConf(tichy.Application):
             set_action = actor.new_action('Use')
             set_action.connect('activated', self.on_set_profile)
             profiles_list.append(actor)
-        
+
         profiles_list.view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         self.window.destroy()
-        
+
     def on_set_profile(self, action, profile, window):
-        print "set profile to", profile.name
+        logger.info("set profile to %s", profile.name)
         self.prefs.set_profile(profile.name)
         self.current_text.value = "current : %s" % profile.name
-

@@ -25,40 +25,43 @@ from profiles import ProfilesConf
 from phone import PhoneConf
 from screenlockconf import ScreenLockConf
 
+
 class Conf(tichy.Application):
+
     name = 'Config'
     icon = 'icon.png'
     category = 'general' # So that we see the app in the launcher
-     
+
     def run(self, parent):
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        vbox = gui.Box(frame, axis = 1, expand=True)
-        
+        vbox = gui.Box(frame, axis=1, expand=True)
+
         # We create a list of the sub applications actors
         list = tichy.ActorList()
         for app in [ProfilesConf, StyleConf, PhoneConf, ScreenLockConf]:
             actor = app.create_actor()
             list.append(actor)
-        
+
         list.view(vbox)
-        gui.Spring(vbox, axis = 1)
-        
+        gui.Spring(vbox, axis=1)
+
         # Wait until the quit button is clicked
         yield tichy.Wait(frame, 'back')
         self.window.destroy()
-        
-        
+
+
 class StyleConf(tichy.Application):
+
     name = 'Style'
-    
+
     def run(self, parent):
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
         styles = [s.create() for s in tichy.Style.subclasses]
-        
+
         styles_list = tichy.ActorList()
         for s in styles:
             actor = tichy.Actor(s)
@@ -66,10 +69,10 @@ class StyleConf(tichy.Application):
             use_action.connect('activated', self.on_use_style)
             styles_list.append(actor)
         styles_list.view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         self.window.destroy()
-        
+
     def on_use_style(self, action, style, window):
         screen = window.screen
         screen.style = style

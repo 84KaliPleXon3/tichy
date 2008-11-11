@@ -23,7 +23,10 @@ from tichy.tasklet import Tasklet, Wait
 import tichy
 import tichy.gui as gui
 
+
 class Dialog(tichy.Application):
+    """This application shows a message on the screen"""
+
     def run(self, parent, title, msg):
         w = gui.Window(parent)
 

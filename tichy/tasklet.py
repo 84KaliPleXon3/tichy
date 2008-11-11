@@ -28,47 +28,54 @@ __docformat__ = "restructuredtext en"
 import sys
 from types import GeneratorType
 
+
 def tasklet(func):
     """Decorator that turns a generator function into a tasklet instance
     """
+
     def ret(*args, **kargs):
-        return Tasklet( generator=func(*args, **kargs) )
+        return Tasklet(generator=func(*args, **kargs))
+
     ret.__dict__ = func.__dict__
     ret.__name__ = func.__name__
     ret.__doc__ = func.__doc__
     return ret
 
+
 class Tasklet(object):
     """This class can be used to write easy callback style functions using
     the 'yield' python expression.
-        
+
     It is usefull in some cases where callback functions are the right
     thing to do, but make the code too messy
-        
+
     This class is largely inspired by python PEP 0342:
     http://www.python.org/dev/peps/pep-0342/
-        
+
     See the examples below to understand how to use it.
     """
+
     def __init__(self, *args, **kargs):
-        self.generator = kargs.get('generator', None) or self.do_run(*args, **kargs)
-        assert isinstance(self.generator, GeneratorType), type(self.generator)
+        self.generator = kargs.get('generator', None) or \
+            self.do_run(*args, **kargs)
+        assert isinstance(self.generator,
+                          GeneratorType), type(self.generator)
         # The tasklet we are waiting for...
         self.waiting = None
         self.closed = False
-        
+
     def do_run(self, *args, **kargs):
         return self.run(*args, **kargs)
-    
+
     def run(self):
         """The default task run by the tasklet"""
         yield
-        
-    def start(self, callback = None, err_callback = None, *args, **kargs):
+
+    def start(self, callback=None, err_callback=None, *args, **kargs):
         """
         Start the tasklet, connected to a callback and an error
         callback
-        
+
         :Parameters:
 
         - `callback`: a function that will be called with the returned
@@ -92,11 +99,11 @@ class Tasklet(object):
         self.kargs = kargs  # possible additional keywords args that
                             # will be passed to the callback
         self.send(None)     # And now we can initiate the task
-            
+
     def default_callback(self, value):
         """The default callback if None is specified"""
         pass
-    
+
     def default_err_callback(self, type, value, traceback):
         """The default error call back if None is specified"""
         if type is GeneratorExit:
@@ -108,7 +115,7 @@ class Tasklet(object):
         import sys
         tb.print_exception(*sys.exc_info())
         sys.exit(-1)
-        
+
     def close(self):
         if self.closed:
             return
@@ -116,13 +123,13 @@ class Tasklet(object):
             self.waiting.close()
         self.generator.close()
         self.closed = True
-        
+
     def exit(self):
         # TODO: is this really useful, or should we use close here ?
         e = GeneratorExit()
         self.err_callback(type(e), e, sys.exc_info()[2])
-        
-    def send(self, value = None, *args):
+
+    def send(self, value=None, *args):
         """Resume and send a value into the tasklet generator
         """
         # This somehow complicated try switch is used to handle all
@@ -140,7 +147,7 @@ class Tasklet(object):
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
-        
+
     def throw(self, type, value, traceback):
         """Throw an exeption into the tasklet generator"""
         try:
@@ -155,10 +162,10 @@ class Tasklet(object):
             self.close()
             return
         self.handle_yielded_value(value)
-        
+
     def handle_yielded_value(self, value):
         """This method is called after the waiting tasklet yielded a value
-        
+
            We have to take care of two cases:
 
            - If the value is a Tasklet : we start it and connect the
@@ -168,38 +175,40 @@ class Tasklet(object):
              can call our callback function
         """
         if isinstance(value, GeneratorType):
-            value = Tasklet(generator = value)
+            value = Tasklet(generator=value)
         if isinstance(value, Tasklet):
             self.waiting = value
             value.start(self.send, self.throw)
         else:
             self.callback(value, *self.args, **self.kargs)
-            
+
+
 class Wait(Tasklet):
     """
     A special tasklet that wait for an event to be emitted
-    
+
     If o is an Object that can emit a signal 'signal', then we can
     create a tasklet that waits for this event like this : Wait(o,
     'signal')
     """
+
     def __init__(self, obj, event):
         assert obj is not None
         super(Wait, self).__init__()
         self.obj = obj
         self.event = event
         self.connect_id = None
-        
+
     def _callback(self, o, *args):
         """This is the callback that is triggered by the signal"""
         assert o is self.obj
-        
+
         if not self.connect_id:
             return # We have been closed already We need to remember
                    # to disconnect to the signal
         o.disconnect(self.connect_id)
         self.connect_id = None
-        
+
         # We can finally call our real callback
         try:
             self.callback(*args)
@@ -221,61 +230,68 @@ class Wait(Tasklet):
         if self.connect_id:
             self.obj.disconnect(self.connect_id)
         self.obj = self.callback = self.connect_id = None
-            
+
+
 class WaitFirst(Tasklet):
     """Waits for the first to return of a list of tasklets.
     """
+
     def __init__(self, *tasklets):
         super(WaitFirst, self).__init__()
         self.done = None
         self.tasklets = tasklets
-        
+
     def _callback(self, *args):
         i = args[-1]
         values = args[:-1]
         if self.done:
             return
         self.done = True
-        self.callback((i,values))
+        self.callback((i, values))
         for t in self.tasklets:
             t.close()
         self.callback = None
         self.tasklets = None
-    
-    def start(self, callback = None, err_callback = None):
+
+    def start(self, callback=None, err_callback=None):
         self.callback = callback
         self.err_callback = Tasklet.default_err_callback
-        
+
         # We connect all the tasklets
-        for (i,t) in enumerate(self.tasklets):
+        for (i, t) in enumerate(self.tasklets):
             t.start(self._callback, err_callback, i)
-            
+
+
 class WaitDBus(Tasklet):
     """Special tasket that wait for a DBus call"""
+
     def __init__(self, method, *args):
         super(WaitDBus, self).__init__()
         self.method = method
         self.args = args
-    def start(self, callback, err_callback):    
+
+    def start(self, callback, err_callback):
         self.callback = callback
         self.err_callback = err_callback
-        kargs = {
-            'reply_handler':self._callback,
-            'error_handler':self._err_callback
-            }
+        kargs = {'reply_handler': self._callback,
+                 'error_handler': self._err_callback}
         self.method(*self.args, **kargs)
+
     def _callback(self, *args):
         self.callback(*args)
+
     def _err_callback(self, e):
         self.err_callback(type(e), e, sys.exc_info()[2])
+
 
 class Producer(Tasklet):
     """A Producer is a modified Tasklet that is not automatically closed
     after returing a value.
-    
+
     This is still expermimental...
     """
-    def send(self, value = None, *args):
+
+    def send(self, value=None, *args):
         """Resume and send a value into the tasklet generator"""
         # This somehow complicated try switch is used to handle all
         # possible return and exception from the generator function
@@ -286,7 +302,7 @@ class Producer(Tasklet):
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
-        
+
     def throw(self, type, value, traceback):
         """Throw an exeption into the tasklet generator"""
         try:
@@ -296,29 +312,34 @@ class Producer(Tasklet):
             self.err_callback(*sys.exc_info())
             return
         self.handle_yielded_value(value)
-            
+
+
 if __name__ == '__main__':
     # And here is a simple example application using our tasklet class
 
     import gobject
-    
-    
+
     class WaitSomething(Tasklet):
         """This is a 'primitive' tasklet that will trigger our call back after
         a short time
         """
+
         def __init__(self, time):
             """This tasklet has one parameter"""
             self.time = time
+
         def start(self, callback, err_callback, *args):
-            self.event_id = gobject.timeout_add(self.time, callback, None, *args)
+            self.event_id = gobject.timeout_add(self.time,
+                                                callback, None, *args)
+
         def close(self):
             # We cancel the event
             gobject.source_remove(self.event_id)
-            
+
     def example1():
         print "== Simple example that waits two times for an input event =="
         loop = gobject.MainLoop()
+
         def task1(x):
             """An example Tasklet generator function"""
             print "task1 started with value %s" % x
@@ -327,64 +348,73 @@ if __name__ == '__main__':
             yield WaitSomething(1000)
             print "task1 stopped"
             loop.quit()
-        Tasklet(generator = task1(10)).start()
+        Tasklet(generator=task1(10)).start()
         print 'I do other things'
         loop.run()
-        
-        
+
     def example2():
         print "== We can call a tasklet form an other tasklet =="
+
         def task1():
             print "task1 started"
-            value = ( yield Tasklet(generator=task2(10)) )
+            value = (yield Tasklet(generator=task2(10)))
             print "rask2 returned value %s" % value
             print "task1 stopped"
+
         def task2(x):
             print "task2 started"
             print "task2 returns"
             yield 2 * x     # Return value
-        Tasklet(generator = task1()).start()
-        
+        Tasklet(generator=task1()).start()
+
     def example3():
         print "== We can pass exception through tasklets =="
+
         def task1():
             try:
                 yield Tasklet(generator=task2())
             except TypeError:
                 print "task2 raised a TypeError"
                 yield Tasklet(generator=task4())
+
         def task2():
             try:
                 yield Tasklet(generator=task3())
             except TypeError:
                 print "task3 raised a TypeError"
                 raise
+
         def task3():
             raise TypeError
             yield 10
+
         def task4():
             print 'task4'
             yield 10
-            
-        Tasklet(generator=task1()).start()  
-        
+
+        Tasklet(generator=task1()).start()
+
     def example4():
         print "== We can cancel execution of a task before it ends =="
         loop = gobject.MainLoop()
+
         def task():
             print "task started"
             yield WaitSomething(1000)
             print "task stopped"
             loop.quit()
+
         task = Tasklet(generator=task())
         task.start()
         # At this point, we decide to cancel the task
         task.close()
         print "task canceled"
-        
+
     def example5():
-        print "== A task can choose to perform specific action if it is canceld =="
+        print "== A task can choose to perform specific action" \
+            "if it is canceled =="
         loop = gobject.MainLoop()
+
         def task():
             print "task started"
             try:
@@ -394,32 +424,39 @@ if __name__ == '__main__':
                 raise
             print "task stopped"
             loop.quit()
+
         task = Tasklet(generator=task())
         task.start()
         # At this point, we decide to cancel the task
         task.close()
         print "task canceled"
-        
+
     def example6():
-        print "== Using WaitFirst, we can wait for several tasks at the same time =="
+        print "== Using WaitFirst, we can wait for several tasks"\
+            "at the same time =="
         loop = gobject.MainLoop()
+
         def task1(x):
             print "Wait for the first task to return"
             value = yield WaitFirst(WaitSomething(2000), WaitSomething(1000))
             print value
             loop.quit()
+
         Tasklet(generator=task1(10)).start()
         loop.run()
-        
+
     def example7():
         print "== Using Producer, we can create pipes =="
+
         class MyProducer(Producer):
+
             def run(self):
                 for i in range(3):
                     yield WaitSomething(1000)
                     yield i
-        
+
         class MyConsumer(Tasklet):
+
             def run(self, input):
                 print "start"
                 try:
@@ -429,22 +466,24 @@ if __name__ == '__main__':
                 except StopIteration:
                     print "Stop"
                 loop.quit()
-                    
+
         loop = gobject.MainLoop()
         MyConsumer(MyProducer()).start()
         print "We can do other things in the meanwhile"
-        
+
         loop.run()
-        
+
     def test():
         print "== Checking memory usage =="
+
         def task1():
             yield None
+
         import gc
-        
+
         gc.collect()
         n = len(gc.get_objects())
-        
+
         for i in range(1000):
             t = Tasklet(generator=task1())
             t.start()

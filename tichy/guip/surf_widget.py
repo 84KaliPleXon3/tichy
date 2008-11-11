@@ -19,19 +19,22 @@
 from widget import Widget
 import pygame
 
+
 class SurfWidget(Widget):
+    """XXX: write the doc"""
+
     def __init__(self, parent, size, **kargs):
-        super(SurfWidget, self).__init__(parent, optimal_size = size, **kargs)
+        super(SurfWidget, self).__init__(parent, optimal_size=size, **kargs)
         self.store_surface = True
         self.surface = pygame.Surface(size, 0, 32).convert()
-        
+
     def resize(self):
         pass
-        
+
     def need_redraw(self, rect):
         if self.parent is not None:
             self.parent.need_redraw(rect.move(self.pos))
-        
+
     def draw(self, painter):
         assert self.surface
         painter.draw_surface(self.surface)

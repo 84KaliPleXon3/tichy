@@ -24,14 +24,17 @@
 import pygame
 from pygame import *
 
+
 class SpecialKeys(object):
     pass
+
 K_NEXT_LAYOUT = SpecialKeys()
-    
+
+
 def unicode(key, mod):
     """Return the unicode associated with a key and a modifier"""
     # XXX: This thing has to be removed from here
-    # XXX: The unicode should depends of the keyboard 
+    # XXX: The unicode should depends of the keyboard
     if K_a <= key <= K_z:
         ret = chr(ord('a') + key - K_a)
         if mod == 1:

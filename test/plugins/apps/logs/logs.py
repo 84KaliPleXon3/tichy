@@ -23,40 +23,44 @@ from tichy.phone import TelNumber
 import logging
 logger = logging.getLogger('App.Logs')
 
+
 class Logs(tichy.Application):
+
     name = "Logs"
     icon = 'icon.png'
     category = 'general' # So that we see the app in the launcher
-     
+
     def run(self, window):
         w = gui.Window(window, modal=True)
         frame = self.view(w, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        
+
         # We create a list of the sub applications actors
         list = tichy.ActorList()
         for app in [All]:
             actor = app.create_actor()
             list.append(actor)
-        
+
         list.view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         w.destroy()
-        
+
+
 class All(tichy.Application):
+
     name = 'All'
     design = 'Default'
-    
+
     def run(self, window):
-        w = gui.Window(window, modal=True)   # We run into a new modal window
+        w = gui.Window(window, modal=True)
         frame = self.view(w, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        
+
         gsm_service = tichy.Service('GSM')
         gsm_service.logs.actors_view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         w.destroy()

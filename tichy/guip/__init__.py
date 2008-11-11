@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+
 from widget import Widget
 from frame import Frame
 from box import Box, Fixed
@@ -34,4 +35,3 @@ from sdl_painter import SdlPainter as Painter
 from sdl_painter import SdlEventsLoop as EventsLoop
 from surf_widget import SurfWidget
 from xwindow import XWindow
-

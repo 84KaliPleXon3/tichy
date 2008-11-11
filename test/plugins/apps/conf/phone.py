@@ -21,34 +21,40 @@ import tichy
 import tichy.gui as gui
 
 # TODO: move this into prefs service ??
+
+
 class ParamItem(tichy.Item):
+
     def __init__(self, service, key):
         self.service = service
         self.key = key
-        
-    # We override item.get_text cause we want to use our own view
-    # method instead ot relying on the item name
+
     def get_text(self):
+        """We override item.get_text cause we want to use our own view method
+        instead ot relying on the item name"""
         return self
+
     def view(self, parent):
-        ret = gui.Box(parent, axis = 0, border = 0)
+        ret = gui.Box(parent, axis=0, border=0)
         gui.Label(ret, self.key)
         value = str(self.service[self.key])
         gui.Label(ret, value)
         return ret
 
+
 class PhoneConf(tichy.Application):
+
     name = 'Phone'
-     
+
     def run(self, parent):
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        
+
         prefs = tichy.Service('Prefs')
         phone = prefs['phone']
-        
+
         # We create a list of actor on all the params we want to show
         self.params_list = tichy.List()
         for param in ['ring-tone', 'ring-volume']:
@@ -56,6 +62,6 @@ class PhoneConf(tichy.Application):
             actor = tichy.Actor(param_item)
             self.params_list.append(actor)
         self.params_list.view(vbox)
-        
+
         yield tichy.Wait(frame, 'back')
         self.window.destroy()

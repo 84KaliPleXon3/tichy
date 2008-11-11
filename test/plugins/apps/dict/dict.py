@@ -26,38 +26,43 @@ import tichy
 import tichy.gui as gui
 
 import logging
-logger = logging.getLogger('App.Dict')
+logger = logging.getLogger('app.dict')
+
 
 class Entrie(object):
+
     def __init__(self, chinese, pinying, translations):
         self.chinese = chinese
         self.pinying = pinying
         self.translations = translations
-    # TODO: don't we have a default method that could be used here ? 
+
     def unicode(self):
-        return u"%s (%s): %s" % (self.chinese, self.pinying, "; ".join(self.translations))
-        
+        return u"%s (%s): %s" % (self.chinese, self.pinying,
+                                 "; ".join(self.translations))
+
+
 class Dict(object):
+
     def __init__(self, path):
         # All the dicts are sorted so that we can use bisect to find
         # element quickly We only read the lines of the dictionaries
         # and don't try to prcess them before we actually need them
         # otherwise it takes too much time.
-        print "read entries"
+        logger.info("read entries")
         file = open(os.path.join(path, 'dict.txt'), 'r')
         self.entries = file.readlines()
-        print "%d entries read" % len(self.entries)
+        logger.info("%d entries read", len(self.entries))
 
-        print "read index"
+        logger.info("read index")
         file = open(os.path.join(path, 'index.txt'), 'r')
         self.index = file.readlines()
-        print "%d index read" % len(self.index)
+        logger.info("%d index read", len(self.index))
 
-        print "read pinying"
+        logger.info("read pinying")
         file = open(os.path.join(path, 'pinying.txt'), 'r')
         self.pinyings = file.readlines()
-        print "%d pinying read" % len(self.pinyings)
-    
+        logger.info("%d pinying read", len(self.pinyings))
+
     def search(self, word):
         """Return a list of matching entries"""
         # We use bisect to optimize the speed
@@ -82,34 +87,37 @@ class Dict(object):
             ret.append(Entrie(ch, pinying, translations))
         return ret
 
+
 class DictApp(tichy.Application):
+
     name = 'Dict'
     category = 'general'
 
     def run(self, window):
-        self.window = gui.Window(window, modal = True)
+        self.window = gui.Window(window, modal=True)
         frame = self.view(self.window, back_button=True)
         vbox = gui.Box(frame, axis=1)
         # The search entry
         text = tichy.Text('')
         text.view(vbox, editable=True)
         text.connect('modified', self.on_text_modified)
-        
+
         # The result actions
         self.results = tichy.List()
         self.results.view(vbox)
-        
+
         self.dict = Dict(self.path())
 
         yield tichy.Wait(frame, 'back')
         self.window.destroy()
-        
+
     def on_text_modified(self, text):
         self.results.clear()
         entries = self.dict.search(str(text))
         for entrie in entries:
             self.results.append(tichy.Text(entrie.unicode()))
-            
+
+
 if __name__ == '__main__':
     dict = Dict('.')
     rets = dict.search('hello')

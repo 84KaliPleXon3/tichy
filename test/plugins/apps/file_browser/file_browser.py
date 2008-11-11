@@ -27,48 +27,53 @@ logger = logging.getLogger('App.Browser')
 
 # TODO : it is a little bit mess here. Make things cleaner
 
+
 class FileItem(tichy.Item):
     """Define a special item for an entry in the file list"""
-    def __init__(self, browser, path, name = None):
+
+    def __init__(self, browser, path, name=None):
         self.browser = browser
         self.path = path
-        self.name = name or os.path.basename(self.path).decode('utf-8', 'replace')
-        
+        self.name = name or os.path.basename(self.path).decode('utf-8',
+                                                               'replace')
+
     def view(self, parent):
         ret = gui.Button(parent)
         gui.Label(ret, self.name)
+
         def on_clicked(w):
             self.browser.select_path(self.path)
         ret.connect('clicked', on_clicked)
         return ret
 
+
 class FileBrowser(tichy.Application):
+
     name = 'Browser'
     icon = 'icon.png'
     category = 'general' # So that we see the app in the launcher
-    
+
     def __init__(self, *args):
         super(FileBrowser, self).__init__(*args)
         self.list = tichy.List()
-        
+
     def run(self, parent):
-        w = gui.Window(parent, modal = True)
+        w = gui.Window(parent, modal=True)
         frame = self.view(w, back_button="Load")
-        vbox = gui.Box(frame, axis = 1)
-        
+        vbox = gui.Box(frame, axis=1)
+
         list_view = self.list.view(vbox)
-        
-        gui.Spring(vbox, axis = 1)
-        
+
+        gui.Spring(vbox, axis=1)
+
         self.select_path(os.path.expanduser('~/'))
-        
-        yield tichy.Wait(frame, 'back')     # Wait until the back button is clicked
-        w.destroy()                   # Don't forget to close the window
+
+        yield tichy.Wait(frame, 'back')
+        w.destroy()
 
     def select_path(self, path):
         if not os.path.isdir(path):
             return
-    
         self.dir = path
         self.list.clear()
         list = sorted(os.listdir(path))
@@ -77,39 +82,40 @@ class FileBrowser(tichy.Application):
             if file.startswith('.'):
                 continue
             self.list.append(FileItem(self, os.path.join(path, file)))
-            
-            
+
+
 class SelectFileBrowser(FileBrowser):
+
     def __init__(self, *args):
         super(SelectFileBrowser, self).__init__(*args)
-        
-    def run(self, parent, file_name = '', can_create = False):
-        w = gui.Window(parent, modal = True)
+
+    def run(self, parent, file_name='', can_create=False):
+        w = gui.Window(parent, modal=True)
         msg = can_create and 'Save' or 'Load'
-        frame = self.view(w, title = 'Select File', back_button=msg)
-        vbox = gui.Box(frame, axis = 1)
-        
-        self.file_name_item = tichy.Text(file_name, editable = can_create)
+        frame = self.view(w, title='Select File', back_button=msg)
+        vbox = gui.Box(frame, axis=1)
+
+        self.file_name_item = tichy.Text(file_name, editable=can_create)
         self.file_name_item.view(vbox)
-        
+
         list_view = self.list.view(vbox)
-        
-        gui.Spring(vbox, axis = 1)
-        
+
+        gui.Spring(vbox, axis=1)
+
         self.select_path(os.path.expanduser('~/'))
-        
-        yield tichy.Wait(frame, 'back')     # Wait until the quit button is clicked
-        w.destroy()                   # Don't forget to close the window
-        
+
+        yield tichy.Wait(frame, 'back')
+        w.destroy()
+
         # Return the result
         yield os.path.join(self.dir, self.file_name_item.value)
-        
+
     def select_path(self, path):
         if not os.path.isdir(path):
             logger.info("selecting %s", os.path.basename(path))
             self.file_name_item.value = os.path.basename(path)
             return
-    
+
         self.dir = path
         self.list.clear()
         list = sorted(os.listdir(path))
@@ -118,11 +124,14 @@ class SelectFileBrowser(FileBrowser):
             if file.startswith('.'):
                 continue
             self.list.append(FileItem(self, os.path.join(path, file)))
-        
+
 
 class FileBrowserService(tichy.Service):
+
     service = 'FileBrowser'
+
     def get_save_path(self, parent, name):
         return SelectFileBrowser(parent, name, True)
+
     def get_load_path(self, parent):
         return SelectFileBrowser(parent, '', False)

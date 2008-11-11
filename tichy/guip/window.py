@@ -19,35 +19,38 @@
 
 
 from widget import Widget
-from ..tasklet import Tasklet
+from tichy.tasklet import Tasklet
 
 import logging
 logger = logging.getLogger('gui.Window')
 
+
 class Window(Widget):
     """Special widget that can receive events from an external source
-        
+
     A window can also be an event source for other sub window. We can
     also block the events to all but one child, making it a modal
     dialog.
     """
-    def __init__(self, parent, modal = True, events_source = None, **kargs):
+
+    def __init__(self, parent, modal=True, events_source=None, **kargs):
         super(Window, self).__init__(parent, **kargs)
         if events_source is None:
-            events_source = parent if isinstance(parent, Window) else parent.window
+            events_source = parent if isinstance(parent, Window) else \
+                parent.window
         self.events_source = events_source
         self.modal_child = None
         if modal:
             self.events_source.modal_child = self
-            
+
         self.child_need_organize = False
         self.child_need_resize = False
-        
+
     def remove(self, w):
         super(Window, self).remove(w)
         if w is self.modal_child:
             self.modal_child = None
-            
+
     def sorted_children(self):
         # Since the children can overlap in a window We define that
         # the last window added is on the top Maybe we need to have a
@@ -55,15 +58,16 @@ class Window(Widget):
         if self.modal_child:
             return [self.modal_child]
         return list(reversed(self.children))
-        
+
     def resize(self):
         return
-        
+
     def need_organize(self, child):
         self.child_need_organize = True
+
     def need_resize(self, child):
         self.child_need_resize = True
-            
+
     def draw(self, painter):
         if self.modal_child is None:
             Widget.draw(self, painter)
@@ -71,7 +75,7 @@ class Window(Widget):
             painter.move(self.modal_child.pos)
             self.modal_child.draw(painter)
             painter.umove(self.modal_child.pos)
-            
+
     def tick(self):
         while self.child_need_resize:
             self.child_need_resize = False
@@ -79,19 +83,23 @@ class Window(Widget):
         while self.child_need_organize:
             self.child_need_organize = False
             self.do_organize()
-        
+
         self.events = []
         if not self.modal_child:
-            for e,v in self.events_source.events:
+            for e, v in self.events_source.events:
                 if e == 'mouse-down':
-                    if self.mouse_down(*v): continue
-                if e == 'mouse-up':
-                    if self.mouse_up(*v): continue
-                if e == 'mouse-motion':
-                    if self.mouse_motion(*v): continue
-                if e == 'key-down':
-                    if self.key_down(*v): continue
-                if e == 'resized':
+                    if self.mouse_down(*v):
+                        continue
+                elif e == 'mouse-up':
+                    if self.mouse_up(*v):
+                        continue
+                elif e == 'mouse-motion':
+                    if self.mouse_motion(*v):
+                        continue
+                elif e == 'key-down':
+                    if self.key_down(*v):
+                        continue
+                elif e == 'resized':
                     self.size = v[0]
                     self.resized = False
             for c in self.children:

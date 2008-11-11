@@ -1,3 +1,23 @@
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
+
 import tichy
 import tichy.gui as gui
 
@@ -5,14 +25,15 @@ import tichy.gui as gui
 class Launcher(tichy.Application):
     """ The main application, used to start any other application
     """
+
     name = "Launcher"
     enabled = False
-    
+
     design = 'Grid'
-    
+
     def run(self, window):
         frame = self.view(window)
-        
+
         # We populate the frame with all the applications
         self.list_view = None
         self.populate(frame)
@@ -24,9 +45,11 @@ class Launcher(tichy.Application):
         # the item does not really toggle back.
         # we will need a one that does 'launched' probably
         lock_item.connect('activated', run_lock)
-        
-        # If the design change we repopulate the frame
-        # This is a little bit tricky. We use the 'changed' signal from the Service('Design') base object... 
+
+        # If the design change we repopulate the frame This is a
+        # little bit tricky. We use the 'changed' signal from the
+        # Service('Design') base object...
+
         def on_design_changed(s, design):
             self.populate(frame)
         tichy.Service('Design').base.connect('changed', on_design_changed)
@@ -34,7 +57,7 @@ class Launcher(tichy.Application):
         # Wait until the quit button is clicked
         quit_item = frame.actor.new_action('Quit')
         yield tichy.tasklet.Wait(quit_item, 'activated')
-        
+
     def populate(self, frame):
         if self.list_view:
             self.list_view.destroy()

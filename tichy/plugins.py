@@ -24,12 +24,14 @@ import sys
 import logging
 logger = logging.getLogger('plugins')
 
+
 def get_all_module_paths(dir):
     for root, dirs, files in os.walk(dir):
         if '%s.py' % os.path.basename(root) in files:
             yield root
             dirs[:] = []
-            
+
+
 def import_all(dir):
     logger.info("import_all %s", dir)
     if not os.path.exists(dir):
@@ -37,7 +39,8 @@ def import_all(dir):
         raise IOError
     for path in get_all_module_paths(dir):
         import_single(path)
-        
+
+
 def import_single(dir):
     name = os.path.basename(dir)
     sys_path = sys.path[:]
@@ -49,6 +52,7 @@ def import_single(dir):
         logger.error("can't import %s : %s", dir, e)
     finally:
         sys.path[:] = sys_path
+
 
 if __name__ == '__main__':
     for p in get_all_module_paths("."):

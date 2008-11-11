@@ -17,76 +17,68 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-from .tasklet import Tasklet
-from .item import Item
-from .service import Service
+from tichy.tasklet import Tasklet
+from tichy.item import Item
+from tichy.service import Service
 import tichy
 
 # TODO: shouldn't we rename this to Applet ???
 
+
 class Application(Tasklet, Item):
     """This class represents an application
-    
-       To create a new application just subclass this class, the new
-       application will be automatically registered thanks to the Item
-       class "magic".
 
-        you can create the following class attributes
+    To create a new application just subclass this class, the new
+    application will be automatically registered thanks to the Item
+    class "magic".
 
-        - name : the name of the app
+    you can create the following class attributes
 
-        - icon : an optional path to an icon
+    - name : the name of the app
 
-        - category : a string represneting the category in which the
-          application should appears in the launcher application If
-          the name or category is not defined, then the app won't show
-          up in the laucher application
-        
-        The view method of an application instance will create a frame
-        that the application can use.
-    
-        Here is an example of a simple app :
-        
-        class SmallApp(Application):
-            name = 'Test'
-            category = 'general'
-            def run(self, parent):
-                w = gui.Window(parent, modal = True)   # We run into a new modal window
-                frame = self.view(w) 
-                    
-                yield Wait(b, 'clicked')     # Wait until the quit button is clicked
-                w.destroy()                   # Don't forget to close the window
+    - icon : an optional path to an icon
+
+    - category : a string represneting the category in which the
+      application should appears in the launcher application If the
+      name or category is not defined, then the app won't show up in
+      the laucher application
+
+    The view method of an application instance will create a frame
+    that the application can use.
     """
-    
+
     design = None #: Set this to the name of a Design service to
                   #specify the optimal design TODO: should we set it
                   #to 'Default' by default ??
-    
+
     # Because we want to make Application class behave like Item, we
-    # have to redefine those method using class method...
+    # have to redefine those methods using class method...
+
     @classmethod
     def create_actor(cls):
-        from .actor import Actor
+        from tichy import Actor
         ret = Actor(cls)
         run_action = ret.new_action("Run")
+
         def on_run_action(action, app, view):
             yield app(view.window)
+
         ret.default_action = run_action    # So that by default we run
                                            # the application
         run_action.connect('activated', on_run_action)
-        
+
         return ret
-        
+
     @classmethod
     def get_text(cls):
         """
         Return the name of the application
-           
+
         default to the class 'name' attribute
         """
         from .text import Text
         return Text(cls.name)
-    
+
     def view(self, parent, **kargs):
         """
         Create a view of a frame for the application in the parent widget
@@ -94,7 +86,7 @@ class Application(Tasklet, Item):
         # The 'Design' service is in charge of creating the frame
         design = Service('Design')
         return design.view_application(parent, self, **kargs)
-        
+
     def do_run(self, *args, **kargs):
         """You shouldn't change this, redefine the run method instead"""
         # Before trunning the app we set the default design the the
@@ -106,7 +98,8 @@ class Application(Tasklet, Item):
         if self.design:
             tichy.Service.set_default('Design', old_design)
         yield ret
-        
+
+
 class Gadget(Application):
     """Special Application that can be put in a bar.
     """

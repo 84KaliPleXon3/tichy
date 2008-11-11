@@ -23,19 +23,19 @@
 from tasklet import Tasklet, Wait
 import gobject
 
-        
+
 class MainLoop():
+
     def __init__(self, window):
-        super(MainLoop, self).__init__(self, window, (0,0))
-        
+        super(MainLoop, self).__init__(self, window, (0, 0))
+
     def get_events(self):
         return []
+
     def set_events(self, value):
         pass
-        
+
     events = property(get_events, set_events)
 
-            
     def wait_source(self):
         return MainLoop.Tick()
-        

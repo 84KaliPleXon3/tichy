@@ -18,6 +18,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 import os
 
@@ -30,6 +31,7 @@ import commands
 
 # After too many troubles I decided to stop using cython in the build
 # process from Cython.Distutils import build_ext
+
 
 def plugins_files():
     """generate the plugins data files list
@@ -52,12 +54,13 @@ def plugins_files():
                 src.append(path)
         ret.append((dest, src))
     return ret
-    
+
+
 def make_extension(name):
     """Create an extension for a given guic file
     """
-    flags_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
-    
+    flags_map = {'-I': 'include_dirs', '-L': 'library_dirs',
+                 '-l': 'libraries'}
     # I copied all this stuff from python-etk serup file I should do
     # it a better way. What we do here is parsing the output of
     # pkg-config to get the Extension arguments
@@ -73,31 +76,27 @@ def make_extension(name):
             kargs.setdefault(flags_map[token[:2]], []).append(token[2:])
         else:
             kargs.setdefault("extra_compile_args", []).append(token)
-    
-    return Extension(
-            '%s' % name,
-            sources=['tichy/guic/%s.c' % name],
-            **kargs
-        )
+
+    return Extension('%s' % name,
+                     sources=['tichy/guic/%s.c' % name],
+                     **kargs)
+
 
 setup(name='Tichy',
-    version='0.1',
-    description='Python Applet Manager for OpenMoko',
-    author="Guillaume 'charlie' Chereau",
-    author_email='charlie@openmoko.org',
-    # url='',
-    packages = [
-        'tichy', 'tichy.contacts', 'tichy.guic', 'tichy.guip',
-        'tichy.phone', 'tichy.prefs',
-    ],
-    scripts= ['test/tichy'],
-    # XXX: Those data locations work on my neo, but not on ubuntu !
-    data_files = [
-        ('applications', ['data/tichy.desktop']),
-        ('pixmaps', ['data/tichy.png']),
-        ('tichy/pics', ['tichy/pics/sim.png'])
-    ] + plugins_files(),
-    ext_package='tichy.guic',
-    ext_modules=[make_extension(x) for x in ['geo', 'cobject', 'widget', 'frame', 'painter', 'sdl_painter', 'window', 'surf_widget', 'image']],
-    # cmdclass = {'build_ext': build_ext},
-)
+      version='0.1',
+      description='Python Applet Manager for OpenMoko',
+      author="Guillaume 'charlie' Chereau",
+      author_email='charlie@openmoko.org',
+      # url='',
+      packages = ['tichy', 'tichy.contacts', 'tichy.guic', 'tichy.guip',
+                  'tichy.phone', 'tichy.prefs'],
+      scripts= ['test/tichy'],
+      # XXX: Those data locations work on my neo, but not on ubuntu !
+      data_files = [('applications', ['data/tichy.desktop']),
+                    ('pixmaps', ['data/tichy.png']),
+                    ('tichy/pics', ['tichy/pics/sim.png'])] + \
+          plugins_files(),
+      ext_package='tichy.guic',
+      ext_modules=[make_extension(x) for x in [
+            'geo', 'cobject', 'widget', 'frame', 'painter', 'sdl_painter',
+            'window', 'surf_widget', 'image']])

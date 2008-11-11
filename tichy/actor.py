@@ -50,15 +50,17 @@ from tichy.application import Application
 from tichy.tasklet import Wait, WaitFirst, Tasklet
 from tichy.service import Service
 
+
 class Action(Object):
     """ The Action class
     """
+
     def __init__(self, actor, name):
         """Create a new action into `actor`.
-        
+
         You shouldn't call this method, but use the Actor.new_action
         method instead.
-        
+
         :Parameters:
         - `actor`: the parent actor
         - `name`: the name of the action
@@ -68,10 +70,10 @@ class Action(Object):
         self.name = name
         actor.add(self)
         self.sub_actor = None
-        
-    def activate(self, view = None):
+
+    def activate(self, view=None):
         """trigger the action
-        
+
         :Parameters:
         - `view`: the widget from wich the action was activated.
         It is useful to retreive the window if we want to start
@@ -86,56 +88,59 @@ class Action(Object):
             design.select_actor(self.sub_actor, view)
         else:
             self.emit('activated', self.actor.item, view)
-        
+
     def new_action(self, name):
         """Create a sub action of the action"""
         if not self.sub_actor:
             self.sub_actor = Actor(self)
         return self.sub_actor.new_action(name)
 
+
 class Actor(tichy.Item):
     """Special item that represent a list of action on an item OR an Item
 class
-    
+
     It is very usefull, because it abstract all the mechanism to
     select an action on an item.  You just need to create a actor on
     an object, maybe add a few specific action depending on the
     context, and then you add a view of this actor in your gui, and
     that's it.
     """
+
     def __init__(self, item):
         """Create a new Actor on an given Item
-        
+
         You shouldn't call this directly but use the
         Item.create_actor() method
-        
+
         :Parameters:
-        - `item`: the item the actor represents 
+        - `item`: the item the actor represents
         """
         super(Actor, self).__init__()
         self.item = item
         self.actions = []
         self.default_action = None
-        
-    # The item name of the actor is the same than the item name XXX:
-    # we should be able to only override the get_name method cause the
-    # name attribute is not supposed to be used anymore
+
     def __get_name(self):
+        # The item name of the actor is the same than the item name
+        #
+        # XXX: we should be able to only override the get_name method
+        # cause the name attribute is not supposed to be used anymore
         return self.item.name
     name = property(__get_name)
-        
+
     def add(self, action):
         """Don't call this method, it is already called in Action.__init__"""
         self.actions.append(action)
-        
+
     def new_action(self, name):
         """Create a new action in the Actor
-        
+
         :Parameters:
         - `name`: the name of the action
         """
         return Action(self, name)
-        
+
     def view(self, parent, **kargs):
         """Create a view of the Actor in a parent widget.
         """
@@ -144,21 +149,22 @@ class
         return design.view_actor(parent, self, **kargs)
 
 
-# XXX: what is this thing doing here ?
 class ChoicesApp(Application):
+    # XXX: what is this thing doing here ?
+
     def run(self, parent, name, *choices):
         from ..gui import Box, Button, Label, Window, Scrollable
-        
+
         window = Window(parent)
         frame = self.view(window, title=name)
-        scrollable = Scrollable(frame, axis = 1)
-        box = Box(scrollable, axis = 1)
+        scrollable = Scrollable(frame, axis=1)
+        box = Box(scrollable, axis=1)
         buttons = []
         for choice in choices:
             button = Button(box)
             Label(button, choice)
             buttons.append(button)
-        
+
         ret = yield WaitFirst(*[Wait(b, 'clicked') for b in buttons])
         window.destroy()
         yield ret[0]

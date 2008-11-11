@@ -20,7 +20,9 @@
 import tichy
 import tichy.gui as gui
 
+
 class Test(tichy.Application):
+
     name = 'Test'
     icon = None
     category = 'general' # So that we see the app in the launcher
@@ -28,7 +30,7 @@ class Test(tichy.Application):
     def run(self, parent):
         self.window = gui.Window(parent)
         frame = self.view(self.window, back_button=True)
-        vbox = gui.Box(frame, axis = 1, expand=True)
+        vbox = gui.Box(frame, axis=1, expand=True)
 
         button = gui.Button(vbox)
         gui.Label(button, "fake SMS")

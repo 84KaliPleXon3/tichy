@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 #    Tichy
 #
@@ -20,23 +19,25 @@
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 import tichy
-from tel_number import TelNumber 
+from tel_number import TelNumber
+
 
 class Call(tichy.Item):
-    def __init__(self, number, direction = 'out'):
+
+    def __init__(self, number, direction='out'):
         self.number = TelNumber(number)
         self.direction = direction
         self.status = 'inactive'
-        
+
     def get_text(self):
         return self.number.get_text()
-        
+
     def initiate(self):
         gsm_service = tichy.Service('GSM')
         gsm_service.initiate(self)
         self.status = 'initiating'
         self.emit(self.status)
-    
+
     def release(self):
         if self.status in ['releasing', 'released']:
             return
@@ -44,23 +45,21 @@ class Call(tichy.Item):
         gsm_service.release(self)
         self.status = 'releasing'
         self.emit(self.status)
-        
+
     def activate(self):
         gsm_service = tichy.Service('GSM')
         gsm_service.activate(self)
         self.status = 'activating'
         self.emit(self.status)
-        
-    ##############
-    
+
     def outgoing(self):
         self.status = 'outgoing'
         self.emit('outgoing')
-    
+
     def active(self):
         self.status = 'active'
         self.emit('activated')
-        
+
     def released(self):
         self.status = 'released'
         self.emit('released')

@@ -18,35 +18,42 @@
 
 import tichy
 
+
 class Image(tichy.Item):
-    def __init__(self, path, size = None):
+    """Base class for images"""
+
+    def __init__(self, path, size=None):
+        """create a new image from a file
+        """
         super(Image, self).__init__()
         assert isinstance(path, basestring), type(path)
         self.__path = path
         self.surf = None
         self.size = size
-        
+
     def __get_path(self):
         return self.__path
+
     def __set_path(self, value):
         assert isinstance(value, basestring)
         self.__path = value
         self.surf = None
         self.emit('modified')
+
     path = property(__get_path, __set_path)
-        
+
     def __repr__(self):
         return "Image(%s)" % self.path
-        
+
     def load(self, painter):
         if self.surf:
             return
         self.surf = painter.surface_from_image(self.path)
-        
+
     def view(self, parent):
         import tichy.gui
         return tichy.gui.ImageWidget(parent, self)
-        
+
     def draw(self, painter, size=None):
         self.load(painter)
         painter.draw_surface(self.surf)

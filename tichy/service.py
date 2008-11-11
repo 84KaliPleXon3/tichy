@@ -30,18 +30,21 @@ logger = logging.getLogger('Service')
 #        TestGSM(Service(GSM)): pass. But I don't know how to do that
 #        correctly...
 
+
 class BaseService(Item):
     """Base class for all services
 
     This class is used to have a common class associated with all
     service with the same 'service' attribute
     """
+
     def __init__(self, service):
         self.service = service
 
 
 class ServiceMetaClass(ItemMetaClass):
     """The meta class for Service class"""
+
     def __init__(cls, name, bases, dict):
         """Register a service class
         """
@@ -53,19 +56,24 @@ class ServiceMetaClass(ItemMetaClass):
                 cls._Service__init = dict['__init__']
                 cls.__init__ = Service.__init__
             logger.debug("Register %s as service %s", cls, service_name)
-            Service._Service__all_services.setdefault(service_name, []).append(cls)
+            Service._Service__all_services.setdefault(
+                service_name, []).append(cls)
             if service_name not in Service._Service__bases:
-                Service._Service__bases[service_name] = BaseService(service_name)
+                Service._Service__bases[service_name] = \
+                    BaseService(service_name)
             cls.base = Service._Service__bases[service_name]
         ItemMetaClass.__init__(cls, name, bases, dict)
-        
+
+
 class ServiceUnusable(Exception):
     """Exception raised by a service if it not usable
-    
+
     The service module will then try to use an other service.
     """
-    def __init__(self, msg = None):
+
+    def __init__(self, msg=None):
         super(ServiceUnusable, self).__init__(msg)
+
 
 class Service(Item):
     """Service base class
@@ -82,6 +90,7 @@ class Service(Item):
 
     A service is also an item, so it can have a `name` attribute.
     """
+
     __metaclass__ = ServiceMetaClass
     # This attribute is a dict of list : (service_name -> [service_cls])
     __all_services = {}
@@ -92,13 +101,13 @@ class Service(Item):
     # group This object is put into the `base` attribute of every
     # service classes. That is a little bit tricky !
     __bases = {}
-    
+
     # This is used to store the sigleton value of the service
     __singleton = None
-    
+
     enabled = True
     name = None
-    
+
     @classmethod
     def set_default(cls, service, default):
         """Set a given service as the default one"""
@@ -106,7 +115,7 @@ class Service(Item):
             default = Service(service, default)
         cls.__defaults[service] = default
         Service.__bases[service].emit("changed", default)
-        
+
     @classmethod
     def get_all(cls, name):
         """return all the service that have a given name
@@ -126,9 +135,9 @@ class Service(Item):
                 logger.warning("service %s unusable, skipped", service)
         return ret
 
-    def __new__(cls, service = None, name = None):
+    def __new__(cls, service=None, name=None):
         """Return a service instance that implement a given service
- 
+
         :Parameters:
 
         service : string giving the service name
@@ -136,15 +145,15 @@ class Service(Item):
         name : if given, we specify the actual service namee we want
         """
         logger.debug("try to get service %s", service)
-        
+
         if service is None:
             return Item.__new__(cls)
-            
+
         all_services = Service.__all_services.get(service, [])
-        
+
         if service in cls.__defaults:
             all_services = [cls.__defaults[service]] + all_services
-            
+
         for service_cls in all_services:
             if name and service_cls.name != name:
                 continue
@@ -156,10 +165,10 @@ class Service(Item):
             except ServiceUnusable:
                 logger.warning("service %s unusable, skipped", service_cls)
         raise KeyError("can't find any service '%s'" % service)
-        
-    def __init__(self, service = None, name = None):
+
+    def __init__(self, service=None, name=None):
         super(Service, self).__init__()
-        
+
     def __init(self):
         pass
 
@@ -171,6 +180,3 @@ class Service(Item):
             singleton.__init()
             cls.__singleton = singleton
         return cls.__singleton
-
-
-        

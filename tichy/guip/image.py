@@ -20,7 +20,9 @@
 from widget import Widget
 from geo import Vect, asvect
 
+
 class ImageWidget(Widget):
+
     def __init__(self, parent, image, **kargs):
         self.image = image
         size = asvect(image.size) if image.size else None
@@ -28,14 +30,14 @@ class ImageWidget(Widget):
                                           optimal_size=size, min_size=size,
                                           **kargs)
         self.connection = image.connect('modified', self.on_image_modified)
-    
+
     def draw(self, painter):
         self.image.load(painter)
         painter.draw_surface(self.image.surf)
-    
+
     def on_image_modified(self, image):
         self.need_redraw(self.rect)
-        
+
     def destroy(self):
         # Very important, cause otherwise the image keep having a
         # reference to the view

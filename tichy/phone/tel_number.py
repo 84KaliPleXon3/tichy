@@ -19,7 +19,9 @@
 
 import tichy
 
+
 class TelNumber(tichy.Text):
+
     def __init__(self, text):
         super(TelNumber, self).__init__(text)
         # This is the text that is used for the view of the number It
@@ -32,11 +34,11 @@ class TelNumber(tichy.Text):
 
     def input_method(self):
         return 'number'
-    
+
     def get_text(self):
         self.update_view_text()
         return self.view_text
-        
+
     def update_view_text(self):
         # We check if the number is from a contact.  If so we set the
         # view text
@@ -46,17 +48,20 @@ class TelNumber(tichy.Text):
             self.view_text.value = contact.get_text()
         else:
             self.view_text.value = self.value
-            
-    def edit(self, window, name = 'number', **kargs):
+
+    def edit(self, window, name='number', **kargs):
         text_edit = tichy.Service('TextEdit')
-        return text_edit.edit(window, self, input_method='number', name=name, **kargs)
-        
+        return text_edit.edit(window, self, input_method='number',
+                              name=name, **kargs)
+
     def create_actor(self):
         ret = super(TelNumber, self).create_actor()
+
         def on_contact(actor, item, view):
             select_contact = tichy.Service('SelectContact')
             contact = yield select_contact.select(view.window)
-            if 'tel' in contact: 
+            if 'tel' in contact:
                 item.value = str(contact['tel'])
         ret.new_action("Contact").connect('activated', on_contact)
+
         return ret

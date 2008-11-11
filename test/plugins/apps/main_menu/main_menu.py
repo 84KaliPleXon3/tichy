@@ -37,20 +37,23 @@ try:
 except ImportError:
     logger.info("Failed to import pyxdg modules")
 
-def shlex_split(s):
-  return map(lambda x: unicode(x, "UTF-8"),
-      shlex.split(s.encode("UTF-8")))
 
-# from http://effbot.org/librarybook/os.htm
-# this is a temp solution to complete 0.1 version
+def shlex_split(s):
+    return map(lambda x: unicode(x, "UTF-8"),
+               shlex.split(s.encode("UTF-8")))
+
+
 def spawn(program, *args):
+    """from http://effbot.org/librarybook/os.htm
+    this is a temp solution to complete 0.1 version"""
     try:
-        return os.spawnvp(os.P_NOWAIT, program, (program,) )
+        return os.spawnvp(os.P_NOWAIT, program, (program, ))
     except AttributeError:
         pass
 
 
 class XdgMenuItem(tichy.Item):
+
     def __init__(self, main_app, entry):
         self.main_app = main_app
         self.entry = entry
@@ -68,8 +71,8 @@ class XdgMenuItem(tichy.Item):
 
         # (extension param does not seem to work well??)
         if icon_path is None or \
-           not os.path.exists(icon_path) or \
-           not icon_path[-3:] in ('png','svg','xpm','gif'):
+                not os.path.exists(icon_path) or \
+                not icon_path[-3:] in ('png', 'svg', 'xpm', 'gif'):
 
             icon_path = xdg.IconTheme.getIconPath(iconname='image-missing',
                                                   size=32,
@@ -80,9 +83,9 @@ class XdgMenuItem(tichy.Item):
     def view(self, parent):
         ### should I use actor?
         displayButton = gui.Button(parent)
-        displayButtonBox = gui.Box(displayButton, axis = 0)
+        displayButtonBox = gui.Box(displayButton, axis=0)
         tichy.Image(self.get_icon_path(),
-                  size = Vect(96,96)).view(displayButtonBox)
+                    size=Vect(96, 96)).view(displayButtonBox)
         tichy.Text(self.name).view(displayButtonBox)
 
         self.button = displayButton
@@ -92,6 +95,7 @@ class XdgMenuItem(tichy.Item):
 
 class XdgMenuEntry(XdgMenuItem):
     """Define a launcher item for an entry in the xdg list"""
+
     def __init__(self, main_app, entry):
         super(XdgMenuEntry, self).__init__(main_app, entry)
         self.name = entry.getName()
@@ -100,6 +104,7 @@ class XdgMenuEntry(XdgMenuItem):
         self.run_app()
 
     # taken from rox-xdg-menu and perverted ;)
+
     def run_app(self, *args):
         path = None
         cmdv = None
@@ -114,19 +119,21 @@ class XdgMenuEntry(XdgMenuItem):
             logger.info("Lauching: %s", " ".join(cmdv))
             spawn(cmdv[0], *cmdv[1:])
 
-
     def get_exec_expanded(self):
         e = self.entry.getExec()
-        if e is None: return None
+        if e is None:
+            return None
         icon = self.entry.getIcon()
         cmd = ""
         i, n = 0, len(e)
         while i < n:
-            c = e[i]; i += 1
+            c = e[i]
+            i += 1
             if c != "%":
                 cmd += c
             else:
-                c = e[i]; i = i+1
+                c = e[i]
+                i = i+1
                 if c == "%":
                     cmd += c
                 elif c == "i" and icon:
@@ -138,6 +145,7 @@ class XdgMenuEntry(XdgMenuItem):
 
 class XdgMenu(XdgMenuItem):
     """Define a sub menu entry of the xdg app list"""
+
     def __init__(self, main_app, entry, name=None):
         super(XdgMenu, self).__init__(main_app, entry)
         self.name = name or entry.getName() + ' >>'
@@ -145,7 +153,9 @@ class XdgMenu(XdgMenuItem):
     def on_click(self, window):
         self.main_app.generate_xdg_menu(self.entry)
 
+
 class MainMenu(tichy.Application):
+
     name = 'Main Menu'
     icon = 'icon.png'
     # category = 'general' # So that we see the app in the launcher
@@ -157,45 +167,43 @@ class MainMenu(tichy.Application):
 
         #### icon theme ####
         self.xdg_theme = 'gnome'
-        logger.info("Using icon theme: %s" % (self.xdg_theme,))
+        logger.info("Using icon theme: %s" % (self.xdg_theme, ))
         #### supported desktopentry types ####
-        self.xdg_types = ('Application',)
+        self.xdg_types = ('Application', )
         logger.info("Limit to following .desktop types: %s" %
-                     (self.xdg_types,))
+                    (self.xdg_types, ))
 
     def run(self, parent):
         #### build and layout ####
-        mainWindow = gui.Window(parent, modal = True)
+        mainWindow = gui.Window(parent, modal=True)
         appFrame = self.view(mainWindow, back_button=True)
-        vbox = gui.Box(appFrame, axis = 1, border=0)
+        vbox = gui.Box(appFrame, axis=1, border=0)
         appListView = self.list.view(vbox)
-        gui.Spring(vbox, axis = 1)
+        gui.Spring(vbox, axis=1)
         upButton = gui.Button(vbox)
-        gui.Label(upButton,'.. previous menu ..')
+        gui.Label(upButton, '.. previous menu ..')
 
-        upButton.connect('clicked',self.go_up)
+        upButton.connect('clicked', self.go_up)
 
         #### retrieve app list ####
         self.generate_xdg_menu(xdg.Menu.parse())
 
         #### close button ####
-        yield tichy.Wait(appFrame,'back')
+        yield tichy.Wait(appFrame, 'back')
         mainWindow.destroy()
 
     def go_up(self, window):
-       if isinstance(self.current_xdg_menu.Parent, xdg.Menu.Menu):
-          self.generate_xdg_menu(self.current_xdg_menu.Parent)
+        if isinstance(self.current_xdg_menu.Parent, xdg.Menu.Menu):
+            self.generate_xdg_menu(self.current_xdg_menu.Parent)
 
     def generate_xdg_menu(self, xdg_menu):
         self.list.clear()
         self.current_xdg_menu = xdg_menu
         for entry in xdg_menu.getEntries():
             if isinstance(entry, xdg.Menu.Menu):
-                if entry.getName() == '.hidden': continue
+                if entry.getName() == '.hidden':
+                    continue
                 self.list.append(XdgMenu(self, entry))
             elif isinstance(entry, xdg.Menu.MenuEntry):
                 if entry.DesktopEntry.getType() in self.xdg_types:
                     self.list.append(XdgMenuEntry(self, entry.DesktopEntry))
-
-
-

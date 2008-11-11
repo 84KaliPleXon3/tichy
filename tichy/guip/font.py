@@ -20,35 +20,38 @@
 import pygame
 import pygame.font
 
+
 class Font(object):
-    def __init__(self, name = None, size = 32):
+
+    def __init__(self, name=None, size=32):
         name = name or 'arplumingtwmbe'
         file = pygame.font.match_font(name)
         self.font = pygame.font.Font(file, size)
-        
-    def render_line(self, text, color = None):
+
+    def render_line(self, text, color=None):
         # We use a little trick to add a border to the text
         border = self.font.render(text, True, (64, 64, 64))
         text = self.font.render(text, True, (255, 255, 255))
-        ret = pygame.Surface(text.get_rect().inflate(2,2).size, 0, text)
-        for x in (0,2):
-            for y in (0,2):
-                ret.blit(border, (x,y))
+        ret = pygame.Surface(text.get_rect().inflate(2, 2).size, 0, text)
+        for x in (0, 2):
+            for y in (0, 2):
+                ret.blit(border, (x, y))
         ret.blit(text, (1, 1))
         return ret.convert_alpha()
-        
-    def render(self, text, color = None, length = None):
+
+    def render(self, text, color=None, length=None):
         lines = self.split(text, length)
         surfs = [self.render_line(line) for line in lines]
         height = self.font.get_height()
-        rects = [surf.get_rect().move(0, height * i) for i,surf in enumerate(surfs)]
-        rect = pygame.Rect(0,0,0,0).unionall(rects)
+        rects = [surf.get_rect().move(0, height * i) \
+                     for i, surf in enumerate(surfs)]
+        rect = pygame.Rect(0, 0, 0, 0).unionall(rects)
         surf = pygame.Surface(rect.size, pygame.SRCALPHA, 32).convert_alpha()
-        for s,r in zip(surfs, rects):
+        for s, r in zip(surfs, rects):
             surf.blit(s, r)
         return surf
-        
-    def split(self, text, length = None):
+
+    def split(self, text, length=None):
         # For the moment we use a very stupid way of doing it...
         ret = []
         i = 0

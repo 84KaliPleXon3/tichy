@@ -1,8 +1,10 @@
 			  Tichy coding style
 
 Tichy follows the python codding style defined by Guido van Rossum in
-PEP0008 : http://www.python.org/dev/peps/pep-0008/ (The only
-difference being that sometime I think lines over 80 characters are
-better than having long breaked line)
+PEP0008 : http://www.python.org/dev/peps/pep-0008/
 
-Anybody contributing to tichy : please read this document carefully !
+There is a script in the 'tools' directory called 'pep.py' that can be
+used to check the code for coding style errors.
+
+Anybody contributing to tichy : please read the PEP and use the script
+to check your code before committing.

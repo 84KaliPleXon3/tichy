@@ -47,4 +47,3 @@ import notifications
 # The mainloop is defined here !
 # We can use it to access to the timeout_add method
 mainloop = gui.EventsLoop()
-

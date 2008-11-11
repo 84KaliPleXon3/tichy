@@ -30,25 +30,28 @@ from tichy.service import Service
 
 import logging
 logger = logging.getLogger('App.Terminal')
-        
+
+
 class Terminal(Application):
+
     name = "Terminal"
     category = 'general' # So that we see the app in the launcher
-     
+
     def run(self, window):
-        self.window = gui.Window(window, modal = True)   # We run into a new modal window
+        self.window = gui.Window(window, modal=True)
         frame = self.view(self.window, back_button=True)
-        
-        vbox = gui.Box(frame, axis = 1)
+
+        vbox = gui.Box(frame, axis=1)
         self.x_window = gui.XWindow(vbox)
-        
+
         keyboard = Service('Keyboard').get()
         keyboard.view(vbox)
-        
-        # We need to be sure that the xwindow is exposed before we can start the subprocess...
+
+        # We need to be sure that the xwindow is exposed before we can
+        # start the subprocess...
         yield Wait(self.x_window, 'exposed')
         self.xterm = self.x_window.start_app('xterm')
-        
-        yield Wait(frame, 'back')     # Wait until the quit button is clicked
-        self.window.destroy()                   # Don't forget to close the window
+
+        yield Wait(frame, 'back')
+        self.window.destroy()
         os.kill(self.xterm.pid, signal.SIGKILL)

@@ -25,12 +25,15 @@ from tichy import gui
 import logging
 logger = logging.getLogger('Gadget.Notifications')
 
+
 class Notifications(tichy.Gadget):
     """Notification gadget
 
     This will show a little icon per active notifications.
     """
+
     name = 'Notifications'
+
     def run(self, window):
         """Create a new box for the notifications"""
         self.box = gui.Box(window, axis=0)

@@ -20,12 +20,16 @@
 from widget import Widget
 from geo import Vect
 
+
 class Spring(Widget):
-    """This widget does nothing but tries to extend, so it can be used to separate other widget"""
+    """This widget does nothing but tries to extend
+
+    It can be used to separate other widgets.
+    """
+
     def __init__(self, parent, axis, expand=True, **kargs):
         self.axis = axis
-        super(Spring, self).__init__(parent, expand=True, **kargs)#optimal_size = Vect(0, 640), **kargs)
-        
+        super(Spring, self).__init__(parent, expand=True, **kargs)
+
     def resistance(self, axis):
         return 0 if axis == self.axis else 1
-

@@ -24,6 +24,7 @@ logger = logging.getLogger('notifications')
 
 import tichy
 
+
 class Notification(tichy.Item):
     """Notification class
 
@@ -38,6 +39,7 @@ class Notification(tichy.Item):
     - released : emitted when the notification is released and
       shouldn't be taken care of anymore.
     """
+
     def __init__(self, service, msg, icon=None):
         super(Notification, self).__init__()
         self.service = service
@@ -53,6 +55,7 @@ class Notification(tichy.Item):
             return
         self.service._remove(self)
         self.emit('released')
+
 
 class Notifications(tichy.Service):
     """Notification service
@@ -80,7 +83,7 @@ class Notifications(tichy.Service):
         :Parameters:
 
         - msg : the message of the notification
-        
+
         - icon : an optional icon for the notification
         """
         notification = Notification(self, msg, icon)

@@ -26,40 +26,40 @@ from tichy.gui import Vect
 
 from application_view import ApplicationFrame
 
+
 class ListView(gui.Scrollable):
+
     def __init__(self, parent, list, expand=True, **kargs):
-        super(ListView, self).__init__(parent, item=list, axis=1, border=0, spacing=0, expand=expand)
-            
+        super(ListView, self).__init__(parent, item=list, axis=1, border=0,
+                                       spacing=0, expand=expand)
         vbox = gui.Box(self, axis=1)
         # We add the already present items :
         for item in list:
             item.view(vbox)
-        
+
         # This is important, we need to disconnect all the connections
         # we make when the view is destroyed
         #
         # TODO: could be cool to have this automated. But how to do it
         # ?
-        connections = [
-            list.connect('appened', self.on_appened, vbox),
-            list.connect('removed', self.on_removed, vbox),
-            list.connect('cleared', self.on_clear, vbox),
-        ]
+        connections = [list.connect('appened', self.on_appened, vbox),
+                       list.connect('removed', self.on_removed, vbox),
+                       list.connect('cleared', self.on_clear, vbox)]
         self.connect('destroyed', self.on_view_destroyed, connections)
-        
+
     def on_appened(self, list, value, view):
         value.view(view)
-        
+
     def on_removed(self, list, value, view):
         for c in view.children[:]:
             c.destroy()
         for item in list:
             item.view(view)
-        
+
     def on_clear(self, list, view):
         for c in view.children[:]:
             c.destroy()
-            
+
     def on_view_destroyed(self, view, connections):
         for c in connections:
             self.item.disconnect(c)
@@ -74,39 +74,40 @@ class Default(Service):
     An actor will be seen as a button, pressing the button will make
     the list of actions appear on the bottom of the window.
     """
+
     enabled = True
     service = 'Design'
     name = 'Default'
-    
+
     def __init__(self):
         self.selected = None
-    
+
     def view_list(self, parent, list, **kargs):
         return ListView(parent, list, **kargs)
-    
+
     def view_actor_list(self, parent, items, **kargs):
         return self.view_list(parent, items, **kargs)
-          
-    def view_actor(self, parent, actor, **kargs):  
+
+    def view_actor(self, parent, actor, **kargs):
         ret = gui.Button(parent, item=actor, holdable=1000, **kargs)
-        hbox = gui.Box(ret, axis=0, border = 0)
+        hbox = gui.Box(ret, axis=0, border=0)
         if actor.item.icon:
             icon_path = actor.item.path(actor.item.icon)
-            icon = tichy.Image(icon_path, size=Vect(96,96)).view(hbox)
+            icon = tichy.Image(icon_path, size=Vect(96, 96)).view(hbox)
         else:
-            gui.Widget(hbox, min_size=Vect(0,96))
+            gui.Widget(hbox, min_size=Vect(0, 96))
         actor.item.get_text().view(hbox)
-        
+
         def on_clicked(b, actor, self):
             self.select_actor(actor, b)
         ret.connect('clicked', on_clicked, actor, self)
-        
+
         def on_holded(b, actor, self):
             self.select_actor(actor, b, use_default=False)
         ret.connect('holded', on_holded, actor, self)
-        
+
         return ret
-        
+
     def select_actor(self, actor, view, use_default=True):
         # If the actor has a default action and it is the only one,
         # then we start it
@@ -116,7 +117,7 @@ class Default(Service):
             self.selected = None
             view.remove_tag('selected')
             return
-        
+
         if self.selected:
             self.selected.remove_tag('selected')
         if actor.default_action and use_default:
@@ -128,13 +129,13 @@ class Default(Service):
         # action_bar
         action_bar = view.parent_as(ApplicationFrame).action_bar
         action_bar.set_actor(actor, view)
-        
+
         # We have to make sure we remove the reference to this view if
         # it get destroyed this is a little tricky...
+
         def on_destroy(b):
             self.selected = None
         self.selected.connect('destroyed', on_destroy)
-        
+
     def view_application(self, parent, app, **kargs):
         return ApplicationFrame(parent, app, **kargs)
-

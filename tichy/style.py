@@ -20,71 +20,93 @@
 from .object import Object
 from .item import Item
 
+
 class Frame(object):
     """Define a frame from an image"""
+
     def __init__(self, image):
         self.image = image
+
     def __repr__(self):
         return "Frame(%s)" % self.image
+
     def draw(self, painter, size):
-    	return painter.draw_frame(self, size)
-    	
+        return painter.draw_frame(self, size)
+
+
 class Font(object):
-    def __init__(self, file, size = 24):
+
+    def __init__(self, file, size=24):
         self.file = file
         self.size = size
         self.font = None
-                
+
     def load(self, painter):
         if self.font:
             return
         self.font = painter.font_from_file(self.file, self.size)
-        
-    def render(self, painter, text, color = None, length = None):
+
+    def render(self, painter, text, color=None, length=None):
         self.load(painter)
         return self.font.render(text, color, length)
-        
+
     def resize(self, size):
         """Create a new font identical to this one but with a different size
         """
         return Font(self.file, size)
 
+
 class Filter(object):
     """Filter condiction for sub-styles"""
+
     def __call__(self, w):
         raise NotImplementedError
-        
+
+
 class Tag(Filter):
+
     def __init__(self, name):
         self.name = name
+
     def __call__(self, w):
         return self.name in w.tags
 
+
 class TypeFilter(Filter):
     """Filter on the widget type"""
+
     def __init__(self, type):
         self.type = type
+
     def __call__(self, w):
         return isinstance(w, self.type)
+
     def __repr__(self):
         return self.type.__name__
+
     def __cmp__(self, v):
         """We define the cmp method so that the more general rules are 'lower'
         than more 'specifics'
         """
         if isinstance(v, TypeFilter):
-            if self.type == v.type: return 0
-            if issubclass(self.type, v.type): return 1
-            if issubclass(v.type, self.type): return -1
+            if self.type == v.type:
+                return 0
+            if issubclass(self.type, v.type):
+                return 1
+            if issubclass(v.type, self.type):
+                return -1
         return -1
-        
+
+
 class ItemTypeFilter(Filter):
+
     def __init__(self, type):
         self.type = type
+
     def __call__(self, w):
         return isinstance(w.item, self.type)
 
-    	
+
 class Style(dict, Item):
     """A Style is a dictionary of key -> values with parenting property
 
@@ -102,31 +124,32 @@ class Style(dict, Item):
 
     - finally it gets the attributes from its parent style
     """
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(Style, self).__init__()
         self.parent = parent
         self.parts = []
 
-    # TODO: this is not really good, we shouldn't have to call this 
     @classmethod
     def create(cls):
+        # TODO: this is not really good, we shouldn't have to call this
         return cls.from_dict(None, cls.code())
-        
+
     def add_part(self, filter, style):
         self.parts.append((filter, style))
-        
-    # XXX: also apply to Style attribute (children-style, etc..)
-    def apply(self, widget, up = True):
+
+    def apply(self, widget, up=True):
+        # XXX: also apply to Style attribute (children-style, etc..)
         ret = {}
         if up and self.parent is not None:
             ret.update(self.parent.apply(widget))
         ret.update(self)
-        for (f,p) in self.parts:
+        for (f, p) in self.parts:
             assert isinstance(f, Filter)
             if f(widget):
-                ret.update(p.apply(widget, up = False))
+                ret.update(p.apply(widget, up=False))
         return ret
-        
+
     @classmethod
     def from_dict(cls, parent, d):
         from tichy import gui
@@ -149,4 +172,3 @@ class Style(dict, Item):
         # at will be overriden by the more specific ones
         ret.parts = sorted(ret.parts)
         return ret
-

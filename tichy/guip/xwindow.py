@@ -30,35 +30,38 @@ try:
 except ImportError, e:
     logger.error("can't import Xlib %s", e)
     Xlib = None
-    
+
 import pygame
 import time
-    
-# Experimental support for XWindow
-#
+
 # XXX: we have a few busy wait in this class
+
+
 class XWindow(Widget):
+    """Experimental support for XWindow"""
+
     def __init__(self, parent, expand=True, **kargs):
         super(XWindow, self).__init__(parent, expand=expand, **kargs)
         self.x_window = None
-        
+
     def __get_id(self):
         return self.x_window.id
     id = property(__get_id)
-    
+
     def create_x_window(self):
         if self.x_window is not None:
             return
         if not Xlib:
             self.x_display = None
             return
-            
+
         # First we get the xwindow id of the SDL window
         self.x_display = Xlib.display.Display()
         self.x_screen = self.x_display.screen()
         info = pygame.display.get_wm_info()
         x_window_id = info['window']
-        x_window = self.x_display.create_resource_object('window', x_window_id)
+        x_window = self.x_display.create_resource_object('window',
+                                                         x_window_id)
         pos = self.screen_pos()
         # Create a sub window
         self.x_window = x_window.create_window(
@@ -68,8 +71,7 @@ class XWindow(Widget):
             Xlib.X.CopyFromParent,
             background_pixel=self.x_screen.white_pixel,
             colormap=Xlib.X.CopyFromParent,
-            event_mask=Xlib.X.StructureNotifyMask
-        )
+            event_mask=Xlib.X.StructureNotifyMask)
         self.x_window.map()
 
         # Do a busy wait for X reply
@@ -79,10 +81,10 @@ class XWindow(Widget):
                     event.window == self.x_window:
                 break
         self.x_display.sync()
-        
+
         # We get the Notify Events
         self.emit('exposed')
-            
+
     def hide(self):
         if self.x_window:
             self.x_window.destroy()
@@ -93,18 +95,18 @@ class XWindow(Widget):
                         event.window == self.x_window:
                     break
         self.x_window = None
-            
+
     def show(self):
         if not self.x_window:
             self.create_x_window()
-                
+
     def organize(self):
         self.show()
-        
+
     def destroy(self):
         self.hide()
         super(XWindow, self).destroy()
-        
+
     def key_down(self, key):
         # If a key down event arrives, we send it to the x_window (in
         # fact here we just send it to X and assume that the x window
@@ -125,7 +127,7 @@ class XWindow(Widget):
         Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyPress, keycode)
         self.x_display.sync()
         Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyRelease, keycode)
-        
+
         if modifier:
             self.x_display.sync()
             Xlib.ext.xtest.fake_input(self.x_display, Xlib.X.KeyRelease,
@@ -138,13 +140,13 @@ class XWindow(Widget):
         #      manager, Or at least write a warning if there is a WM
         #      running.
         import subprocess
-        
+
         self.x_screen.root.change_attributes(
             event_mask=Xlib.X.SubstructureNotifyMask)
         self.x_display.sync()
-        
+
         process = subprocess.Popen(*cmd)
-    
+
         while True:
             event = self.x_display.next_event()
             if event.type == Xlib.X.CreateNotify and \
@@ -157,7 +159,7 @@ class XWindow(Widget):
                 self.x_display.set_input_focus(
                     event.window, Xlib.X.RevertToParent, Xlib.X.CurrentTime)
                 break
-                
+
         self.x_screen.root.change_attributes(event_mask=Xlib.X.NONE)
-                
+
         return process
