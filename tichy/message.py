@@ -72,9 +72,9 @@ class MessagesService(tichy.Service):
         self.outbox = tichy.List()
         self.inbox = tichy.List()
         # Prepare the future notification
-        notifications = tichy.Service('Notifications')
-        icon = tichy.Image(self.path('pics/message.png'), (32, 32))
-        self.notification = notifications.create('new message', icon)
+        self.notification_icon = tichy.Image(self.path('pics/message.png'),
+                                             (32, 32))
+        self.notification = None
 
     def add_to_inbox(self, msg):
         logger.info("Add to inbox : %s", msg)
@@ -96,7 +96,11 @@ class MessagesService(tichy.Service):
         in the inbox.
         """
         nb_unread = len([m for m in self.inbox if m.status == 'unread'])
-        if nb_unread == 0:
+        logger.debug("We have %d unread messages", nb_unread)
+        if nb_unread == 0 and self.notification:
             self.notification.release()
-        else:
-            self.notification.notify()
+            self.notification = None
+        elif nb_unread > 0 and not self.notification:
+            notifications = tichy.Service('Notifications')
+            self.notification = notifications.notify(
+                'new message', self.notification_icon)

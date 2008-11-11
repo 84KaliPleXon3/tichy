@@ -47,12 +47,6 @@ class Notification(tichy.Item):
     def __repr__(self):
         return str(self.msg)
 
-    def notify(self):
-        """"Notify the notification, if it is not already the case"""
-        if self.service.notifications:
-            return
-        self.service._add(self)
-
     def release(self):
         """To be called when the notification can be removed"""
         if self not in self.service.notifications:
@@ -80,17 +74,6 @@ class Notifications(tichy.Service):
     def __init__(self):
         self.notifications = []
 
-    def create(self, msg, icon=None):
-        """Create a new initially disabled notification
-
-        :Parameters:
-
-        - msg : the message of the notification
-
-        - icon : an optional icon for the notification
-        """
-        return Notification(self, msg, icon)
-
     def notify(self, msg, icon=None):
         """add a new notification
 
@@ -100,13 +83,11 @@ class Notifications(tichy.Service):
         
         - icon : an optional icon for the notification
         """
-        notification = self.create(msg, icon)
-        notification.notify()
-
-    def _add(self, notification):
+        notification = Notification(self, msg, icon)
         self.notifications.append(notification)
         logger.info("Notify : %s", notification)
         self.emit('new-notification', notification)
+        return notification
 
     def _remove(self, notification):
         logger.info("Remove : %s", notification)
