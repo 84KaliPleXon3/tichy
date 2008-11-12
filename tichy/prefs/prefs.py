@@ -67,6 +67,9 @@ class FreeSmartPhonePrefs(PrefsService):
             self.prefs = self.bus.get_object(
                 'org.freesmartphone.opreferencesd',
                 '/org/freesmartphone/Preferences')
+            self.prefs = dbus.Interface(
+                self.prefs,
+                'org.freesmartphone.Preferences')
         except Exception, e:
             logger.warning("can't use freesmartphone Preferences : %s", e)
             self.prefs = None
