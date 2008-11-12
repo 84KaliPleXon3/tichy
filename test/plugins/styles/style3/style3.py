@@ -11,7 +11,7 @@ class MyStyle(Style):
     def code(cls):
         return {
             'background': None,
-            'font': Font(None, 16),
+            'font': Font(None, 26),
             gui.Edit: {'background': Frame(tichy.Image(
                         MyStyle.path('edit_frame.png')))},
             gui.Button: {
