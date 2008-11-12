@@ -77,6 +77,9 @@ class FreeSmartPhoneGSM(GSMService):
             self.gsm_network = dbus.Interface(
                 self.gsm,
                 'org.freesmartphone.GSM.Network')
+            self.gsm_call = dbus.Interface(
+                self.gsm,
+                'org.freesmartphone.GSM.Call')
             self.gsm.connect_to_signal("Status", self.on_status)
             self.gsm.connect_to_signal("CallStatus", self.on_call_status)
         except Exception, e:
@@ -185,11 +188,11 @@ class FreeSmartPhoneGSM(GSMService):
 
     def activate(self, call):
         logger.info("activate call %s", str(call.number))
-        self.gsm.Activate(call.__id)
+        self.gsm_call.Activate(call.__id)
 
     def release(self, call):
         logger.info("release call %s", str(call.number))
-        self.gsm.Release(call.__id)
+        self.gsm_call.Release(call.__id)
 
 
 class TestGsm(tichy.Service):
