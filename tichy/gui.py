@@ -20,13 +20,28 @@
 """
 
 import logging
-logger = logging.getLogger('')
+logger = logging.getLogger('gui')
 
-# guig is here only for testing purpose, we can use it but it looks quite bad
-# from guie import *
+# This is a hack to be able to chose the gui backend before we load
+# the module. If the variable `tichy_gui_backends` is set we use it as
+# a list of backends to try.
+import sys
+if hasattr(sys.modules['__main__'], 'tichy_gui_backends'):
+    backends = sys.modules['__main__'].tichy_gui_backends
+else:
+    backends = ['csdl', 'sdl']
 
-try:
-    from guic import *
-except Exception:
-    logger.warning("can't use guic, using guip")
-    from guip import *
+for backend in backends:
+    try:
+        if backend == 'csdl':
+            from guic import *
+        elif backend == 'sdl':
+            from guip import *
+        elif backend == 'gtk':
+            from guig import *
+        elif backend == 'etk':
+            from guie import *
+    except Exception:
+        logger.warning("can't use backend %s", backend)
+    else:
+        break
