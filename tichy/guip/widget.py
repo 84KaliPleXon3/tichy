@@ -63,6 +63,7 @@ class Widget(Object):
         self.item = item    # Set to None if the object is not a view
                             # on an item
         parent = parent.get_contents_child() if parent else None
+        assert isinstance(parent, Widget) or parent is None
         self.parent = parent
 
         self.style_dict = {}
