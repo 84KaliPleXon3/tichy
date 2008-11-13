@@ -22,14 +22,20 @@
 import logging
 logger = logging.getLogger('gui')
 
+backends = ['csdl', 'sdl']  # default backends
 # This is a hack to be able to chose the gui backend before we load
 # the module. If the variable `tichy_gui_backends` is set we use it as
 # a list of backends to try.
 import sys
 if hasattr(sys.modules['__main__'], 'tichy_gui_backends'):
     backends = sys.modules['__main__'].tichy_gui_backends
-else:
-    backends = ['csdl', 'sdl']
+# We can also specify etk backend using a command line option
+# TODO: make this cleaner
+if '--etk' in sys.argv:
+    backends = ['etk']
+if '--gtk' in sys.argv:
+    backends = ['gtk']
+
 
 for backend in backends:
     try:
@@ -45,3 +51,5 @@ for backend in backends:
         logger.warning("can't use backend %s", backend)
     else:
         break
+else:
+    raise Exception("can't use any gui backends from %s", backends)
