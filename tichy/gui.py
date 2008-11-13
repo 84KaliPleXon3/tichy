@@ -33,8 +33,12 @@ if hasattr(sys.modules['__main__'], 'tichy_gui_backends'):
 # TODO: make this cleaner
 if '--etk' in sys.argv:
     backends = ['etk']
-if '--gtk' in sys.argv:
+elif '--gtk' in sys.argv:
     backends = ['gtk']
+elif '--sdl' in sys.argv:
+    backends = ['csdl', 'sdl']
+elif '--csdl' in sys.argv:
+    backends = ['csdl']
 
 
 for backend in backends:
@@ -49,7 +53,7 @@ for backend in backends:
             from guie import *
     except Exception:
         logger.warning("can't use backend %s", backend)
+        if backend == backends[-1]:
+            raise
     else:
         break
-else:
-    raise Exception("can't use any gui backends from %s", backends)
