@@ -39,8 +39,6 @@ sys.path.insert(0, '../')
 
 import dbus
 import dbus.service
-import dbus.mainloop.glib
-import gobject
 
 import logging
 logging.basicConfig(
@@ -50,10 +48,7 @@ logger = logging.getLogger('launcher')
 
 # We use the hack described in tichy/gui.py to choose the gui backend
 # before importing tichy
-#
-# TODO: use etk backend, it means that we have to remove all gobject
-# dependencies (we need to put it in the gui module instead)
-tichy_gui_backends = ['gtk']
+tichy_gui_backends = ['etk']
 
 import tichy
 
@@ -96,8 +91,6 @@ class Launcher(dbus.service.Object):
 
 
 if __name__ == '__main__':
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
     # We import all the modules into the plugin directory
     for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
                         '/usr/tichy/plugins']:
@@ -112,7 +105,7 @@ if __name__ == '__main__':
     tichy.Service.set_default('Design', 'Default')
 
     logger.info("start launcher service")
-    bus = dbus.SessionBus()
+    bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
     bus_name = dbus.service.BusName('org.tichy', bus)
 
     launcher = Launcher(bus, '/Launcher')
