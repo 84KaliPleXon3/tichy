@@ -27,7 +27,6 @@ class Launcher(tichy.Application):
     """
 
     name = "Launcher"
-    enabled = False
 
     design = 'Grid'
 
