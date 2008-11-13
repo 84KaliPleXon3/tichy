@@ -175,7 +175,8 @@ class Button(Widget):
 class Label(Widget):
 
     def __init__(self, parent, text, **kargs):
-        etk_obj = etk.Label(text)
+        # XXX: why can't we use unicode with etk.labels ??
+        etk_obj = etk.Label(text.encode('ascii', 'replace'))
         super(Label, self).__init__(parent, etk_obj=etk_obj, **kargs)
 
     def __get_text(self):
