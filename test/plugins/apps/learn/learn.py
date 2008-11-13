@@ -47,6 +47,42 @@ class Choice(tichy.Item):
         return ret
 
 
+class Answer(tichy.Application):
+
+    def run(self, window, card, correct):
+        self.name = "Correct" if correct else "Wrong"
+        self.window = gui.Window(window, modal=True)
+        frame = self.view(self.window)
+
+        vbox = gui.Box(frame, axis=1)
+        gui.Label(vbox, card.q, font_size=58)
+        gui.Label(vbox, card.a)
+        if card.comment:
+            gui.Label(vbox, "(%s)" % card.comment)
+
+        gui.Spring(vbox, axis=1)
+
+        read_button = gui.Button(vbox)
+        gui.Label(read_button, "Read")
+        read_button.connect('clicked', self.on_read, card.a)
+
+        next_button = gui.Button(vbox)
+        gui.Label(next_button, "OK")
+
+        yield tichy.tasklet.Wait(next_button, 'clicked')
+        self.window.destroy()
+
+    def on_read(self, b, msg):
+        try:
+            import subprocess
+            espeak = 'espeak -s100 -vzh --stdout'
+            cmd = "echo '%s' | %s | aplay" % (msg, espeak)
+            logger.info("bash : %s", cmd)
+            subprocess.Popen(cmd, shell=True)
+        except Exception, e:
+            logger.error("can't use espeak : %s" % e)
+
+
 class Learn(tichy.Application):
 
     name = 'Learn'
@@ -59,7 +95,7 @@ class Learn(tichy.Application):
 
         vbox = gui.Box(frame, axis=1)
         self.question_text = tichy.Text("Question")
-        self.question_text.view(vbox, expandable=True)
+        self.question_text.view(vbox, expandable=True, font_size=58)
 
         self.choices = tichy.List()
         self.choices.view(vbox)
@@ -114,10 +150,12 @@ class Learn(tichy.Application):
         ret = answers[ret[0]]
         if ret == card.a:
             # Correct answer
-            yield tichy.Dialog(self.window,
-                               "Correct", "%s : %s" %
-                               (card.a, card.comment or ''))
+#             yield tichy.Dialog(self.window,
+#                                "Correct", "%s : %s" %
+#                                (card.a, card.comment or ''))
+            yield Answer(self.window, card, True)
             yield True
         else:
-            yield tichy.Dialog(self.window, "Wrong Answer", "")
+            # yield tichy.Dialog(self.window, "Wrong Answer", "")
+            yield Answer(self.window, card, False)
             yield False
