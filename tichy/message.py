@@ -96,11 +96,13 @@ class MessagesService(tichy.Service):
         in the inbox.
         """
         nb_unread = len([m for m in self.inbox if m.status == 'unread'])
-        logger.debug("We have %d unread messages", nb_unread)
+        logger.debug("%d unread messages", nb_unread)
         if nb_unread == 0 and self.notification:
             self.notification.release()
             self.notification = None
         elif nb_unread > 0 and not self.notification:
             notifications = tichy.Service('Notifications')
             self.notification = notifications.notify(
-                'new message', self.notification_icon)
+                "You have a new message", self.notification_icon)
+        elif nb_unread > 0 and self.notification:
+            self.notification.msg = "You have %d unread messages" % nb_unread

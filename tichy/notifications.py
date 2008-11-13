@@ -38,13 +38,25 @@ class Notification(tichy.Item):
 
     - released : emitted when the notification is released and
       shouldn't be taken care of anymore.
+
+    - modified : emitted when the message of a notification has beed
+      modified.
     """
 
     def __init__(self, service, msg, icon=None):
         super(Notification, self).__init__()
         self.service = service
-        self.msg = msg
+        self.__msg = msg
         self.icon = icon
+
+    def __get_msg(self):
+        return self.__msg
+
+    def __set_msg(self, msg):
+        self.__msg = msg
+        self.emit('modified')
+
+    msg = property(__get_msg, __set_msg)
 
     def __repr__(self):
         return str(self.msg)

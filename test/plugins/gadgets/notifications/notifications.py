@@ -49,8 +49,13 @@ class Notifications(tichy.Gadget):
             view = notification.icon.view(self.box)
             notification.connect('released',
                                  self.on_notification_released, view)
+            notification.connect('modified',
+                                 self.on_notification_modified)
 
     def on_notification_released(self, notification, view):
         """Remove the notification icon"""
         logger.info("release notification %s", notification)
         view.destroy()
+
+    def on_notification_modified(self, notification):
+        pass
