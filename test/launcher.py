@@ -28,8 +28,11 @@ It is still experimental.
 
 To use it, start it (./launcher.py), then use for example dbus-send to
 start an application, e.g. :
-  dbus-send --session --dest='org.tichy' /Launcher \
+  dbus-send --session --dest='org.tichy' /Launcher --print-reply \
   org.tichy.Launcher.Launch string:Contacts
+
+Note for neo : We need to remember to set DISPLAY=:0 even when we call
+the dbus method !
 """
 
 # This is to make sure that we use the local tichy lib if run from the
@@ -57,7 +60,7 @@ class Launcher(dbus.service.Object):
     """Launch applets via DBus call
 
     example, top launch the Contacts application, using dbus-send :
-      dbus-send --session --dest='org.tichy' /Launcher \
+      dbus-send --session --dest='org.tichy' /Launcher --print-reply \
       org.tichy.Launcher.Launch string:Contacts
     """
 
