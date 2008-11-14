@@ -242,6 +242,9 @@ class EventsLoop(object):
     def run(self):
         self.gobject_loop.run()
 
+    def quit(self):
+        self.gobject_loop.quit()
+
     def timeout_add(self, time, callback, *args):
         return gobject.timeout_add(time, callback, *args)
 
