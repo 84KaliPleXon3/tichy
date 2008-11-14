@@ -53,7 +53,9 @@ class Widget(tichy.Object):
         self.pos = pos or Vect(0, 0)
         self.item = item
         self.gtk_obj = gtk_obj or gtk.VBox()
-        # Hack to avoid bug : http://bugzilla.gnome.org/show_bug.cgi?id=546802 (to remove when the bug is fixed)
+        # Hack to avoid bug :
+        # http://bugzilla.gnome.org/show_bug.cgi?id=546802 (to remove
+        # when the bug is fixed)
         self.gtk_obj.__dict__
         if self.parent:
             self.parent.get_contents_child().add(self)
