@@ -53,6 +53,8 @@ class Widget(tichy.Object):
         self.pos = pos or Vect(0, 0)
         self.item = item
         self.gtk_obj = gtk_obj or gtk.VBox()
+        # Hack to avoid bug : http://bugzilla.gnome.org/show_bug.cgi?id=546802 (to remove when the bug is fixed)
+        self.gtk_obj.__dict__
         if self.parent:
             self.parent.get_contents_child().add(self)
         self.gtk_obj.show()
@@ -74,6 +76,7 @@ class Widget(tichy.Object):
         self.children.append(child)
 
     def on_clicked(self, gtk_obj):
+
         self.emit('clicked')
 
     def destroy(self):
@@ -204,8 +207,12 @@ class Button(Widget):
 
     def __init__(self, parent, **kargs):
         gtk_obj = gtk.Button()
+
+        def on_clicked(gtk, self):
+            self.on_clicked(gtk)
+        gtk_obj.connect('clicked', on_clicked, self)
+
         super(Button, self).__init__(parent, gtk_obj=gtk_obj, **kargs)
-        self.gtk_obj.connect('clicked', self.on_clicked)
 
 
 class Scrollable(Widget):
