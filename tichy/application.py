@@ -47,12 +47,8 @@ class Application(Tasklet, Item):
     that the application can use.
     """
 
-    design = None #: Set this to the name of a Design service to
-                  #specify the optimal design TODO: should we set it
-                  #to 'Default' by default ??
-
-    # Because we want to make Application class behave like Item, we
-    # have to redefine those methods using class method...
+    design = 'Default'  # Set this to the name of a Design service to
+                        # specify the optimal design.
 
     @classmethod
     def create_actor(cls):
