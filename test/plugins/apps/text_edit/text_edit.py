@@ -16,6 +16,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+logger = logging.getLogger('app.text_edit')
 
 import tichy
 from tichy import gui
@@ -59,7 +61,7 @@ class TextEdit(tichy.Application):
         self.keyboard.set_input(input)
 
     def key_down(self, key):
-        print 'TEST KEY DOWN', key
+        logger.debug("key down %s", key)
 
 
 class MyTextEditService(tichy.Service):
