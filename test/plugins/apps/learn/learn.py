@@ -93,12 +93,12 @@ class Learn(tichy.Application):
         self.window = gui.Window(window, modal=True)
         frame = self.view(self.window, back_button=True)
 
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(frame, axis=1, expand=True)
         self.question_text = tichy.Text("Question")
-        self.question_text.view(vbox, expandable=True, font_size=58)
+        self.question_text.view(vbox, expand=True, font_size=58)
 
         self.choices = tichy.List()
-        self.choices.view(vbox)
+        self.choices.view(vbox, expand=True)
 
         frame.connect('back', self.on_quit)
 
