@@ -43,6 +43,33 @@ class ActorView(gui.Button):
         actor.get_text().view(box)
 
 
+class ActorsTable(gui.Frame):
+    """The table used in the grid service"""
+
+    def __init__(self, parent, list, expand=True, **kargs):
+        super(ActorsTable, self).__init__(parent, item=list, expand=expand,
+                                          **kargs)
+        scroll = gui.Scrollable(self, item=list, axis=1, expand=True)
+        self.table = gui.Table(scroll, axis=1, border=0, expand=True)
+
+        for actor in list:
+            self._add(actor)
+
+        self.monitor(list, 'appened', self._on_appened)
+
+    def _on_appened(self, list, actor):
+        self._add(actor)
+
+    def _add(self, actor):
+        view = ActorView(self.table, actor)
+
+        def on_clicked(b, actor):
+            # This method is defined in the default design. It
+            # will put the actors action in the application frame
+            tichy.Service('Design').select_actor(actor, b)
+        view.connect('clicked', on_clicked, actor)
+
+
 class GridDesign(tichy.Service):
     """Grid Design Service
 
@@ -54,19 +81,8 @@ class GridDesign(tichy.Service):
     service = 'Design'
     name = 'Grid'
 
-    def view_actor_list(self, parent, actors, **kargs):
-        ret = gui.Frame(parent, item=actors, expand=True, **kargs)
-        scroll = gui.Scrollable(ret, item=actors, axis=1, expand=True)
-        box = gui.Table(scroll, axis=1, border=0)
-        for actor in actors:
-            view = ActorView(box, actor)
-
-            def on_clicked(b, actor):
-                # This method is defined in the default design. It
-                # will put the actors action in the application frame
-                self.select_actor(actor, b)
-            view.connect('clicked', on_clicked, actor)
-        return ret
+    def view_actor_list(self, parent, list, expand=True, **kargs):
+        return ActorsTable(parent, list, expand=expand, **kargs)
 
     def __getattr__(self, name):
         # XXX: This is a hack to use the Default Design service
