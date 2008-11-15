@@ -121,13 +121,8 @@ class
         self.actions = []
         self.default_action = None
 
-    def __get_name(self):
-        # The item name of the actor is the same than the item name
-        #
-        # XXX: we should be able to only override the get_name method
-        # cause the name attribute is not supposed to be used anymore
-        return self.item.name
-    name = property(__get_name)
+    def get_text(self):
+        return self.item.get_text()
 
     def add(self, action):
         """Don't call this method, it is already called in Action.__init__"""
