@@ -51,7 +51,7 @@ class FileBrowser(tichy.Application):
 
     name = 'Browser'
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def __init__(self, *args):
         super(FileBrowser, self).__init__(*args)

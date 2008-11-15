@@ -109,7 +109,7 @@ class DrawingApp(tichy.Application):
 
     name = 'Drawing'
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def __init__(self, *args):
         super(DrawingApp, self).__init__(*args)

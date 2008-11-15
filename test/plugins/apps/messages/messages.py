@@ -28,7 +28,7 @@ class Message(tichy.Application):
 
     name = "Messages"
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def run(self, window):
         w = gui.Window(window, modal=True)   # We run into a new modal window

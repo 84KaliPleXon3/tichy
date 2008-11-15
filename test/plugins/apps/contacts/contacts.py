@@ -26,7 +26,7 @@ class Contacts(tichy.Application):
 
     name = 'Contacts'
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
     design = 'Default'
 
     def run(self, parent):

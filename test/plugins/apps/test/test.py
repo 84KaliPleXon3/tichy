@@ -25,7 +25,7 @@ class Test(tichy.Application):
 
     name = 'Test'
     icon = None
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def run(self, parent):
         self.window = gui.Window(parent)

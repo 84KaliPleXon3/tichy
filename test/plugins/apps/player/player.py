@@ -31,7 +31,7 @@ class Player(tichy.Application):
 
     name = "Player"
     icon = 'play.png'
-    category = 'general'
+    category = 'main'
 
     player = None # The gstreamer player instance
 

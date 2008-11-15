@@ -86,7 +86,7 @@ class Answer(tichy.Application):
 class Learn(tichy.Application):
 
     name = 'Learn'
-    category = 'general'
+    category = 'main/chinese'
     icon = 'icon.png'
 
     def run(self, window):

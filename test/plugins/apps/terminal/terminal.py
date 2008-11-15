@@ -35,7 +35,7 @@ logger = logging.getLogger('App.Terminal')
 class Terminal(Application):
 
     name = "Terminal"
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def run(self, window):
         self.window = gui.Window(window, modal=True)

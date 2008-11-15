@@ -50,6 +50,8 @@ class Application(Tasklet, Item):
     design = 'Default'  # Set this to the name of a Design service to
                         # specify the optimal design.
 
+    category = None
+
     @classmethod
     def create_actor(cls):
         from tichy import Actor

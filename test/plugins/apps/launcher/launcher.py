@@ -22,6 +22,26 @@ import tichy
 import tichy.gui as gui
 
 
+class Category(tichy.Item):
+
+    def __init__(self, category):
+        self.category = category
+
+    def get_text(self):
+        return tichy.Text(self.category.split('/')[-1])
+
+    def create_actor(self):
+        actor = super(Category, self).create_actor()
+        open_action = actor.new_action("Open")
+
+        def on_open(action, self, view):
+            yield Launcher(view.window, self.category)
+        open_action.connect('activated', on_open)
+
+        actor.default_action = open_action
+        return actor
+
+
 class Launcher(tichy.Application):
     """ The main application, used to start any other application
     """
@@ -30,12 +50,15 @@ class Launcher(tichy.Application):
 
     design = 'Grid'
 
-    def run(self, window):
-        frame = self.view(window)
-
+    def run(self, window, category='main'):
+        self.category = category
+        main = self.category == 'main'
+        self.window = tichy.gui.Window(window, modal=True)
+        frame = self.view(self.window, title=self.category,
+                          back_button=not main)
         # We populate the frame with all the applications
         self.list_view = None
-        self.populate(frame)
+        self._populate(frame)
 
         def run_lock(action, app, view):
             tichy.Service('ScreenLock').run(view.window)
@@ -50,21 +73,36 @@ class Launcher(tichy.Application):
         # Service('Design') base object...
 
         def on_design_changed(s, design):
-            self.populate(frame)
+            self._populate(frame)
         tichy.Service('Design').base.connect('changed', on_design_changed)
 
-        # Wait until the quit button is clicked
         quit_item = frame.actor.new_action('Quit')
-        yield tichy.tasklet.Wait(quit_item, 'activated')
+        yield tichy.WaitFirst(tichy.Wait(quit_item, 'activated'),
+                              tichy.Wait(frame, 'back'))
+        self.window.destroy()
 
-    def populate(self, frame):
+    def _is_sub_category(self, category):
+        """Return true if the category is a sub category of the launcher
+        category"""
+        parts = category.split('/')
+        return len(parts) == 2 and parts[0] == self.category
+
+    def _populate(self, frame):
         if self.list_view:
             self.list_view.destroy()
-        # View all the enabled applications
         list = tichy.ActorList()
+        categories = set()
+        # View all the enabled applications in this category
         for app in tichy.Application.subclasses:
-            if not app.name or not hasattr(app, 'category'):
+            if not app.name or not app.category:
                 continue
-            actor = app.create_actor()
+            if app.category == self.category:
+                actor = app.create_actor()
+            elif self._is_sub_category(app.category) and \
+                    not app.category in categories:
+                actor = Category(app.category).create_actor()
+                categories.add(app.category)
+            else:
+                continue
             list.append(actor)
         self.list_view = list.view(frame)

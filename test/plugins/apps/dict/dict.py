@@ -112,7 +112,7 @@ class Dict(object):
 class DictApp(tichy.Application):
 
     name = 'Dict'
-    category = 'general'
+    category = 'main/chinese'
 
     def run(self, window):
         self.window = gui.Window(window, modal=True)

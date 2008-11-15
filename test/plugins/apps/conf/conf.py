@@ -30,7 +30,7 @@ class Conf(tichy.Application):
 
     name = 'Config'
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def run(self, parent):
         self.window = gui.Window(parent)

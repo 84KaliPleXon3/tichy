@@ -28,7 +28,7 @@ class Logs(tichy.Application):
 
     name = "Logs"
     icon = 'icon.png'
-    category = 'general' # So that we see the app in the launcher
+    category = 'main'
 
     def run(self, window):
         w = gui.Window(window, modal=True)
