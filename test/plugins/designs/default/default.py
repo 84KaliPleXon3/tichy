@@ -37,15 +37,9 @@ class ListView(gui.Scrollable):
         for item in list:
             item.view(vbox)
 
-        # This is important, we need to disconnect all the connections
-        # we make when the view is destroyed
-        #
-        # TODO: could be cool to have this automated. But how to do it
-        # ?
-        connections = [list.connect('appened', self.on_appened, vbox),
-                       list.connect('removed', self.on_removed, vbox),
-                       list.connect('cleared', self.on_clear, vbox)]
-        self.connect('destroyed', self.on_view_destroyed, connections)
+        self.monitor(list, 'appened', self.on_appened, vbox)
+        self.monitor(list, 'removed', self.on_removed, vbox)
+        self.monitor(list, 'cleared', self.on_clear, vbox)
 
     def on_appened(self, list, value, view):
         value.view(view)
@@ -59,10 +53,6 @@ class ListView(gui.Scrollable):
     def on_clear(self, list, view):
         for c in view.children[:]:
             c.destroy()
-
-    def on_view_destroyed(self, view, connections):
-        for c in connections:
-            self.item.disconnect(c)
 
 
 class Default(Service):
