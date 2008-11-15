@@ -29,16 +29,37 @@ import logging
 logger = logging.getLogger('app.dict')
 
 
-class Entrie(object):
+class Entry(tichy.Item):
+    """represent a result entry after a dictionary search"""
 
     def __init__(self, chinese, pinying, translations):
+        super(Entry, self).__init__()
         self.chinese = chinese
         self.pinying = pinying
         self.translations = translations
 
-    def unicode(self):
+    def get_text(self):
+        return tichy.Text(unicode(self).strip())
+
+    def __unicode__(self):
         return u"%s (%s): %s" % (self.chinese, self.pinying,
                                  "; ".join(self.translations))
+
+    def create_actor(self):
+        actor = super(Entry, self).create_actor()
+        actor.new_action("Read").connect('activated', self.on_read)
+        return actor
+
+    def on_read(self, action, entry, view):
+        """invoke espeak to pronounce the word"""
+        try:
+            import subprocess
+            espeak = 'espeak -s100 -vzh --stdout'
+            cmd = "echo '%s' | %s | aplay" % (self.pinying, espeak)
+            logger.info("bash : %s", cmd)
+            subprocess.Popen(cmd, shell=True)
+        except Exception, e:
+            logger.error("can't use espeak : %s" % e)
 
 
 class Dict(object):
@@ -84,7 +105,7 @@ class Dict(object):
                 line = self.pinyings[p]
                 pinying += line.split()[1]
             translations = entrie[1:]
-            ret.append(Entrie(ch, pinying, translations))
+            ret.append(Entry(ch, pinying, translations))
         return ret
 
 
@@ -96,7 +117,7 @@ class DictApp(tichy.Application):
     def run(self, window):
         self.window = gui.Window(window, modal=True)
         frame = self.view(self.window, back_button=True)
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(frame, axis=1, expand=True)
         # The search entry
         text = tichy.Text('')
         text.view(vbox, editable=True)
@@ -104,7 +125,7 @@ class DictApp(tichy.Application):
 
         # The result actions
         self.results = tichy.List()
-        self.results.view(vbox)
+        self.results.actors_view(vbox, can_delete=False, expand=True)
 
         self.dict = Dict(self.path())
 
@@ -113,9 +134,10 @@ class DictApp(tichy.Application):
 
     def on_text_modified(self, text):
         self.results.clear()
+        logger.info("search for %s", str(text))
         entries = self.dict.search(str(text))
         for entrie in entries:
-            self.results.append(tichy.Text(entrie.unicode()))
+            self.results.append(entrie)
 
 
 if __name__ == '__main__':
