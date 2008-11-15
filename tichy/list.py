@@ -57,7 +57,7 @@ class List(list, Item):
         design = Service('Design')
         return design.view_list(parent, self, **kargs)
 
-    def actors_view(self, parent, can_delete=True):
+    def actors_view(self, parent, can_delete=True, **kargs):
         """Return a view that contains actors view to all the elements of this
         list
 
@@ -86,7 +86,7 @@ class List(list, Item):
 
         connection = self.connect('modified', on_modified)
         on_modified(self)
-        view = actors.view(parent)
+        view = actors.view(parent, **kargs)
 
         def on_destroyed(view, connection):
             self.disconnect(connection)
