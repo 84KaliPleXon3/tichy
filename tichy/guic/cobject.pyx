@@ -69,3 +69,18 @@ cdef class Object:
         """An optimized version of emit only for internal use"""
         for e in self.__listeners.get(event, []):
             e[0](e[1], a, *e[2])
+
+    def monitor(self, object, char* event, callback, *args):
+        """connect an object to a callback, and automatically disconnect it
+        when this object is destroyed.
+
+        WARNING: This is still experimental, and should only be used
+        with objects that have a 'destroy' signal.
+        """
+        connection = object.connect(event, callback, *args)
+        self.connect('destroyed', _on_monitor_destroyed, object,
+                     connection)
+
+#TODO: make it a static method ?
+def _on_monitor_destroyed(self, object, connection):
+    object.disconnect(connection)

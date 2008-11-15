@@ -93,6 +93,19 @@ class Object(object):
             if type(call) is GeneratorType:
                 Tasklet(generator=call).start()
 
+    def monitor(self, object, event, callback, *args):
+        """connect an object to a callback, and automatically disconnect it
+        when this object is destroyed.
+
+        WARNING: This is still experimental, and should only be used
+        with objects that have a 'destroy' signal.
+        """
+        connection = object.connect(event, callback, *args)
+
+        def on_destroyed(self, object, connection):
+            object.disconnect(connection)
+        self.connect('destroyed', on_destroyed, object, connection)
+
 
 if __name__ == '__main__':
 
