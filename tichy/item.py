@@ -105,5 +105,8 @@ class Item(tichy.Object):
         from actor import Actor
         return Actor(self)
 
+    def __unicode__(self):
+        return unicode(self.get_text())
+
     def __repr__(self):
-        return str(self.name)
+        return repr(self.get_text())

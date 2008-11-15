@@ -43,7 +43,10 @@ class Text(Item):
     def input_method(self):
         return None
 
-    def __str__(self):
+    def __repr__(self):
+        return self.__value.encode('ascii', 'replace')
+
+    def __unicode__(self):
         return self.__value
 
     def __len__(self):
