@@ -113,6 +113,8 @@ class Service(Item):
         """Set a given service as the default one"""
         if isinstance(default, str):
             default = Service(service, default)
+        if cls.__defaults.get(service, None) == default:
+            return
         cls.__defaults[service] = default
         Service.__bases[service].emit("changed", default)
 
