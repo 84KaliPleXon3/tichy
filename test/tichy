@@ -113,7 +113,7 @@ if __name__ == '__main__':
             logger.info("failed to load plugins in %s", plugins_dir)
 
     # TODO: at least remove the create invocation !
-    style = Style.find_by_name("black style").create()
+    style = Style.find_by_name("cool style").create()
 
     # We set the default design
     tichy.Service.set_default('Design', 'Default')
