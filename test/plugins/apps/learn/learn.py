@@ -73,14 +73,8 @@ class Answer(tichy.Application):
         self.window.destroy()
 
     def on_read(self, b, msg):
-        try:
-            import subprocess
-            espeak = 'espeak -s100 -vzh --stdout'
-            cmd = "echo '%s' | %s | aplay" % (msg, espeak)
-            logger.info("bash : %s", cmd)
-            subprocess.Popen(cmd, shell=True)
-        except Exception, e:
-            logger.error("can't use espeak : %s" % e)
+        speak = tichy.Service('Speak')
+        speak.speak(msg, lang='zh')
 
 
 class Learn(tichy.Application):

@@ -52,14 +52,8 @@ class Entry(tichy.Item):
 
     def on_read(self, action, entry, view):
         """invoke espeak to pronounce the word"""
-        try:
-            import subprocess
-            espeak = 'espeak -s100 -vzh --stdout'
-            cmd = "echo '%s' | %s | aplay" % (self.pinying, espeak)
-            logger.info("bash : %s", cmd)
-            subprocess.Popen(cmd, shell=True)
-        except Exception, e:
-            logger.error("can't use espeak : %s" % e)
+        speak = tichy.Service('Speak')
+        speak.speak(self.pinying, 'zh')
 
 
 class Dict(object):

@@ -128,12 +128,5 @@ class Reader(tichy.Application):
 
     def on_read(self, button):
         text = unicode(self.text)
-        try:
-            import subprocess
-            espeak = 'espeak -s%d -v+%s --stdout' % \
-                (self.speed, self.voice)
-            cmd = "echo '%s' | %s | aplay" % (text, espeak)
-            logger.info("bash : %s", cmd)
-            subprocess.Popen(cmd, shell=True)
-        except Exception, e:
-            logger.error("can't use espeak : %s" % e)
+        speak = tichy.Service('Speak')
+        speak.speak(text, lang='en', speed=self.speed, voice=self.voice)
