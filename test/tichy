@@ -27,11 +27,26 @@ os.environ['SDL_VIDEODRIVER'] = 'x11'
 import sys
 sys.path.insert(0, '../')
 
+
+def setup_logging():
+    """Set up two logging handlers, one in the log file, one in the
+    stdoutput"""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s %(name)-8s %(levelname)-8s %(message)s',
+        filename='/tmp/tichy.log', filemode='w')
+
+    formatter = logging.Formatter(
+        '%(name)-8s %(levelname)-8s %(message)s')
+    stream_log = logging.StreamHandler()
+    stream_log.setFormatter(formatter)
+    stream_log.setLevel(logging.INFO)
+    logger.addHandler(stream_log)
+
 import logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(name)-8s %(levelname)-8s %(message)s')
 logger = logging.getLogger('')
+
+setup_logging()
 
 import time
 

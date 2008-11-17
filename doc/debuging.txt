@@ -1,0 +1,22 @@
+			    Tichy debuging
+
+In case of bug:
+
+  If there are some bugs in tichy, the first thing to do is to trace
+  the loggins. By default tichy print logging info to stderr output
+  and in the file /tmp/tichy.log. The entries in /tmp/tichy.log are
+  more verbose than the one on stderr.
+
+  if you think that something is going wrong please send an email to
+  Guillaume Chereau <charlie@openmoko.org>
+
+  If the problem seems to be new, you can check the git logs and try
+  to track down the commit that introduces the error.
+
+
+Profiling tichy:
+
+  Tichy is quite slow. Many optimization may be done. So far I didn't
+  really care, I prefer to have a clean design than a fast one.
+
+  To profile tichy we can use python profiler module.
