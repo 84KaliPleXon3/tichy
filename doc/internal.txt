@@ -1,0 +1,93 @@
+			    Tichy internal
+
+
+Object:
+
+  tichy.Object is a class that defines the slot/signal pattern.  It is
+  similar to a gobject. Most of the classes in tichy inherit from
+  Object, wich means that most things can emit signals.
+
+
+Item:
+
+  In tichy many classes inherit from the Item class. Item are used to
+  represent all actual information. Example of Item are : Text,
+  TelNumber, List, Contact, Application, etc.
+
+  All the Item have a `get_text` method, that return a Text object.
+
+  They also all have a `view` method, that can be used to create a
+  representation of the item.
+
+
+Actor:
+
+  Every Item also have a `create_actor` method, that returns an Actor
+  object. An Actor is a special Item that can be used to trigger
+  actions on an other item. For example creating a view on an
+  Contact's Actor will show a representation of the contact plus a way
+  to trigger some default action on it (Edit, Call, etc.)
+
+  The way the actor are represented depends on the Design.
+
+  Most applications in Tichy simply retrieve a list of Item and then
+  show actors on those items.
+
+
+Service:
+
+  Service is a special Item that is a singleton (You can have only one
+  instance of each Service class).
+
+  Every service has a 'service' attribute that is the name of the
+  service it implements. Several services can have the same service
+  name.
+
+  The Service function -yes, Service is both a class and a function
+  thanks to some python magic- return an instance of a Service
+  implementing a given service name. for example :
+  
+    tichy.Service('Caller')
+
+  will return a service instance that implements the 'Caller' service.
+
+
+Design:
+
+  Design is a tichy Service that is in charge of creating all the
+  items's views on the screen. Basically every item.view method will
+  retreive the Design service and call one of the view_xxx methods of
+  it.
+
+  Since it is a service, you can have several Design implementations.
+
+
+Plugin:
+
+  At startup tichy will import a set of python scripts in the plugin
+  directory. All Item classes found are registered (using python
+  meta-class magic) and can later be used.
+
+
+Tasklet:
+
+  tichy.tasklet module is a solution to the complicated problem of
+  callback based software.
+
+  Since tichy runs app in a single process, it uses callback all the
+  time. No part of the code can block. Now the problem with callbacks
+  is that they tend to make the code unreadable, cause you need to
+  split your functions in several sub functions.
+
+  Tasklets uses python coroutines to simulate multi process code using
+  callbacks. It works like this : from within a tasklet the yield
+  statement may represents a branching to an other tasklet.  The task
+  will exit and be resumed only after the called tasklet returns.
+
+  e.g. :
+
+    yield tichy.tasklet.Wait(my_obj, 'something')
+
+  means that the current tasklet will stop at this point until my_obj
+  emit the signal 'something'
+
