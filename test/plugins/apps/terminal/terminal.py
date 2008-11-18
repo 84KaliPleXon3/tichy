@@ -36,6 +36,7 @@ class Terminal(Application):
 
     name = "Terminal"
     category = 'main'
+    experimental = True
 
     def run(self, window):
         self.window = gui.Window(window, modal=True)
