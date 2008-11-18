@@ -46,7 +46,7 @@ def plugins_files():
             dirs[:] = []
             continue
         # XXX: Where is the best place to put the plugins files ???
-        dest = 'tichy/plugins/%s' % root[15:]
+        dest = 'share/tichy/plugins/%s' % root[15:]
         src = []
         for file in files:
             if file.endswith((".py", ".ttf", ".png", ".dic", ".txt")):
@@ -91,10 +91,10 @@ setup(name='Tichy',
       packages = ['tichy', 'tichy.contacts', 'tichy.guic', 'tichy.guip',
                   'tichy.phone', 'tichy.prefs'],
       scripts= ['test/tichy'],
-      # XXX: Those data locations work on my neo, but not on ubuntu !
-      data_files = [('applications', ['data/tichy.desktop']),
-                    ('pixmaps', ['data/tichy.png']),
-                    ('tichy/pics', ['tichy/pics/sim.png'])] + \
+      # XXX: Those locations may not work on the neo !
+      data_files = [('share/applications', ['data/tichy.desktop']),
+                    ('share/pixmaps', ['data/tichy.png']),
+                    ('share/tichy/pics', ['tichy/pics/sim.png'])] + \
           plugins_files(),
       ext_package='tichy.guic',
       ext_modules=[make_extension(x) for x in [
