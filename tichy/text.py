@@ -28,6 +28,12 @@ class Text(Item):
         self.__value = unicode(value)
         self.editable = editable
 
+    @classmethod
+    def as_text(cls, value):
+        if isinstance(value, cls):
+            return value
+        return cls(unicode(value))
+
     def get_text(self):
         return self
 
