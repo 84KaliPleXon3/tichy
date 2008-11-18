@@ -45,8 +45,8 @@ class Message(tichy.Item):
           'unread'. If set to None, incoming message will have
           'unread' status and outgoing message will have 'read' status
         """
-        self.peer = peer
-        self.text = text
+        self.peer = tichy.phone.TelNumber.as_text(peer)
+        self.text = tichy.Text.as_text(text)
         assert direction in ['in', 'out'], direction
         self.direction = direction
         self.status = status or direction == 'out' and 'read' or 'unread'
