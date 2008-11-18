@@ -110,7 +110,12 @@ class FreeSmartPhoneSMS(tichy.Service):
 
     def on_incoming_message(self, index):
         logger.info("Incoming message %d", index)
-        # TODO: finish it
+        message = self.sim_iface.RetrieveMessage(index)
+        status = str(message[0])
+        peer = str(message[1])
+        text = unicode(message[2])
+        sms = SMS(peer, text, 'in')
+        tichy.Service('Messages').add_to_inbox(sms)
 
 
 class TestSms(tichy.Service):
