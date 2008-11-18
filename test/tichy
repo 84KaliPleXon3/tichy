@@ -59,6 +59,11 @@ parser.add_option("", "--fullscreen",
                   action='store_true', dest="fullscreen",
                   help="run tichy in fullscreen",
                   default=True)
+parser.add_option("", "--experimental",
+                  action='store_true', dest="experimental",
+                  help="Use experimental features",
+                  default=False)
+                  
 (options, args) = parser.parse_args()
 
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
