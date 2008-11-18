@@ -29,17 +29,12 @@ backends = ['csdl', 'sdl']  # default backends
 import sys
 if hasattr(sys.modules['__main__'], 'tichy_gui_backends'):
     backends = sys.modules['__main__'].tichy_gui_backends
-# We can also specify etk backend using a command line option
-# TODO: make this cleaner
-if '--etk' in sys.argv:
-    backends = ['etk']
-elif '--gtk' in sys.argv:
-    backends = ['gtk']
-elif '--sdl' in sys.argv:
-    backends = ['csdl', 'sdl']
-elif '--csdl' in sys.argv:
-    backends = ['csdl']
 
+# We can also specify etk backend using a command line option
+if hasattr(sys.modules['__main__'], 'options'):
+    options = sys.modules['__main__'].options
+    if getattr(options, 'gui_backend', None):
+        backends = [options.gui_backend]
 
 for backend in backends:
     try:

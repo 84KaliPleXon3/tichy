@@ -19,13 +19,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-# This is to solve a bug in neo where sdl on the framebuffer doesn't work
-# XXX: we should solve the real issue instead of using this hack
 import os
-os.environ['SDL_VIDEODRIVER'] = 'x11'
-
 import sys
-sys.path.insert(0, '../')
+import time
+from optparse import OptionParser
+import logging
+logger = logging.getLogger('')
 
 
 def setup_logging():
@@ -43,12 +42,32 @@ def setup_logging():
     stream_log.setLevel(logging.INFO)
     logger.addHandler(stream_log)
 
-import logging
-logger = logging.getLogger('')
-
+# We do it before importing tichy modules, cause some import may have
+# logging info.
+#
+# XXX: is it normal ?
 setup_logging()
 
-import time
+# Parse the command line options
+parser = OptionParser()
+parser.add_option("", "--gui-backend", dest="gui_backend",
+                  help="select a specific gui backend",
+                  metavar="BACKEND",
+                  choices=["sdl", "csdl", "gtk", "etk"],
+                  default=None)
+parser.add_option("", "--fullscreen",
+                  action='store_true', dest="fullscreen",
+                  help="run tichy in fullscreen",
+                  default=True)
+(options, args) = parser.parse_args()
+
+# This is to solve a bug in neo where sdl on the framebuffer doesn't work
+# XXX: we should solve the real issue instead of using this hack
+os.environ['SDL_VIDEODRIVER'] = 'x11'
+
+# This is so that we can start tichy from the test dir without having
+# to set PYTHONPATH
+sys.path.insert(0, '../')
 
 # Import all the stuffs we need...
 import tichy
@@ -117,6 +136,7 @@ class Main(Application):
         yield launcher(content_window)
 
 if __name__ == '__main__':
+
     # We import all the modules into the plugin directory
     for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
                         '/usr/tichy/plugins']:
@@ -134,10 +154,8 @@ if __name__ == '__main__':
     tichy.Service.set_default('Design', 'Default')
     # tichy.Service.set_default('Design', 'Grid')
 
-    fullscreen = '--fullscreen' in sys.argv
-
     # The backend SDL painter
-    painter = gui.Painter((480, 640), fullscreen=fullscreen)
+    painter = gui.Painter((480, 640), fullscreen=options.fullscreen)
 
     # Create the screen
     screen = gui.Screen(tichy.mainloop, painter, style=style)
