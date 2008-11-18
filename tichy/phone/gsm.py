@@ -119,7 +119,7 @@ class FreeSmartPhoneGSM(GSMService):
             on_step("Register on the network")
             logger.info("register on the network")
             yield WaitDBus(self.gsm_network.Register)
-            yield Wait(self, 'provider-modified')
+            yield tichy.Wait(self, 'provider-modified')
         except Exception, e:
             logger.error("Error : %s", e)
             print type(e)
