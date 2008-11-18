@@ -1,11 +1,11 @@
 		      TODO List for TICHY
 
 * Add an Evas backend for the gui
+* Fix bug : cab't retrieve phone book
+* See why sometime we can't turn antenna on
 o [guillaume] Finish SMS application
+   Need to sort the messages by date
 o [guillaume] Make the keyboard faster
-* Have a way to tag Items as 'debug'
-   The 'debug' items should only registered in debug mode (or via the
-   configurations maybe).
 * Put Box.border and Box.space in the style
 * Let guip and guic widgets be able to get there size from the style
 * Add a way to test the plugins
