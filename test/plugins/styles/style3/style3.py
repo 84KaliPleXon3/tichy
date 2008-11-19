@@ -60,14 +60,7 @@ class MyStyle(Style):
                                         'button_pressed_frame.png')))}},
                     Tag('grid-item'): {
                         'background': None,
-                        'min-size': gui.Vect(96, 128),
-                        'children-style': {
-                            gui.Frame: {
-                                'background': Frame(tichy.Image(
-                                        MyStyle.path('button_frame.png'))),
-                                'min-size': gui.Vect(96, 96)},
-                            gui.Label: {'background': None},
-                            gui.Box: {'background': None}}}}},
+                        'min-size': gui.Vect(128, 128)}}},
             gui.ScrollableSlide: {
                 'background': Frame(tichy.Image(
                         MyStyle.path('button_frame.png')))}}
