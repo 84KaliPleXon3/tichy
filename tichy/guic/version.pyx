@@ -24,4 +24,4 @@ that require us to recompile before we can use guic.
 It is just to make things clearer in case of errors.
 """
 
-__version__ = 1
+__version__ = 2

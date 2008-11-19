@@ -318,4 +318,11 @@ class SdlEventsLoop(Object):
     def timeout_add(self, time, callback, *args):
         return gobject.timeout_add(time, callback, *args)
 
+    def __get_dbus_loop(self):
+        import dbus
+        return dbus.mainloop.glib.DBusGMainLoop()
+
+    dbus_loop = property(__get_dbus_loop)
+
+
         
