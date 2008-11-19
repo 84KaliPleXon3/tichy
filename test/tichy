@@ -58,7 +58,7 @@ parser.add_option("", "--gui-backend", dest="gui_backend",
 parser.add_option("", "--fullscreen",
                   action='store_true', dest="fullscreen",
                   help="run tichy in fullscreen",
-                  default=True)
+                  default=False)
 parser.add_option("", "--experimental",
                   action='store_true', dest="experimental",
                   help="Use experimental features",
