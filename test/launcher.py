@@ -86,7 +86,7 @@ class Launcher(dbus.service.Object):
     """Launch applets via DBus call
 
     example, to launch the Contacts application, using dbus-send :
-      dbus-send --session --dest='org.tichy' /Launcher --print-reply \
+      dbus-send --system --dest='org.tichy' /Launcher --print-reply \
       org.tichy.Launcher.Launch string:Contacts
     """
 
