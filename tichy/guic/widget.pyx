@@ -227,10 +227,12 @@ cdef class Widget(Object):
         self.need_redraw(self.rect)
         
     def destroy(self):
-        if not self.parent: # Just to ensure we are not already destroyed
+        if self._destroyed:
             return
-        self.parent.remove(self)
-        self.parent = None
+        self._destroyed = True
+        if self.parent:
+            self.parent.remove(self)
+            self.parent = None
         self._emit('destroyed')
         cdef Widget c
         for c in self.children[:]:

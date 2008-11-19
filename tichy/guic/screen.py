@@ -65,6 +65,11 @@ class Screen(Window):
         self.draw()
         super(Screen, self).tick()
 
+    def destroy(self):
+        super(Screen, self).destroy()
+        import pygame.display
+        pygame.display.quit()
+
 
 if __name__ == '__main__':
     from box import VBox, HBox

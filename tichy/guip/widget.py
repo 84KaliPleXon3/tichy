@@ -79,6 +79,8 @@ class Widget(Object):
         self.__organized = False
         self.__resized = False
 
+        self.__destroyed = False
+
         self.rect = Rect((0, 0), min_size or Vect(0, 0))
         self.__pos = pos or Vect(0, 0)
         if same_as is None:
@@ -262,9 +264,15 @@ class Widget(Object):
         self.resized = False
 
     def destroy(self):
-        if not self.parent: # Just to ensure we are not already destroyed
+        """destroy the widget
+
+        Can be called several times on the same widget.
+        """
+        if self.__destroyed:
             return
-        self.parent.remove(self)
+        self.__destroyed = True
+        if self.parent:
+            self.parent.remove(self)
         self.emit('destroyed')
         for c in self.children[:]:
             c.destroy()

@@ -55,6 +55,8 @@ cdef class Widget(Object):
     cdef public int _resized = False
     cdef void c_need_resize(self, Widget child)
     cdef public int resizable
+
+    cdef public int _destroyed = False
     
     cdef public list children
     cdef readonly Widget focused
