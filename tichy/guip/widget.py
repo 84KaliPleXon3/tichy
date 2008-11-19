@@ -115,6 +115,8 @@ class Widget(Object):
                 self.__style = self.parent.style_dict['children-style']
             else:
                 self.__style = self.parent.style
+        else:
+            raise Exception("no parent and no style")
         self.style_dict = self.__style.apply(self)
         children_style = self.__style if \
             'children-style' not in self.style_dict else \
