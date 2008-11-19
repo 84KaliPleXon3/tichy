@@ -62,7 +62,6 @@ logger = logging.getLogger('sdl_display')
 cdef class SdlPainter(Painter):
     def __init__(self, size, fullscreen = False):
         Painter.__init__(self, Vect(0,0), Rect((0,0), size))
-        # pygame.init()
         pygame.display.init()
         pygame.font.init()
         

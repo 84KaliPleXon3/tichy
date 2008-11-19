@@ -42,7 +42,8 @@ class SdlPainter(Painter):
 
     def __init__(self, size, fullscreen=False):
         Painter.__init__(self, Vect(0, 0), Rect((0, 0), size))
-        pygame.init()
+        pygame.display.init()
+        pygame.font.init()
         flags = pygame.RESIZABLE
         self.surface = pygame.display.set_mode(size, flags)
         pygame.display.set_caption("Tichy")
