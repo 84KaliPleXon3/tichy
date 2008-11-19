@@ -153,21 +153,22 @@ class SdlEventsLoop(Object):
 
     def next(self):
         self.events = []
-        for event in pygame.event.get(pygame.locals.MOUSEMOTION):
-            if event.buttons[0]:
-                self.events = [('mouse-motion', (asvect(event.pos), ))]
+        if pygame.display.get_init():
+            for event in pygame.event.get(pygame.locals.MOUSEMOTION):
+                if event.buttons[0]:
+                    self.events = [('mouse-motion', (asvect(event.pos), ))]
 
-        for event in pygame.event.get():
-            if event.type == pygame.locals.MOUSEBUTTONDOWN:
-                self.events.append(('mouse-down', (asvect(event.pos), )))
-            elif event.type == pygame.locals.MOUSEBUTTONUP:
-                self.events.append(('mouse-up', (asvect(event.pos), )))
-            elif event.type == pygame.locals.KEYDOWN:
-                self.events.append(('key-down', (event, )))
-            elif event.type == pygame.locals.VIDEORESIZE:
-                self.events.append(('resized', (asvect(event.size), )))
-                self.surface = pygame.display.set_mode(event.size,
-                                                       pygame.RESIZABLE)
+            for event in pygame.event.get():
+                if event.type == pygame.locals.MOUSEBUTTONDOWN:
+                    self.events.append(('mouse-down', (asvect(event.pos), )))
+                elif event.type == pygame.locals.MOUSEBUTTONUP:
+                    self.events.append(('mouse-up', (asvect(event.pos), )))
+                elif event.type == pygame.locals.KEYDOWN:
+                    self.events.append(('key-down', (event, )))
+                elif event.type == pygame.locals.VIDEORESIZE:
+                    self.events.append(('resized', (asvect(event.size), )))
+                    self.surface = pygame.display.set_mode(event.size,
+                                                           pygame.RESIZABLE)
         self.emit('tick')
 
     def run(self):
