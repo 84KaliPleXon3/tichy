@@ -36,6 +36,10 @@ the dbus method !
 """
 
 import os
+import sys
+from optparse import OptionParser
+import dbus
+import dbus.service
 
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
 # XXX: we should solve the real issue instead of using this hack
@@ -43,17 +47,36 @@ os.environ['SDL_VIDEODRIVER'] = 'x11'
 
 # This is to make sure that we use the local tichy lib if run from the
 # test directory
-import sys
 sys.path.insert(0, '../')
-
-import dbus
-import dbus.service
 
 import logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(name)-8s %(levelname)-8s %(message)s')
 logger = logging.getLogger('launcher')
+
+# Parse the command line options
+parser = OptionParser()
+parser.add_option("", "--gui-backend", dest="gui_backend",
+                  help="select a specific gui backend",
+                  metavar="BACKEND",
+                  choices=["sdl", "csdl", "gtk", "etk", "paroli"],
+                  default=None)
+parser.add_option("", "--fullscreen",
+                  action='store_true', dest="fullscreen",
+                  help="run tichy in fullscreen",
+                  default=False)
+parser.add_option("", "--experimental",
+                  action='store_true', dest="experimental",
+                  help="Use experimental features",
+                  default=False)
+
+(options, args) = parser.parse_args()
+
+# We select the gui backend before importing tichy
+if options.gui_backend:
+    global tichy_gui_backends
+    tichy_gui_backends = [options.gui_backend]
 
 
 import tichy
