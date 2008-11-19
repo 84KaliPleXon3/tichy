@@ -41,7 +41,7 @@ for backend in backends:
         elif backend == 'etk':
             from guie import *
         elif backend == 'paroli':
-            from gui_p import *
+            from gui_paroli import *
     except Exception:
         logger.warning("can't use backend %s", backend)
         if backend == backends[-1]:
