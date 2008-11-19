@@ -35,6 +35,12 @@ Note for neo : We need to remember to set DISPLAY=:0 even when we call
 the dbus method !
 """
 
+import os
+
+# This is to solve a bug in neo where sdl on the framebuffer doesn't work
+# XXX: we should solve the real issue instead of using this hack
+os.environ['SDL_VIDEODRIVER'] = 'x11'
+
 # This is to make sure that we use the local tichy lib if run from the
 # test directory
 import sys
@@ -49,9 +55,6 @@ logging.basicConfig(
     format='%(name)-8s %(levelname)-8s %(message)s')
 logger = logging.getLogger('launcher')
 
-# We use the hack described in tichy/gui.py to choose the gui backend
-# before importing tichy
-tichy_gui_backends = ['etk']
 
 import tichy
 
@@ -59,17 +62,15 @@ import tichy
 class Launcher(dbus.service.Object):
     """Launch applets via DBus call
 
-    example, top launch the Contacts application, using dbus-send :
+    example, to launch the Contacts application, using dbus-send :
       dbus-send --session --dest='org.tichy' /Launcher --print-reply \
       org.tichy.Launcher.Launch string:Contacts
     """
 
     def __init__(self, *args, **kargs):
         super(Launcher, self).__init__(*args, **kargs)
-        # The backend painter
-        self.painter = tichy.gui.Painter((480, 640))
-        # TODO: at least remove the create invocation !
-        self.style = tichy.Style.find_by_name("black style").create()
+        self.style = tichy.Style.find_by_name("cool style").create()
+        self.screen = None
 
     @dbus.service.method("org.tichy.Launcher", "s")
     def Launch(self, name):
@@ -77,14 +78,29 @@ class Launcher(dbus.service.Object):
         logger.info("launch %s", name)
         for app in tichy.Application.subclasses:
             if app.name == name:
-                self._launch(app)
+                self._launch(app).start()
                 break
 
+    @tichy.tasklet.tasklet
     def _launch(self, app):
         """Actually launch the application"""
-        # Since we use one screen per application, we don't need to
-        # pass a parent window to the app
-        app(None).start()
+        kill_on_close = False
+        if not self.screen:
+            self.screen = self.create_screen()
+            kill_on_close = True
+        window = tichy.gui.Window(self.screen,
+                                  min_size=tichy.gui.Vect(480, 0),
+                                  modal=True, expand=True)
+        yield app(window)
+        window.destroy()
+        if kill_on_close:
+            self.screen.destroy()
+            self.screen = None
+
+    def create_screen(self):
+        painter = tichy.gui.Painter((480, 640))
+        return tichy.gui.Screen(tichy.mainloop, painter,
+                                style=self.style)
 
     @dbus.service.method("org.tichy.Launcher")
     def Quit(self):
@@ -108,7 +124,7 @@ if __name__ == '__main__':
     tichy.Service.set_default('Design', 'Default')
 
     logger.info("start launcher service")
-    bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
+    bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
     bus_name = dbus.service.BusName('org.tichy', bus)
 
     launcher = Launcher(bus, '/Launcher')
