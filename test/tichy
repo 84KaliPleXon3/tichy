@@ -53,7 +53,7 @@ parser = OptionParser()
 parser.add_option("", "--gui-backend", dest="gui_backend",
                   help="select a specific gui backend",
                   metavar="BACKEND",
-                  choices=["sdl", "csdl", "gtk", "etk"],
+                  choices=["sdl", "csdl", "gtk", "etk", "paroli"],
                   default=None)
 parser.add_option("", "--fullscreen",
                   action='store_true', dest="fullscreen",
@@ -63,8 +63,13 @@ parser.add_option("", "--experimental",
                   action='store_true', dest="experimental",
                   help="Use experimental features",
                   default=False)
-                  
+
 (options, args) = parser.parse_args()
+
+# We select the gui backend before importing tichy
+if options.gui_backend:
+    global tichy_gui_backends
+    tichy_gui_backends = [options.gui_backend]
 
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
 # XXX: we should solve the real issue instead of using this hack

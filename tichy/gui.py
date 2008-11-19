@@ -27,14 +27,8 @@ backends = ['csdl', 'sdl']  # default backends
 # the module. If the variable `tichy_gui_backends` is set we use it as
 # a list of backends to try.
 import sys
-if hasattr(sys.modules['__main__'], 'tichy_gui_backends'):
+if getattr(sys.modules['__main__'], 'tichy_gui_backends', None):
     backends = sys.modules['__main__'].tichy_gui_backends
-
-# We can also specify etk backend using a command line option
-if hasattr(sys.modules['__main__'], 'options'):
-    options = sys.modules['__main__'].options
-    if getattr(options, 'gui_backend', None):
-        backends = [options.gui_backend]
 
 for backend in backends:
     try:
@@ -46,6 +40,8 @@ for backend in backends:
             from guig import *
         elif backend == 'etk':
             from guie import *
+        elif backend == 'paroli':
+            from gui_p import *
     except Exception:
         logger.warning("can't use backend %s", backend)
         if backend == backends[-1]:
