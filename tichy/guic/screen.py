@@ -39,8 +39,7 @@ class Screen(Window):
         self.size = Vect(480, 640) # TODO find a better way
         self.painter = painter
         self.redraw_rect = self.rect
-
-        events_source.connect_object('tick', Screen.tick, self)
+        self.monitor(events_source, 'tick', self.on_tick)
 
     screen = property(lambda self: self)
 
@@ -58,6 +57,9 @@ class Screen(Window):
     def need_redraw(self, rect):
         self.redraw_rect = rect if not self.redraw_rect else \
             self.redraw_rect.merge(rect)
+
+    def on_tick(self, event_source):
+        self.tick()
 
     def tick(self):
         self.draw()
