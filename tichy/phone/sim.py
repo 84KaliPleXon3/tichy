@@ -22,11 +22,19 @@ from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
 
 import tichy
+from tichy.tasklet import WaitDBus
 
 import logging
 logger = logging.getLogger('SIM')
 logger.setLevel(logging.DEBUG)
 
+
+class SIMContact(tichy.Contact):
+    
+    def __init__(self, name, sim_index=None, **kargs):
+        super(SIMContact, self).__init__(name, **kargs)
+        self.sim_index = sim_index
+        self.icon = 'pics/sim.png'
 
 class FreeSmartPhoneSim(tichy.Service):
 
@@ -48,9 +56,15 @@ class FreeSmartPhoneSim(tichy.Service):
 
     def get_contacts(self):
         logger.info("Retrieve Phonebook")
-        ret = self.gsm_sim.RetrievePhonebook('contacts')
-        logger.debug('get contacts : %s', ret)
-        ret = [(unicode(s[1]), str(s[2])) for s in ret]
+        entries = yield WaitDBus(self.gsm_sim.RetrievePhonebook, 'contacts')
+        logger.debug('get contacts : %s', entries)
+        ret = []
+        for entry in entries:
+            index = int(entry[0])
+            name = unicode(entry[1])
+            tel = str(entry[2])
+            contact = SIMContact(name, tel=tel, sim_index=index)
+            ret.append(contact)
         yield ret
 
 
@@ -59,4 +73,4 @@ class TestSim(tichy.Service):
     service = 'SIM'
 
     def get_contacts(self):
-        yield [('test', '099872394')]
+        yield [SIMContact('test', tel='099872394', sim_index=0)]

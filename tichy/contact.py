@@ -23,28 +23,82 @@ from tichy.object import Object
 import tichy
 import tichy.gui as gui
 
-from tichy.phone import TelNumber
 
+class Contact(tichy.Item):
+    """base class for tichy's contacts"""
 
-class Contact(dict, tichy.Item):
+    class Field(tichy.Item):
+        """Representation of a field in a given contact
+        """
 
-    def __init__(self, name, source=None):
+        def __init__(self, contact, name, type, requiered=False):
+            """Create a new field representation
+
+            Parameters:
+
+            - contact : the contact the field belong to
+
+            - name : the name of the attribute in the contact
+
+            - type : the type of the field
+
+            - requiered : If set to True, then the field is requiered
+              (we can't set it to None)
+            """
+            super(Contact.Field, self).__init__()
+            self.contact = contact
+            self.name = name
+            self.type = type
+            self.requiered = requiered
+
+        def __get_value(self):
+            return getattr(self.contact, self.name)
+
+        def __set_value(self, value):
+            assert value is None or isinstance(value, self.type)
+            return setattr(self.contact, self.name, value)
+
+        value = property(__get_value, __set_value)
+
+        def get_text(self):
+            return self
+
+        def __unicode__(self):
+            return unicode(self.name)
+
+        def view(self, parent):
+            ret = gui.Box(parent, axis=0, border=0)
+            gui.Label(ret, self.name)
+            self.value.view(ret)
+            return ret
+
+        def create_actor(self):
+            actor = super(Contact.Field, self).create_actor()
+            actor.new_action('Edit').connect('activated', self.on_edit)
+            return actor
+
+        def on_edit(self, action, attr, view):
+            yield self.value.edit(view.window, name=self.name)
+
+    def __init__(self, name, tel=None, note=None, **kargs):
         """Create a new contact
-
-        source can be :
-
-        - 'sim'
         """
         super(Contact, self).__init__()
-        self['name'] = name
-        if source == 'sim':
-            self.icon = 'pics/sim.png'
+        self.name = tichy.Text.as_text(name)
+        self.tel = tichy.TelNumber.as_text(tel)
+        self.note = tichy.Text.as_text(note)
+
+    def get_fields(self):
+        """return all the fields of the contact"""
+        return [Contact.Field(self, 'name', tichy.Text, True),
+                Contact.Field(self, 'tel', tichy.TelNumber),
+                Contact.Field(self, 'note', tichy.Text)]
 
     def get_text(self):
-        return self['name']
+        return self.name
 
-    def view(self, parent, editable=True):
-        return gui.Label(parent, unicode(self.name))
+    def view(self, parent, **kargs):
+        return self.name.view(parent, **kargs)
 
     def create_actor(self):
         actor = tichy.Item.create_actor(self)
@@ -53,11 +107,11 @@ class Contact(dict, tichy.Item):
         return actor
 
     def on_call(self, action, contact, view):
-        if not 'tel' in self:
+        if not self.tel:
             yield gui.Message(view.window, "Contact has no tel")
         else:
             caller = tichy.Service('Caller')
-            yield caller.call(view.window, str(self['tel']))
+            yield caller.call(view.window, self.tel)
 
     def on_edit(self, item, contact, view):
         editor = tichy.Service('EditContact')
@@ -70,16 +124,12 @@ class ContactsService(Service):
 
     def __init__(self):
         self.contacts = tichy.List()
-        fabien = self.create('Fabien')
-        fabien['tel'] = TelNumber('0478657392')
-        fabien['note'] = tichy.Text('hello')
+        fabien = Contact('Fabien', tel='0478657392', note='Hello')
+        self.add(fabien)
+        etienne = Contact('Etienne', tel='044569892')
+        self.add(etienne)
 
-        etienne = self.create('Etienne')
-        etienne['tel'] = TelNumber('044569892')
-
-    def create(self, name=None, source=None):
-        name = name or self.new_name()
-        contact = Contact(tichy.Text(name), source=source)
+    def add(self, contact):
         self.contacts.append(contact)
         return contact
 
@@ -93,5 +143,5 @@ class ContactsService(Service):
 
     def find_by_number(self, number):
         for c in self.contacts:
-            if 'tel' in c and c['tel'] == number:
+            if c.tel == number:
                 return c

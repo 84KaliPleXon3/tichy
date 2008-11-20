@@ -50,92 +50,57 @@ class Contacts(tichy.Application):
         yield Contact(self.window, contact)
 
 
-class ContactAttrItem(tichy.Item):
-    """This item is used to print a contact attribute"""
-
-    def __init__(self, name, value):
-        super(ContactAttrItem, self).__init__()
-        self.name = name
-        self.value = value
-
-    def get_text(self):
-        """We override item.get_text cause we want to use our own view
-        method Instead ot relying on the item name"""
-        return self
-
-    def __str__(self):
-        return self.name
-
-    def view(self, parent):
-        ret = gui.Box(parent, axis=0, border=0)
-        gui.Label(ret, self.name)
-        self.value.view(ret)
-        return ret
-
-
 class Contact(tichy.Application):
 
     design = 'Default'
 
     def run(self, window, contact):
         self.contact = contact
-        self.name = "Edit %s" % contact['name']
+        self.name = "Edit %s" % contact.name
         self.window = gui.Window(window, modal=True)
-        frame = self.view(self.window, back_button=True)
+        self.frame = self.view(self.window, back_button=True)
 
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(self.frame, axis=1)
 
         self.attr_list = tichy.ActorList()
-        self.update_list()
+        self.update()
         list_view = self.attr_list.view(vbox)
 
         gui.Spring(vbox, axis=1)
 
-        add_menu = frame.actor.new_action('Add')
-        add_tel_menu = add_menu.new_action('Tel')
-        add_note_menu = add_menu.new_action('Note')
-
-        add_note_menu.connect('activated', self.on_add, tichy.Text, 'note')
-        add_tel_menu.connect('activated', self.on_add, TelNumber, 'tel')
-
-        yield tichy.Wait(frame, 'back')
+        yield tichy.Wait(self.frame, 'back')
         self.window.destroy()
 
-    def on_add(self, action, item, view, item_cls, name):
-        # first we have to set up a unique name for the new attr
-        i = 1
-        final_name = name
-        while final_name in self.contact:
-            i += 1
-            final_name = '%s %d' % (name, i)
-        name = final_name
+    def on_add_field(self, action, item, view, field):
+        value = field.type()
+        field.value = value
+        yield value.edit(self.window, name=field.name)
+        self.update()
 
-        value = item_cls("")
-        self.contact[name] = value
-        self.update_list()
-
-        value.edit(self.window, name=name)
-
-    def update_list(self):
+    def update(self):
+        """Update the list of attributes, and the possible actions"""
         self.attr_list.clear()
 
-        for attr, value in self.contact.items():
-            actor = tichy.Actor(ContactAttrItem(attr, value))
-            edit = actor.new_action('Edit')
-            edit.connect('activated', self.on_edit_attr)
-            delete = actor.new_action('Delete')
-            delete.connect('activated', self.on_delete_attr)
-            self.attr_list.append(actor)
+        for field in self.contact.get_fields():
+            if field.value:
+                actor = field.create_actor()
+                if not field.requiered:
+                    actor.new_action('Delete').connect('activated',
+                                                       self.on_delete_field)
+                self.attr_list.append(actor)
 
-    def on_edit_attr(self, action, attr, view):
-        yield self.contact[attr.name].edit(view.window, name=attr.name)
+        self.frame.actor.clear()
+        add_menu = self.frame.actor.new_action('Add')
+        for field in self.contact.get_fields():
+            if field.value:
+                continue
+            add_field = add_menu.new_action(field.name)
+            add_field.connect('activated', self.on_add_field, field)
 
-    def on_delete_attr(self, action, attr, view):
-        if attr.name == 'name':
-            yield tichy.Dialog(view.window, "Error", "Can't delete name")
-        else:
-            self.attr_list.remove(action.actor)
-            del self.contact[attr.name]
+    def on_delete_field(self, action, attr, view):
+        self.attr_list.remove(action.actor)
+        setattr(self.contact, attr.name, None)
+        self.update()
 
 
 class SelectContactApp(tichy.Application):
