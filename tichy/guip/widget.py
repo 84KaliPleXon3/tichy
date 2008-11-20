@@ -276,7 +276,6 @@ class Widget(Object):
         self.emit('destroyed')
         for c in self.children[:]:
             c.destroy()
-        self.parent = None
 
     def remove(self, w):
         """Remove a child from the widget"""

@@ -232,7 +232,6 @@ cdef class Widget(Object):
         self._destroyed = True
         if self.parent:
             self.parent.remove(self)
-            self.parent = None
         self._emit('destroyed')
         cdef Widget c
         for c in self.children[:]:
