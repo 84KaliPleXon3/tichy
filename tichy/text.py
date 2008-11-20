@@ -23,7 +23,7 @@ from tichy.service import Service
 class Text(Item):
     """Base class for all text in tichy"""
 
-    def __init__(self, value, editable=False):
+    def __init__(self, value="", editable=False):
         super(Text, self).__init__()
         self.__value = unicode(value)
         self.editable = editable
@@ -31,6 +31,8 @@ class Text(Item):
     @classmethod
     def as_text(cls, value):
         if isinstance(value, cls):
+            return value
+        if value is None:
             return value
         return cls(unicode(value))
 

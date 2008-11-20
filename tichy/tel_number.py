@@ -22,8 +22,8 @@ import tichy
 
 class TelNumber(tichy.Text):
 
-    def __init__(self, text):
-        super(TelNumber, self).__init__(text)
+    def __init__(self, text='', **kargs):
+        super(TelNumber, self).__init__(text, **kargs)
         # This is the text that is used for the view of the number It
         # can be either the number, either the name of the contact
         # TODO: we could not do like this but instead have the
