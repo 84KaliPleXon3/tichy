@@ -99,33 +99,36 @@ class Default(Service):
         return ret
 
     def select_actor(self, actor, view, use_default=True):
-        # If the actor has a default action and it is the only one,
-        # then we start it
-        if view == self.selected:
-            action_bar = view.parent_as(ApplicationFrame).action_bar
-            action_bar.clear()
-            self.selected = None
-            view.remove_tag('selected')
-            return
+        action_bar = view.parent_as(ApplicationFrame).action_bar
 
+        if view == self.selected:
+            self.unselect()
+            return
         if self.selected:
-            self.selected.remove_tag('selected')
+            self.unselect()
         if actor.default_action and use_default:
             actor.default_action.activate(view)
             return
         self.selected = view
         view.add_tag('selected')
-        # Otherwise we put the possible actions in the application
-        # action_bar
-        action_bar = view.parent_as(ApplicationFrame).action_bar
+
         action_bar.set_actor(actor, view)
 
         # We have to make sure we remove the reference to this view if
         # it get destroyed this is a little tricky...
 
         def on_destroy(b):
-            self.selected = None
+            self.unselect()
         self.selected.connect('destroyed', on_destroy)
+
+    def unselect(self, actor=None, view=None):
+        view = view or self.selected
+        if view != self.selected or not view:
+            return
+        action_bar = view.parent_as(ApplicationFrame).action_bar
+        action_bar.clear()
+        self.selected.remove_tag('selected')
+        self.selected = None
 
     def view_application(self, parent, app, **kargs):
         return ApplicationFrame(parent, app, **kargs)
