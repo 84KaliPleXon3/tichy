@@ -30,6 +30,7 @@ import plugins
 
 from list import List, ActorList
 from text import Text
+from tel_number import TelNumber
 from item import Item
 from actor import Actor
 from style import Style
