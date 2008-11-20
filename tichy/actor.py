@@ -136,6 +136,9 @@ class
         """
         return Action(self, name)
 
+    def clear(self):
+        del self.actions[:]
+
     def view(self, parent, **kargs):
         """Create a view of the Actor in a parent widget.
         """
