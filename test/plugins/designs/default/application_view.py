@@ -48,6 +48,7 @@ class ActionBar(gui.Widget):
 
             def on_clicked(b, a):
                 a.activate(b)
+                tichy.Service('Design').unselect(actor, view)
             b.connect('clicked', on_clicked, a)
             self.buttons.append(b)
 
