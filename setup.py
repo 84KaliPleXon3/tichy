@@ -88,7 +88,7 @@ setup(name='Tichy',
       author="Guillaume 'charlie' Chereau",
       author_email='charlie@openmoko.org',
       # url='',
-      packages = ['tichy', 'tichy.contacts', 'tichy.guic', 'tichy.guip',
+      packages = ['tichy', 'tichy.guic', 'tichy.guip',
                   'tichy.phone', 'tichy.prefs'],
       scripts= ['test/tichy'],
       # XXX: Those locations may not work on the neo !
