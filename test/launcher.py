@@ -70,6 +70,10 @@ parser.add_option("", "--experimental",
                   action='store_true', dest="experimental",
                   help="Use experimental features",
                   default=False)
+parser.add_option("", "--session",
+                  action='store_const', dest='bus',
+                  help="Connect to the session bus",
+                  const='session', default='system')
 
 (options, args) = parser.parse_args()
 
@@ -147,7 +151,11 @@ if __name__ == '__main__':
     tichy.Service.set_default('Design', 'Default')
 
     logger.info("start launcher service")
-    bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
+    if options.bus == 'system':
+        bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
+    else:
+        bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
+
     bus_name = dbus.service.BusName('org.tichy', bus)
 
     launcher = Launcher(bus, '/Launcher')
