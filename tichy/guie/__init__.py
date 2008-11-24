@@ -40,12 +40,16 @@ def Rect(pos, size):
 class Widget(tichy.Object):
 
     def __init__(self, parent, etk_obj=None, item=None, expand=False,
-                 **kargs):
+                 optimal_size=None, min_size=None, **kargs):
         self.etk_obj = etk_obj or etk.VBox()
         self.item = item
         self.parent = parent
         self.children = []
         self.expand = expand
+
+        if min_size:
+            self.etk_obj.size_request_set(min_size[0], min_size[1])
+
         if self.parent:
             self.parent.get_contents_child().add(self)
         self.show()
