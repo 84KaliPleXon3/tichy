@@ -74,6 +74,10 @@ parser.add_option("", "--session",
                   action='store_const', dest='bus',
                   help="Connect to the session bus",
                   const='session', default='system')
+parser.add_option("", "--launch", dest='launch',
+                  help="launch an applet using DBus",
+                  metavar="APPLICATION",
+                  default=None)
 
 (options, args) = parser.parse_args()
 
@@ -137,6 +141,24 @@ class Launcher(dbus.service.Object):
 
 
 if __name__ == '__main__':
+    logger.info("connect to dbus")
+    if options.bus == 'system':
+        bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
+    else:
+        bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
+    bus_name = dbus.service.BusName('org.tichy', bus)
+
+    if options.launch:
+        if options.bus == 'system':
+            bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
+        else:
+            bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
+        launcher = bus.get_object('org.tichy', '/Launcher')
+        launcher = dbus.Interface(launcher, 'org.tichy.Launcher')
+        launcher.Launch(options.launch)
+        sys.exit(0)
+
+
     # We import all the modules into the plugin directory
     for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
                         '/usr/tichy/plugins']:
@@ -151,13 +173,6 @@ if __name__ == '__main__':
     tichy.Service.set_default('Design', 'Default')
 
     logger.info("start launcher service")
-    if options.bus == 'system':
-        bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
-    else:
-        bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
-
-    bus_name = dbus.service.BusName('org.tichy', bus)
-
     launcher = Launcher(bus, '/Launcher')
 
     logger.info("starting mainloop")
