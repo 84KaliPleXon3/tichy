@@ -211,20 +211,22 @@ class ScrollableSlide(Frame):
 
 class Button(Widget):
 
-    def __init__(self, parent, **kargs):
+    def __init__(self, parent, min_size=(0, 64), **kargs):
         gtk_obj = gtk.Button()
 
         def on_clicked(gtk, self):
             self.on_clicked(gtk)
         gtk_obj.connect('clicked', on_clicked, self)
 
-        super(Button, self).__init__(parent, gtk_obj=gtk_obj, **kargs)
+        super(Button, self).__init__(parent, gtk_obj=gtk_obj,
+                                     min_size=(-1, 96), **kargs)
 
 
 class Scrollable(Widget):
 
     def __init__(self, parent, axis=1, **kargs):
         gtk_obj = gtk.ScrolledWindow()
+        gtk_obj.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         super(Scrollable, self).__init__(parent, gtk_obj=gtk_obj, **kargs)
 
     def add(self, child):
