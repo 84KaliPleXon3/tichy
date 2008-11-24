@@ -43,8 +43,7 @@ class Conf(tichy.Application):
             actor = app.create_actor()
             list.append(actor)
 
-        list.view(vbox)
-        gui.Spring(vbox, axis=1)
+        list.view(vbox, expand=True)
 
         # Wait until the quit button is clicked
         yield tichy.Wait(frame, 'back')
