@@ -24,8 +24,17 @@ import tichy
 import tichy.gui as gui
 
 
+# TODO: Redo the whole contact things. We should have a single contact
+# class, no subclass for different backends, instead we have
+# ContactStorage classes where we define storage functions.  A contact
+# should have any fields (dictionary style), and each storage can
+# define which fields are supported.
+
+
 class Contact(tichy.Item):
     """base class for tichy's contacts"""
+
+    storage = None
 
     class Field(tichy.Item):
         """Representation of a field in a given contact
@@ -80,6 +89,12 @@ class Contact(tichy.Item):
         def on_edit(self, action, attr, view):
             yield self.value.edit(view.window, name=self.name)
 
+        @classmethod
+        def import_(cls, contact):
+            """create a new contact from an other contact)
+            """
+            yield None
+
     def __init__(self, name, tel=None, note=None, **kargs):
         """Create a new contact
         """
@@ -104,7 +119,18 @@ class Contact(tichy.Item):
         actor = tichy.Item.create_actor(self)
         actor.new_action("Call").connect('activated', self.on_call)
         actor.new_action("Edit").connect('activated', self.on_edit)
+
+        for cls in Contact.subclasses:
+            if isinstance(self, cls):
+                continue
+            import_ = actor.new_action("Copy to %s" % cls.storage)
+            import_.connect('activated', self.on_copy_to, cls)
+
         return actor
+
+    def on_copy_to(self, action, contact, view, cls):
+        contact = yield cls.import_(self)
+        tichy.Service('Contacts').add(contact)
 
     def on_call(self, action, contact, view):
         if not self.tel:
@@ -118,15 +144,24 @@ class Contact(tichy.Item):
         return editor.edit(self, view.window)
 
 
+class PhoneContact(Contact):
+    storage = 'Phone'
+
+    @classmethod
+    def import_(cls, contact):
+        assert not isinstance(contact, PhoneContact)
+        yield PhoneContact(contact.name, tel=contact.tel)
+
+
 class ContactsService(Service):
 
     service = 'Contacts'
 
     def __init__(self):
         self.contacts = tichy.List()
-        fabien = Contact('Fabien', tel='0478657392', note='Hello')
+        fabien = PhoneContact('Fabien', tel='0478657392', note='Hello')
         self.add(fabien)
-        etienne = Contact('Etienne', tel='044569892')
+        etienne = PhoneContact('Etienne', tel='044569892')
         self.add(etienne)
 
     def add(self, contact):
@@ -145,3 +180,7 @@ class ContactsService(Service):
         for c in self.contacts:
             if c.tel == number:
                 return c
+
+    def create(self):
+        name = self.new_name()
+        return PhoneContact(name)

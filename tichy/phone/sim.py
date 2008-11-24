@@ -30,11 +30,19 @@ logger.setLevel(logging.DEBUG)
 
 
 class SIMContact(tichy.Contact):
-    
-    def __init__(self, name, sim_index=None, **kargs):
+    storage = 'SIM'
+
+    def __init__(self, name, tel=None, sim_index=None, **kargs):
         super(SIMContact, self).__init__(name, **kargs)
         self.sim_index = sim_index
         self.icon = 'pics/sim.png'
+
+    @classmethod
+    def import_(cls, contact):
+        """create a new contact from an other contact)
+        """
+        assert not isinstance(contact, SIMContact)
+        yield SIMContact(contact.name, tel=contact.tel)
 
 class FreeSmartPhoneSim(tichy.Service):
 
