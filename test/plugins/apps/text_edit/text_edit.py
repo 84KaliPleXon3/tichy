@@ -45,7 +45,7 @@ class TextEdit(tichy.Application):
 
         self.text = text
         self.text.view(vbox, editable=True, auto_keyboard=False,
-                       min_size=Vect(0, 0), expand=True)
+                       expand=True)
 
         self.keyboard = tichy.Service('Keyboard').get()
         if input_method:

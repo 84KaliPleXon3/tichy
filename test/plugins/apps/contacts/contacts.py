@@ -17,6 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+logger = logging.getLogger('app.contacts')
+
 import tichy
 import tichy.gui as gui
 
@@ -60,13 +63,11 @@ class Contact(tichy.Application):
         self.window = gui.Window(window, modal=True)
         self.frame = self.view(self.window, back_button=True)
 
-        vbox = gui.Box(self.frame, axis=1)
+        vbox = gui.Box(self.frame, axis=1, expand=True)
 
         self.attr_list = tichy.ActorList()
         self.update()
         list_view = self.attr_list.view(vbox)
-
-        gui.Spring(vbox, axis=1)
 
         yield tichy.Wait(self.frame, 'back')
         self.window.destroy()
@@ -79,8 +80,8 @@ class Contact(tichy.Application):
 
     def update(self):
         """Update the list of attributes, and the possible actions"""
+        logger.debug("update contact attributes")
         self.attr_list.clear()
-
         for field in self.contact.get_fields():
             if field.value:
                 actor = field.create_actor()
@@ -112,7 +113,7 @@ class SelectContactApp(tichy.Application):
         self.window = gui.Window(window)
         frame = self.view(self.window)
 
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(frame, axis=1, expand=True)
 
         for contact in tichy.Service('Contacts').contacts:
             button = gui.Button(vbox)

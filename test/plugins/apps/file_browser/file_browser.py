@@ -60,11 +60,9 @@ class FileBrowser(tichy.Application):
     def run(self, parent):
         w = gui.Window(parent, modal=True)
         frame = self.view(w, back_button="Load")
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(frame, axis=1, expand=True)
 
         list_view = self.list.view(vbox)
-
-        gui.Spring(vbox, axis=1)
 
         self.select_path(os.path.expanduser('~/'))
 
@@ -93,14 +91,12 @@ class SelectFileBrowser(FileBrowser):
         w = gui.Window(parent, modal=True)
         msg = can_create and 'Save' or 'Load'
         frame = self.view(w, title='Select File', back_button=msg)
-        vbox = gui.Box(frame, axis=1)
+        vbox = gui.Box(frame, axis=1, expand=True)
 
         self.file_name_item = tichy.Text(file_name, editable=can_create)
         self.file_name_item.view(vbox)
 
         list_view = self.list.view(vbox)
-
-        gui.Spring(vbox, axis=1)
 
         self.select_path(os.path.expanduser('~/'))
 
