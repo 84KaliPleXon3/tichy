@@ -45,6 +45,7 @@ def Rect(pos, size):
 class Widget(tichy.Object):
 
     def __init__(self, parent, expand=False, item=None, pos=None,
+                 optimal_size=None, min_size=None,
                  gtk_obj=None, **kargs):
         super(Widget, self).__init__()
         self.parent = parent
@@ -53,6 +54,9 @@ class Widget(tichy.Object):
         self.pos = pos or Vect(0, 0)
         self.item = item
         self.gtk_obj = gtk_obj or gtk.VBox()
+
+        if min_size:
+            self.gtk_obj.set_size_request(min_size[0], min_size[1])
         # Hack to avoid bug :
         # http://bugzilla.gnome.org/show_bug.cgi?id=546802 (to remove
         # when the bug is fixed)
