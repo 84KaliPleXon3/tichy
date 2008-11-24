@@ -94,11 +94,7 @@ class KeyboardWidget(gui.Fixed):
         if key.key == tichy.key.K_NEXT_LAYOUT:
             self.item.next_layout()
             return
-        # XXX: this should be done in a backend agnostic way !!!
-        import pygame
-        pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=key.key,
-                                             mod=key.mod,
-                                             unicode=key.unicode))
+        tichy.mainloop.post_key_event('down', key.key, key.mod, key.unicode)
         self.preview.value = ''
 
     def mouse_motion(self, pos):

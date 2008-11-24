@@ -266,3 +266,13 @@ class EventsLoop(object):
         return dbus.mainloop.glib.DBusGMainLoop()
 
     dbus_loop = property(__get_dbus_loop)
+
+    def post_key_event(self, type, key, mod, str):
+        # XXX: to finish, not working yet...  I don't care so much
+        # because we are supposed to use an external keyboard for gtk
+        # backend
+        if type == 'down':
+            type = gtk.gdk.KEY_PRESS
+        event = gtk.gdk.Event(type)
+        event.keyval = key
+        event.string = str

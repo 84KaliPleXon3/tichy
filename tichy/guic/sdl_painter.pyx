@@ -324,5 +324,11 @@ class SdlEventsLoop(Object):
 
     dbus_loop = property(__get_dbus_loop)
 
-
-        
+    def post_key_event(self, type, key, mod, str):
+        """Simulate a key event from the user"""
+        if type == 'down':
+            type = pygame.KEYDOWN
+        elif type == 'up':
+            type = pygame.KEYUP
+        pygame.event.post(pygame.event.Event(type, key=key, mod=mod,
+                                             unicode=str))
