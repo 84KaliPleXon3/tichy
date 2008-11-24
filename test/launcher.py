@@ -35,25 +35,7 @@ Note for neo : We need to remember to set DISPLAY=:0 even when we call
 the dbus method !
 """
 
-import os
-import sys
 from optparse import OptionParser
-import dbus
-import dbus.service
-
-# This is to solve a bug in neo where sdl on the framebuffer doesn't work
-# XXX: we should solve the real issue instead of using this hack
-os.environ['SDL_VIDEODRIVER'] = 'x11'
-
-# This is to make sure that we use the local tichy lib if run from the
-# test directory
-sys.path.insert(0, '../')
-
-import logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(name)-8s %(levelname)-8s %(message)s')
-logger = logging.getLogger('launcher')
 
 # Parse the command line options
 parser = OptionParser()
@@ -80,6 +62,27 @@ parser.add_option("", "--launch", dest='launch',
                   default=None)
 
 (options, args) = parser.parse_args()
+
+import os
+import sys
+import dbus
+import dbus.service
+
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(name)-8s %(levelname)-8s %(message)s')
+logger = logging.getLogger('launcher')
+
+
+# This is to solve a bug in neo where sdl on the framebuffer doesn't work
+# XXX: we should solve the real issue instead of using this hack
+os.environ['SDL_VIDEODRIVER'] = 'x11'
+
+# This is to make sure that we use the local tichy lib if run from the
+# test directory
+sys.path.insert(0, '../')
+
 
 # We select the gui backend before importing tichy
 if options.gui_backend:
