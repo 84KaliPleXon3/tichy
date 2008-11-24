@@ -284,6 +284,27 @@ class WaitDBus(Tasklet):
         self.err_callback(type(e), e, sys.exc_info()[2])
 
 
+class Sleep(Tasklet):
+    """Tasklet that will return after a while"""
+    def __init__(self, t):
+        super(Sleep, self).__init__()
+        self.t = t
+
+    def _callback(self):
+        self.connection = None
+        self.callback()
+
+    def start(self, callback, err_callback):
+        import tichy
+        self.callback = callback
+        self.connection = tichy.mainloop.timeout_add(
+            self.t * 1000, self._callback)
+
+    def close(self):
+        if self.connection:
+            import tichy
+            tichy.mainloop.source_remove(self.connection)
+
 class Producer(Tasklet):
     """A Producer is a modified Tasklet that is not automatically closed
     after returing a value.
