@@ -137,6 +137,7 @@ class TestSms(tichy.Service):
 
     def send(self, sms):
         logger.info("Sending message to %s", sms.number)
+        yield tichy.tasklet.Sleep(2)
         tichy.Service('Messages').add_to_outbox(sms)
         yield None
 
