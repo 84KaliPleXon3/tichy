@@ -197,8 +197,8 @@ class SdlEventsLoop(Object):
     def timeout_add(self, time, callback, *args):
         return gobject.timeout_add(time, callback, *args)
 
-    def disconnect(self, connection):
-        gobject.disconnect(connection)
+    def source_remove(self, connection):
+        gobject.source_remove(connection)
 
     def __get_dbus_loop(self):
         import dbus
