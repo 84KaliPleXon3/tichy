@@ -53,8 +53,8 @@ class Edit(tichy.Application):
     icon = 'icon.png'
 
     def run(self, parent, sms):
-        w = gui.Window(parent, modal=True)   # We run into a new modal window
-        frame = self.view(w, title="Message", back_button=True)
+        self.window = gui.Window(parent, modal=True)
+        frame = self.view(self.window, title="Message", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         self.sms = sms
 
@@ -69,14 +69,27 @@ class Edit(tichy.Application):
         frame.actor.new_action("Send").connect('activated', self.on_send)
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
+        self.window.destroy()
 
     def on_send(self, action, item, view):
+        yield Sender(self.window, self.sms)
+
+
+class Sender(tichy.Application):
+    """Application that runs while we wait for the message to be sent.
+    """
+
+    def run(self, parent, sms):
+        w = gui.Window(parent, modal=True)
+        frame = self.view(w, title="Sending...")
+        vbox = gui.Box(frame, axis=1, expand=True)
         try:
-            yield self.sms.send()
+            yield sms.send()
+            yield tichy.Dialog(w, "Sent", "")
         except Exception, e:
             logger.error("Error: %s", e)
             yield tichy.Dialog(view.window, "Error", e)
+        w.destroy()
 
 
 class New(tichy.Application):
