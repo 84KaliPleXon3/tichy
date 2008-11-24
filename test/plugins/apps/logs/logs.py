@@ -18,7 +18,6 @@
 
 import tichy
 import tichy.gui as gui
-from tichy.phone import TelNumber
 
 import logging
 logger = logging.getLogger('App.Logs')

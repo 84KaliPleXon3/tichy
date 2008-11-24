@@ -19,13 +19,12 @@
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 import tichy
-from tel_number import TelNumber
 
 
 class Call(tichy.Item):
 
     def __init__(self, number, direction='out'):
-        self.number = TelNumber(number)
+        self.number = tichy.TelNumber(number)
         self.direction = direction
         self.status = 'inactive'
 

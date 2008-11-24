@@ -91,7 +91,7 @@ class FreeSmartPhoneSMS(tichy.Service):
 
     def create(self, number='', text='', direction='out'):
         """create a new sms instance"""
-        number = tichy.phone.TelNumber(number)
+        number = tichy.TelNumber(number)
         text = tichy.Text(text)
         return SMS(number, text)
 
@@ -128,7 +128,7 @@ class TestSms(tichy.Service):
         self.create('0123456789', 'Hello')
 
     def create(self, number='', text='', direction='out'):
-        number = tichy.phone.TelNumber(number)
+        number = tichy.TelNumber(number)
         text = tichy.Text(text)
         return SMS(number, text, direction)
 

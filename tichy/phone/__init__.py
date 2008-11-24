@@ -17,7 +17,6 @@
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 from gsm import GSMService
-from tel_number import TelNumber
 import sim
 import sms
 from call import Call

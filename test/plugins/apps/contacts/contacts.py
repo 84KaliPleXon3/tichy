@@ -19,7 +19,6 @@
 
 import tichy
 import tichy.gui as gui
-from tichy.phone import TelNumber
 
 
 class Contacts(tichy.Application):
