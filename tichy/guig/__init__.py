@@ -197,11 +197,18 @@ class Label(Widget):
 
 class Edit(Widget):
 
-    def __init__(self, parent, item=None, **kargs):
-        text = str(item)
+    def __init__(self, parent, item=None, min_size=(-1, 96), **kargs):
+        item = tichy.Text.as_text(item)
         gtk_obj=gtk.Entry()
-        gtk_obj.set_text(str(item))
-        super(Edit, self).__init__(parent, gtk_obj=gtk_obj, **kargs)
+        gtk_obj.set_text(unicode(item))
+        gtk_obj.connect('changed', self.on_changed)
+        super(Edit, self).__init__(parent, gtk_obj=gtk_obj,
+                                   min_size=min_size, item=item,
+                                   **kargs)
+
+    def on_changed(self, entry, *args):
+        self.item.value = self.gtk_obj.get_text()
+
 
 
 class ScrollableSlide(Frame):
