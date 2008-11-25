@@ -62,7 +62,7 @@ class List(list, Item):
         design = Service('Design')
         return design.view_list(parent, self, **kargs)
 
-    def actors_view(self, parent, can_delete=True, **kargs):
+    def actors_view(self, parent, can_delete=False, **kargs):
         """Return a view that contains actors view to all the elements of this
         list
 
