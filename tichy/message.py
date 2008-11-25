@@ -91,14 +91,14 @@ class MessagesService(tichy.Service):
     def add_to_inbox(self, msg):
         logger.info("Add to inbox : %s", msg)
         assert(isinstance(msg, Message))
-        self.inbox.append(msg)
+        self.inbox.insert(0, msg)
         msg.connect('read', self.on_message_read)
         self._update()
 
     def add_to_outbox(self, msg):
         logger.info("Add to outbox : %s", msg)
         assert(isinstance(msg, Message))
-        self.outbox.append(msg)
+        self.outbox.insert(0, msg)
 
     def on_message_read(self, msg):
         self._update()
