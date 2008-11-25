@@ -40,3 +40,6 @@ class Time(tichy.Item):
 
     def get_text(self):
         return tichy.Text(str(self))
+
+    def view(self, parent, **kargs):
+        return self.get_text().view(parent, **kargs)
