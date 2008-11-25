@@ -46,6 +46,11 @@ class List(list, Item):
         self.emit('appened', value)
         self.emit('modified')
 
+    def insert(self, index, value):
+        list.insert(self, index, value)
+        self.emit('inserted', index, value)
+        self.emit('modified')
+
     def remove(self, value):
         """Remove one item from the list"""
         list.remove(self, value)

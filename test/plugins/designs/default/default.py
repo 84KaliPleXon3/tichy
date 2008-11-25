@@ -40,6 +40,7 @@ class ListView(gui.Scrollable):
         self.monitor(list, 'appened', self.on_appened, vbox)
         self.monitor(list, 'removed', self.on_removed, vbox)
         self.monitor(list, 'cleared', self.on_clear, vbox)
+        self.monitor(list, 'inserted', self.on_insert, vbox)
 
     def on_appened(self, list, value, view):
         value.view(view)
@@ -53,6 +54,13 @@ class ListView(gui.Scrollable):
     def on_clear(self, list, view):
         for c in view.children[:]:
             c.destroy()
+
+    def on_insert(self, list, index, value, view):
+        # Sub optimal way of doing...
+        for c in view.children[:]:
+            c.destroy()
+        for item in list:
+            item.view(view)
 
 
 class Default(Service):
