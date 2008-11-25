@@ -17,6 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+logger = logging.getLogger('Contact')
+
 from tichy.service import Service, ServiceUnusable
 from tichy.object import Object
 
@@ -119,6 +122,7 @@ class Contact(tichy.Item):
         actor = tichy.Item.create_actor(self)
         actor.new_action("Call").connect('activated', self.on_call)
         actor.new_action("Edit").connect('activated', self.on_edit)
+        actor.new_action("Delete").connect('activated', self.on_delete)
 
         for cls in Contact.subclasses:
             if isinstance(self, cls):
@@ -129,8 +133,13 @@ class Contact(tichy.Item):
         return actor
 
     def on_copy_to(self, action, contact, view, cls):
-        contact = yield cls.import_(self)
-        tichy.Service('Contacts').add(contact)
+        try:
+            contact = yield cls.import_(self)
+            tichy.Service('Contacts').add(contact)
+        except Exception, e:
+            logger.error("can't import contact : %s", e)
+            yield tichy.Dialog(view.window, "Error",
+                               "can't import the contact")
 
     def on_call(self, action, contact, view):
         if not self.tel:
@@ -142,6 +151,19 @@ class Contact(tichy.Item):
     def on_edit(self, item, contact, view):
         editor = tichy.Service('EditContact')
         return editor.edit(self, view.window)
+
+    def on_delete(self, item, contact, view):
+        try:
+            yield contact.delete()
+            tichy.Service('Contacts').remove(contact)
+        except Exception, e:
+            logger.error("can't delete contact : %s", e)
+            yield tichy.Dialog(view.window, "Error",
+                               "can't delete the contact")
+
+    def delete(self):
+        """delete the contact"""
+        yield None
 
 
 class PhoneContact(Contact):
@@ -167,6 +189,9 @@ class ContactsService(Service):
     def add(self, contact):
         self.contacts.append(contact)
         return contact
+
+    def remove(self, contact):
+        self.contacts.remove(contact)
 
     def new_name(self):
         name = 'new'

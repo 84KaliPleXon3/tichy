@@ -26,7 +26,6 @@ from tichy.tasklet import WaitDBus
 
 import logging
 logger = logging.getLogger('SIM')
-logger.setLevel(logging.DEBUG)
 
 
 class SIMContact(tichy.Contact):
@@ -42,7 +41,13 @@ class SIMContact(tichy.Contact):
         """create a new contact from an other contact)
         """
         assert not isinstance(contact, SIMContact)
-        yield SIMContact(contact.name, tel=contact.tel)
+        sim = tichy.Service('SIM')
+        ret = yield sim.add_contact(contact.name, contact.tel)
+        yield ret
+
+    def delete(self):
+        sim = tichy.Service('SIM')
+        yield sim.remove_contact(self)
 
 
 class FreeSmartPhoneSim(tichy.Service):
@@ -62,6 +67,8 @@ class FreeSmartPhoneSim(tichy.Service):
             logger.warning("can't use freesmartphone GSM : %s", e)
             self.gsm = None
             raise tichy.ServiceUnusable
+
+        self.indexes = {}       # map sim_index -> contact
 
     def get_contacts(self):
         """Return the list of all the contacts in the SIM
@@ -93,8 +100,34 @@ class FreeSmartPhoneSim(tichy.Service):
             name = unicode(entry[1])
             tel = str(entry[2])
             contact = SIMContact(name, tel=tel, sim_index=index)
+            self.indexes[index] = contact
             ret.append(contact)
         yield ret
+
+    def add_contact(self, name, number):
+        logger.info("add %s : %s into the sim" % (name, number))
+        index = self._get_free_index()
+        contact = SIMContact(name, tel=number, sim_index=index)
+        self.indexes[index] = contact
+        yield WaitDBus(self.gsm_sim.StoreEntry, 'contacts', index,
+                       unicode(name), str(number))
+        yield contact
+
+    def _get_free_index(self):
+        """return the first found empty index in the sim"""
+        # XXX: Need to return an error if we don't have enough place
+        # on the sim
+        all = self.indexes.keys()
+        ret = 1
+        while True:
+            if not ret in all:
+                return ret
+            ret += 1
+
+    def remove_contact(self, contact):
+        logger.info("remove contact %s from sim", contact.name)
+        yield WaitDBus(self.gsm_sim.DeleteEntry, 'contacts',
+                       contact.sim_index)
 
 
 class TestSim(tichy.Service):
