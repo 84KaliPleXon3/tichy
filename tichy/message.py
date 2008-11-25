@@ -28,8 +28,8 @@ class Message(tichy.Item):
     """Base class for all messages
     """
 
-    def __init__(self, peer, text, direction, status=None):
-        """Create a new contact
+    def __init__(self, peer, text, direction, status=None, timestamp=None):
+        """Create a new message
 
         :Parameters:
 
@@ -44,9 +44,13 @@ class Message(tichy.Item):
         - status : the status of the message. Can be 'read' or
           'unread'. If set to None, incoming message will have
           'unread' status and outgoing message will have 'read' status
+
+        - timestamp : the time at which we received the message. If
+          set to None we use the current time
         """
         self.peer = tichy.TelNumber.as_text(peer)
         self.text = tichy.Text.as_text(text)
+        self.timestamp = tichy.Time.as_time(timestamp)
         assert direction in ['in', 'out'], direction
         self.direction = direction
         self.status = status or direction == 'out' and 'read' or 'unread'
