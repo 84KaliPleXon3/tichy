@@ -88,7 +88,7 @@ class Sender(tichy.Application):
             yield tichy.Dialog(w, "Sent", "")
         except Exception, e:
             logger.error("Error: %s", e)
-            yield tichy.Dialog(view.window, "Error", e)
+            yield tichy.Dialog(w, "Error", e)
         w.destroy()
 
 
