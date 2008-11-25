@@ -21,7 +21,6 @@
 
 import logging
 logger = logging.getLogger('GSM')
-logger.setLevel(logging.DEBUG)
 
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
@@ -111,9 +110,11 @@ class FreeSmartPhoneGSM(GSMService):
             logger.info("Request the GSM resource")
             on_step("Request the GSM resource")
             yield WaitDBus(self.ousage.RequestResource, 'GSM')
+            logger.info("Check antenna power")
             power = yield WaitDBus(self.gsm_device.GetAntennaPower)
             logger.info("antenna power is %d", power)
             if not power:
+                logger.info("turn on antenna power")
                 on_step("Turn on antenna power")
                 yield WaitDBus(self.gsm_device.SetAntennaPower, True)
             on_step("Register on the network")
