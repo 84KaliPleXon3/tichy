@@ -44,6 +44,7 @@ class SIMContact(tichy.Contact):
         assert not isinstance(contact, SIMContact)
         yield SIMContact(contact.name, tel=contact.tel)
 
+
 class FreeSmartPhoneSim(tichy.Service):
 
     service = 'SIM'

@@ -210,7 +210,6 @@ class Edit(Widget):
         self.item.value = self.gtk_obj.get_text()
 
 
-
 class ScrollableSlide(Frame):
 
     pass

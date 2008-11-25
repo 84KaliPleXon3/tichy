@@ -286,6 +286,7 @@ class WaitDBus(Tasklet):
 
 class Sleep(Tasklet):
     """Tasklet that will return after a while"""
+
     def __init__(self, t):
         super(Sleep, self).__init__()
         self.t = t
@@ -304,6 +305,7 @@ class Sleep(Tasklet):
         if self.connection:
             import tichy
             tichy.mainloop.source_remove(self.connection)
+
 
 class Producer(Tasklet):
     """A Producer is a modified Tasklet that is not automatically closed
