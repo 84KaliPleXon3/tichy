@@ -28,6 +28,9 @@ __docformat__ = "restructuredtext en"
 import sys
 from types import GeneratorType
 
+import logging
+logger = logging.getLogger('tasklet')
+
 
 def tasklet(func):
     """Decorator that turns a generator function into a tasklet instance
@@ -275,12 +278,15 @@ class WaitDBus(Tasklet):
         self.err_callback = err_callback
         kargs = {'reply_handler': self._callback,
                  'error_handler': self._err_callback}
+        logger.debug("call dbus method %s", self.method)
         self.method(*self.args, **kargs)
 
     def _callback(self, *args):
+        logger.debug("got reply from dbus method %s", self.method)
         self.callback(*args)
 
     def _err_callback(self, e):
+        logger.debug("got error reply from dbus method %s", self.method)
         self.err_callback(type(e), e, sys.exc_info()[2])
 
 
