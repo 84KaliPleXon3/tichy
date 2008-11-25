@@ -37,6 +37,7 @@ from style import Style
 from image import Image
 from message import Message
 from contact import Contact
+from time import Time
 
 from dialog import Dialog
 
