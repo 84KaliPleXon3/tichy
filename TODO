@@ -1,11 +1,11 @@
 		      TODO List for TICHY
 
-* Adjust min size in gtk and etk backends
 * Add an Evas backend for the gui
-* Fix bug : can't retrieve phone book
+* See why battery info won't show up now...
+* Remove useless window from etk and gtk backends
 o [charlie] Fix bug : using sdl backend windows sometime lose there background
-   I need to sort this out !
 * See why sometime we can't turn antenna on
+* separate MainLoop from sdl_painter file in guip and guic
 o [guillaume] Finish SMS application
    Need to sort the messages by date
 o [guillaume] Make the keyboard faster
