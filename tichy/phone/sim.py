@@ -64,9 +64,29 @@ class FreeSmartPhoneSim(tichy.Service):
             raise tichy.ServiceUnusable
 
     def get_contacts(self):
-        logger.info("Retrieve Phonebook")
-        entries = yield WaitDBus(self.gsm_sim.RetrievePhonebook, 'contacts')
-        logger.debug('get contacts : %s', entries)
+        """Return the list of all the contacts in the SIM
+
+        The framework may fail, so we try at least 5 times before we
+        give up. We need to remove this if the framework correct this
+        problem.
+        """
+        for i in range(5):
+            try:
+                logger.info("Retrieve Phonebook")
+                entries = yield WaitDBus(self.gsm_sim.RetrievePhonebook,
+                                         'contacts')
+                logger.info("Got %d contacts" % len(entries))
+                logger.debug('get contacts : %s', entries)
+                break
+            except Exception, e:
+                logger.error("can't retrieve phone book : %s" % e)
+                logger.info("retrying in 10 seconds")
+                yield tichy.tasklet.Sleep(10)
+                continue
+        else:
+            logger.error("can't retrieve phone book")
+            raise Exception("can't retrieve phone book")
+
         ret = []
         for entry in entries:
             index = int(entry[0])
