@@ -42,17 +42,9 @@ class SMS(tichy.Message):
         sms_service = tichy.Service('SMS')
         yield sms_service.send(self)
 
-    def create_actor(self):
-        """Return an actor on this sms message"""
-        actor = super(SMS, self).create_actor()
-        view_action = actor.new_action("View")
-
-        def on_view_action(action, sms, view):
-            sms_editor = tichy.Service('EditSMS')
-            self.read()         # so that the message update its status
-            yield sms_editor.edit(sms, view.window)
-        view_action.connect('activated', on_view_action)
-        return actor
+    def edit(self, window):
+        sms_editor = tichy.Service('EditSMS')
+        yield sms_editor.edit(self, window)
 
 
 class FreeSmartPhoneSMS(tichy.Service):

@@ -61,6 +61,18 @@ class Message(tichy.Item):
         self.status = 'read'
         self.emit('read')
 
+    def create_actor(self):
+        """Return an actor on this message"""
+        actor = super(Message, self).create_actor()
+        view_action = actor.new_action("View")
+
+        def on_view_action(action, msg, view):
+            self.read()
+            yield self.edit(view.window)
+
+        view_action.connect('activated', on_view_action)
+        return actor
+
 
 class MessagesService(tichy.Service):
     """The service that stores all the messages
