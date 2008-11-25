@@ -142,9 +142,26 @@ class Outbox(tichy.Application):
         w.destroy()
 
 
+class Details(tichy.Application):
+
+    name = "Details"
+
+    def run(self, window, msg):
+        w = gui.Window(window, modal=True)
+        frame = self.view(w, back_button=True)
+        vbox = gui.Box(frame, axis=1, expand=True)
+        msg.peer.view(vbox)
+        msg.timestamp.view(vbox)
+        yield tichy.Wait(frame, 'back')
+        w.destroy()
+
+
 class EditMessageService(tichy.Service):
 
-    service = 'EditSMS'
+    service = 'EditMessage'
 
-    def edit(self, sms, window):
-        return Edit(window, sms)
+    def edit(self, msg, window):
+        return Edit(window, msg)
+
+    def view_details(self, msg, window):
+        return Details(window, msg)

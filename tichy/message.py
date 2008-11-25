@@ -68,14 +68,27 @@ class Message(tichy.Item):
     def create_actor(self):
         """Return an actor on this message"""
         actor = super(Message, self).create_actor()
-        view_action = actor.new_action("View")
 
         def on_view_action(action, msg, view):
             self.read()
             yield self.edit(view.window)
-
+        view_action = actor.new_action("View")
         view_action.connect('activated', on_view_action)
+
+        def on_details_action(action, msg, view):
+            yield self.view_details(view.window)
+        details_action = actor.new_action("Details")
+        details_action.connect('activated', on_details_action)
+
         return actor
+
+    def edit(self, window):
+        editor = tichy.Service('EditMessage')
+        yield editor.edit(self, window)
+
+    def view_details(self, window):
+        editor = tichy.Service('EditMessage')
+        yield editor.view_details(self, window)
 
 
 class MessagesService(tichy.Service):
