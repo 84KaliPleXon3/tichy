@@ -42,10 +42,6 @@ class SMS(tichy.Message):
         sms_service = tichy.Service('SMS')
         yield sms_service.send(self)
 
-    def edit(self, window):
-        sms_editor = tichy.Service('EditSMS')
-        yield sms_editor.edit(self, window)
-
 
 class FreeSmartPhoneSMS(tichy.Service):
 
