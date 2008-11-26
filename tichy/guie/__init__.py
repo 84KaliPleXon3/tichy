@@ -231,14 +231,17 @@ class Painter(object):
 
 class EventsLoop(object):
 
+    def __init__(self):
+        self.dbus_loop = e_dbus.DBusEcoreMainLoop()
+
     def run(self):
         ecore.main_loop_begin()
 
     def timeout_add(self, time, callback, *args):
         return ecore.timer_add(time / 1000., callback, *args)
 
-    def __get_dbus_loop(self):
-        import e_dbus
-        return e_dbus.DBusEcoreMainLoop()
+    def source_remove(self, timer):
+        timer.delete()
 
-    dbus_loop = property(__get_dbus_loop)
+    def quit(self):
+        ecore.main_loop_quit()
