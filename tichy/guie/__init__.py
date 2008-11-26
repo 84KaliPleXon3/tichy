@@ -235,7 +235,7 @@ class EventsLoop(object):
         ecore.main_loop_begin()
 
     def timeout_add(self, time, callback, *args):
-        return ecore.timer_add(time / 1000, callback, *args)
+        return ecore.timer_add(time / 1000., callback, *args)
 
     def __get_dbus_loop(self):
         import e_dbus
