@@ -63,7 +63,7 @@ class FreeSmartPhonePrefs(PrefsService):
             "connecting to freesmartphone.Preferences dbus interface")
         try:
             # We create the dbus interfaces to org.freesmarphone
-            self.bus = dbus.SystemBus()
+            self.bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
             self.prefs = self.bus.get_object(
                 'org.freesmartphone.opreferencesd',
                 '/org/freesmartphone/Preferences')

@@ -18,8 +18,6 @@
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
-DBusGMainLoop(set_as_default=True)
 
 import tichy
 from tichy.tasklet import WaitDBus
@@ -58,7 +56,7 @@ class FreeSmartPhoneSim(tichy.Service):
         logger.info("connecting to freesmartphone.GSM dbus interface")
         try:
             # We create the dbus interfaces to org.freesmarphone
-            bus = dbus.SystemBus()
+            bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
             self.gsm = bus.get_object('org.freesmartphone.ogsmd',
                                       '/org/freesmartphone/GSM/Device')
             self.gsm_sim = dbus.Interface(self.gsm,

@@ -19,8 +19,6 @@
 
 
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
-DBusGMainLoop(set_as_default=True)
 
 import tichy
 from tichy.tasklet import WaitDBus
@@ -51,7 +49,7 @@ class FreeSmartPhoneSMS(tichy.Service):
         logger.info("connecting to freesmartphone.GSM dbus interface")
         try:
             # We create the dbus interfaces to org.freesmarphone
-            bus = dbus.SystemBus()
+            bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
             gsm = bus.get_object('org.freesmartphone.ogsmd',
                                  '/org/freesmartphone/GSM/Device')
             self.sim_iface = dbus.Interface(gsm,
