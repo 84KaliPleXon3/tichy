@@ -322,7 +322,7 @@ class SdlEventsLoop(Object):
         gobject.source_remove(connection)
 
     def __get_dbus_loop(self):
-        import dbus
+        import dbus.mainloop.glib
         return dbus.mainloop.glib.DBusGMainLoop()
 
     dbus_loop = property(__get_dbus_loop)

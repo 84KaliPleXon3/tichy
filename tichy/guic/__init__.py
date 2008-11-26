@@ -18,7 +18,7 @@
 
 # Check that the compiled version is correct
 from .version import __version__
-if __version__ < 4:
+if __version__ < 5:
     raise Exception("You need to recompile guic")
 
 from .geo import Vect, Rect
