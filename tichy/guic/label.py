@@ -52,8 +52,8 @@ class Label(Widget):
         # XXX: We need to recompute the optimal size !!!
         self.surface = None # TODO: remove that
         if not self.fixed_optimal_size:
-            self.optimal_size = Vect(32 * len(value), 64)
-            self.min_size = Vect(0, 64)
+            self.optimal_size = Vect(32 * len(value), 40)
+            self.min_size = Vect(0, 40)
         self.need_redraw(self.rect)
 
     text = property(__get_text, __set_text)
