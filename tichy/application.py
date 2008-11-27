@@ -77,6 +77,10 @@ class Application(Tasklet, Item):
         from .text import Text
         return Text(cls.name)
 
+    @classmethod
+    def get_sub_text(cls):
+        return None
+
     def view(self, parent, **kargs):
         """
         Create a view of a frame for the application in the parent widget

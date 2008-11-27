@@ -1,3 +1,5 @@
+# coding=utf8
+#
 #    Tichy
 #
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
@@ -92,6 +94,9 @@ class ApplicationFrame(gui.Frame):
 
     def get_text(self):
         return tichy.Text(self.title)
+
+    def get_sub_text(self):
+        return None
 
     def path(self, file_name=None):
         return self.app.path(file_name)

@@ -88,13 +88,17 @@ class Default(Service):
 
     def view_actor(self, parent, actor, **kargs):
         ret = gui.Button(parent, item=actor, holdable=1000, **kargs)
-        hbox = gui.Box(ret, axis=0, border=0)
+        hbox = gui.Box(ret, axis=0, border=0, spacing=0)
         if actor.item.icon:
             icon_path = actor.item.path(actor.item.icon)
             icon = tichy.Image(icon_path, size=Vect(96, 96)).view(hbox)
         else:
             gui.Widget(hbox, min_size=Vect(0, 96))
-        actor.item.get_text().view(hbox)
+        text_box = gui.Box(hbox, axis=1, border=0, spacing=0)
+        actor.item.get_text().view(text_box)
+        sub_text = actor.get_sub_text()
+        if sub_text:
+            sub_text.view(text_box)
 
         def on_clicked(b, actor, self):
             self.select_actor(actor, b)

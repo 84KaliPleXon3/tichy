@@ -115,6 +115,10 @@ class Item(tichy.Object):
         """
         return tichy.Text(self.name)
 
+    def get_sub_text(self):
+        """Return an optional sub text for the item"""
+        return None
+
     def create_actor(self):
         """Return an actor acting on this item"""
         from actor import Actor

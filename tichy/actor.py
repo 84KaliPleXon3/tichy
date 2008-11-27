@@ -124,6 +124,9 @@ class
     def get_text(self):
         return self.item.get_text()
 
+    def get_sub_text(self):
+        return self.item.get_sub_text()
+
     def add(self, action):
         """Don't call this method, it is already called in Action.__init__"""
         self.actions.append(action)

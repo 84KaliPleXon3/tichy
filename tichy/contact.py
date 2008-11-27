@@ -161,6 +161,9 @@ class Contact(tichy.Item):
     def get_text(self):
         return self.name
 
+    def get_sub_text(self):
+        return getattr(self, 'tel', None)
+
     def view(self, parent, **kargs):
         return self.name.view(parent, **kargs)
 
