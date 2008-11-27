@@ -72,35 +72,39 @@ class Contact(tichy.Application):
         yield tichy.Wait(self.frame, 'back')
         self.window.destroy()
 
-    def on_add_field(self, action, item, view, field):
-        value = field.type()
-        field.value = value
-        yield value.edit(self.window, name=field.name)
+    def on_add_attr(self, action, item, view, attr):
+        value = attr.field.type()
+        yield value.edit(self.window, name=attr.field.name)
+        attr.value = value
         self.update()
 
     def update(self):
         """Update the list of attributes, and the possible actions"""
         logger.debug("update contact attributes")
+        # This is a little bit messy, in the future we should have a
+        # special Item for dictionary to hide this kind of things....
         self.attr_list.clear()
-        for field in self.contact.get_fields():
-            if field.value:
-                actor = field.create_actor()
-                if not field.requiered:
+        for field in self.contact.fields:
+            attr = self.contact.attributes[field.name]
+            if attr.value:
+                actor = attr.create_actor()
+                if not attr.field.requiered:
                     actor.new_action('Delete').connect('activated',
-                                                       self.on_delete_field)
+                                                       self.on_delete_attr)
                 self.attr_list.append(actor)
 
         self.frame.actor.clear()
         add_menu = self.frame.actor.new_action('Add')
-        for field in self.contact.get_fields():
-            if field.value:
+        for field in self.contact.fields:
+            attr = self.contact.attributes[field.name]
+            if attr.value:
                 continue
-            add_field = add_menu.new_action(field.name)
-            add_field.connect('activated', self.on_add_field, field)
+            add_attr = add_menu.new_action(attr.field.name)
+            add_attr.connect('activated', self.on_add_attr, attr)
 
-    def on_delete_field(self, action, attr, view):
+    def on_delete_attr(self, action, attr, view):
         self.attr_list.remove(action.actor)
-        setattr(self.contact, attr.name, None)
+        attr.value = None
         self.update()
 
 

@@ -57,11 +57,8 @@ class GSM(tichy.Gadget):
 
         try:
             gsm_status.value = 'Retreive Contacts'
-            # Get the contacts from the sim
-            contacts = yield sim_service.get_contacts()
-            contacts_service = tichy.Service('Contacts')
-            for contact in contacts:
-                contacts_service.add(contact)
+            contacts = tichy.Service('Contacts')
+            yield contacts.load_all()
         except Exception, e:
             logger.error("Error: %s", e)
             gsm_status.value = 'SIM Error'

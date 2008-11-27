@@ -1,3 +1,4 @@
+# coding=utf8
 #    Tichy
 #
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
@@ -17,6 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import logging
 logger = logging.getLogger('Contact')
 
@@ -33,84 +35,128 @@ import tichy.gui as gui
 # should have any fields (dictionary style), and each storage can
 # define which fields are supported.
 
+# TODO: also the Field / Attr thing is good, but it should be a subset
+# of a higher level module Struct.
+
+
+class ContactField(object):
+    """Represent a field in a contact class
+
+    When we create a new Contact type, we can decide what fields can
+    be used with it. For example a SIM contact will only have a name
+    and tel fields.
+
+    typical fields are : name, tel, note...
+
+    A Field is a python descriptor. It means we can declare fields in
+    a Contact class, and when we try to access them we will get the
+    attribute instead of the field itself.
+    """
+
+    def __init__(self, name, type, requiered=False):
+        """Create a new field
+
+        Parameters:
+
+        - name : the name of the field
+
+        - type : the type, it should be a tichy.Item class
+
+        - requiered : If set to True then the field is compulsory
+        """
+        self.name = name
+        self.type = type
+        self.requiered = requiered
+
+    def __get__(self, obj, type=None):
+        return obj.attributes[self.name].value
+
+    def __set__(self, obj, value):
+        obj.attributes[self.name].value = value
+
+    def __repr__(self):
+        return self.name
+
+
+class ContactAttr(tichy.Item):
+    """represent an attribute of a contact
+
+    This is different from the field. The filed contains only meta
+    information about a contact attribute, the attribute contains the
+    value itself.
+    """
+
+    def __init__(self, contact, field):
+        self.contact = contact
+        self.field = field
+
+    def get_text(self):
+        return self
+
+    def __repr__(self):
+        return "%s : %s" % (self.field.name, self.value)
+
+    def __unicode__(self):
+        return unicode(self.field.name)
+
+    def view(self, parent):
+        ret = gui.Box(parent, axis=0, border=0)
+        gui.Label(ret, "%s:" % self.field.name)
+        if self.value:
+            self.value.view(ret)
+        return ret
+
+    def create_actor(self):
+        actor = super(ContactAttr, self).create_actor()
+        actor.new_action('Edit').connect('activated', self.on_edit)
+        return actor
+
+    def __get_value(self):
+        return getattr(self.contact, '_attr_%s_' % self.field.name, None)
+
+    def __set_value(self, value):
+        value = self.field.type.as_type(value)
+        setattr(self.contact, '_attr_%s_' % self.field.name, value)
+        if value is not None:
+            value.connect('modified', self._on_value_modified)
+        self.emit('modified')
+
+    value = property(__get_value, __set_value)
+
+    def _on_value_modified(self, value):
+        self.emit('modified')
+
+    def on_edit(self, action, attr, view):
+        assert self.value
+        yield self.value.edit(view.window, name=self.field.name)
+
 
 class Contact(tichy.Item):
-    """base class for tichy's contacts"""
+    """base class for tichy's contacts
+
+    We have to redo this class better. So far a contact can only have
+    one backend. The backend method (import_) being a class method. If
+    we want to have several backends per contacts we need (and should)
+    to change that...
+    """
 
     storage = None
 
-    class Field(tichy.Item):
-        """Representation of a field in a given contact
-        """
+    Field = ContactField        # Alias for the ContactField class
 
-        def __init__(self, contact, name, type, requiered=False):
-            """Create a new field representation
-
-            Parameters:
-
-            - contact : the contact the field belong to
-
-            - name : the name of the attribute in the contact
-
-            - type : the type of the field
-
-            - requiered : If set to True, then the field is requiered
-              (we can't set it to None)
-            """
-            super(Contact.Field, self).__init__()
-            self.contact = contact
-            self.name = name
-            self.type = type
-            self.requiered = requiered
-
-        def __get_value(self):
-            return getattr(self.contact, self.name)
-
-        def __set_value(self, value):
-            assert value is None or isinstance(value, self.type)
-            return setattr(self.contact, self.name, value)
-
-        value = property(__get_value, __set_value)
-
-        def get_text(self):
-            return self
-
-        def __unicode__(self):
-            return unicode(self.name)
-
-        def view(self, parent):
-            ret = gui.Box(parent, axis=0, border=0)
-            gui.Label(ret, self.name)
-            self.value.view(ret)
-            return ret
-
-        def create_actor(self):
-            actor = super(Contact.Field, self).create_actor()
-            actor.new_action('Edit').connect('activated', self.on_edit)
-            return actor
-
-        def on_edit(self, action, attr, view):
-            yield self.value.edit(view.window, name=self.name)
-
-        @classmethod
-        def import_(cls, contact):
-            """create a new contact from an other contact)
-            """
-            yield None
-
-    def __init__(self, name, tel=None, note=None, **kargs):
+    def __init__(self, **kargs):
         """Create a new contact
         """
         super(Contact, self).__init__()
-        self.name = tichy.Text.as_text(name)
-        self.tel = tichy.TelNumber.as_text(tel)
-        self.note = tichy.Text.as_text(note)
+        self.attributes = dict((x.name, ContactAttr(self, x)) \
+                                   for x in self.fields)
+        for k, a in self.attributes.items():
+            if k in kargs:
+                a.value = kargs[k]
+            a.connect('modified', self._on_attr_modified)
 
-    def get_fields(self):
-        """return all the fields of the contact"""
-        return [Contact.Field(self, 'name', tichy.Text, True),
-                Contact.Field(self, 'tel', tichy.TelNumber),
-                Contact.Field(self, 'note', tichy.Text)]
+    def _on_attr_modified(self, attr):
+        self.emit('modified')
 
     def get_text(self):
         return self.name
@@ -162,17 +208,71 @@ class Contact(tichy.Item):
                                "can't delete the contact")
 
     def delete(self):
-        """delete the contact"""
+        """delete the contact
+
+        This perform the action to delete a contact
+        """
+        yield None
+
+    def to_dict(self):
+        """return all the attributes in a python dict"""
+        return dict((str(f.field.name), unicode(f.value)) \
+                        for f in self.attributes.values() \
+                        if f.value is not None)
+
+    @classmethod
+    def import_(cls, contact):
+        """create a new contact from an other contact)
+        """
         yield None
 
 
 class PhoneContact(Contact):
+    """Contact that is stored on the phone"""
+
     storage = 'Phone'
+
+    name = ContactField('name', tichy.Text, True)
+    tel = ContactField('tel', tichy.TelNumber)
+    note = ContactField('note', tichy.Text)
+    fields = [name, tel, note]
+
+    def __init__(self, **kargs):
+        super(PhoneContact, self).__init__(**kargs)
+        self.connect('modified', self._on_modified)
+
+    def _on_modified(self, contact):
+        logger.info("Phone contact modified")
+        yield self.save()
 
     @classmethod
     def import_(cls, contact):
+        """import a contact into the phone"""
         assert not isinstance(contact, PhoneContact)
-        yield PhoneContact(contact.name, tel=contact.tel)
+        yield PhoneContact(name=contact.name, tel=contact.tel)
+
+    @classmethod
+    def save(cls):
+        """Save all the phone contacts"""
+        logger.info("Saving phone contacts")
+        contacts = tichy.Service('Contacts').contacts
+        data = [c.to_dict() for c in contacts if isinstance(c, PhoneContact)]
+        tichy.Persistance('contacts/phone').save(data)
+        yield None
+
+    @classmethod
+    def load(cls):
+        """Load all the phone contacts
+
+        Return a list of all the contacts
+        """
+        logger.info("Loading phone contacts")
+        ret = []
+        data = tichy.Persistance('contacts/phone').load()
+        for kargs in data:
+            contact = PhoneContact(**kargs)
+            ret.append(contact)
+        yield ret
 
 
 class ContactsService(Service):
@@ -181,14 +281,27 @@ class ContactsService(Service):
 
     def __init__(self):
         self.contacts = tichy.List()
-        fabien = PhoneContact('Fabien', tel='0478657392', note='Hello')
-        self.add(fabien)
-        etienne = PhoneContact('Etienne', tel='044569892')
-        self.add(etienne)
+
+    @tichy.tasklet.tasklet
+    def load_all(self):
+        """load all the contacts from all the sources
+
+        We need to call this before we can access the contacts
+        """
+        for cls in Contact.subclasses:
+            logger.info("loading contacts from %s" % cls.storage)
+            try:
+                contacts = yield cls.load()
+            except Exception, e:
+                logger.warning("can't get contacts : %s", e)
+                continue
+            for c in contacts:
+                assert isinstance(c, Contact), type(c)
+                self.contacts.append(c)
+        logger.info("got %d contacts", len(self.contacts))
 
     def add(self, contact):
         self.contacts.append(contact)
-        return contact
 
     def remove(self, contact):
         self.contacts.remove(contact)
@@ -208,4 +321,4 @@ class ContactsService(Service):
 
     def create(self):
         name = self.new_name()
-        return PhoneContact(name)
+        return PhoneContact(name=name)
