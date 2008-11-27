@@ -3,6 +3,7 @@
 * Add an Evas backend for the gui
 * See why battery info won't show up now...
 * Remove useless window from etk and gtk backends
+* Application shouldn't have to create there window !!!
 o [charlie] Fix bug : using sdl backend windows sometime lose there background
 * See why sometime we can't turn antenna on
 * separate MainLoop from sdl_painter file in guip and guic
