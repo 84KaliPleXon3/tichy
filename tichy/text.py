@@ -29,7 +29,7 @@ class Text(Item):
         self.editable = editable
 
     @classmethod
-    def as_text(cls, value):
+    def as_type(cls, value):
         if isinstance(value, cls):
             return value
         if value is None:

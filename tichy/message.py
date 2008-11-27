@@ -48,8 +48,8 @@ class Message(tichy.Item):
         - timestamp : the time at which we received the message. If
           set to None we use the current time
         """
-        self.peer = tichy.TelNumber.as_text(peer)
-        self.text = tichy.Text.as_text(text)
+        self.peer = tichy.TelNumber.as_type(peer)
+        self.text = tichy.Text.as_type(text)
         self.timestamp = tichy.Time.as_time(timestamp)
         assert direction in ['in', 'out'], direction
         self.direction = direction

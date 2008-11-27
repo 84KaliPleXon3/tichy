@@ -198,7 +198,7 @@ class Label(Widget):
 class Edit(Widget):
 
     def __init__(self, parent, item=None, min_size=(-1, 96), **kargs):
-        item = tichy.Text.as_text(item)
+        item = tichy.Text.as_type(item)
         gtk_obj=gtk.Entry()
         gtk_obj.set_text(unicode(item))
         gtk_obj.connect('changed', self.on_changed)
