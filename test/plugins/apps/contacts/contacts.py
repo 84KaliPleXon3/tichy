@@ -117,19 +117,26 @@ class SelectContactApp(tichy.Application):
         self.window = gui.Window(window)
         frame = self.view(self.window)
 
+        cancel = frame.actor.new_action("Cancel")
+        cancel.connect('activated', self._on_cancel)
+
         vbox = gui.Box(frame, axis=1, expand=True)
 
         for contact in tichy.Service('Contacts').contacts:
             button = gui.Button(vbox)
             contact.get_text().view(button)
-            button.connect('clicked', self.on_select, contact)
+            button.connect('clicked', self._on_select, contact)
 
         # Wait until the quit button is clicked
         yield tichy.Wait(self.window, 'destroyed')
         yield self.ret
 
-    def on_select(self, b, contact):
+    def _on_select(self, b, contact):
         self.ret = contact
+        self.window.destroy()
+
+    def _on_cancel(self, *args):
+        self.ret = None
         self.window.destroy()
 
 

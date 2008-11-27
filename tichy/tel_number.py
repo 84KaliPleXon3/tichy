@@ -60,7 +60,7 @@ class TelNumber(tichy.Text):
         def on_contact(actor, item, view):
             select_contact = tichy.Service('SelectContact')
             contact = yield select_contact.select(view.window)
-            if contact.tel:
+            if contact and contact.tel:
                 item.value = str(contact.tel)
         ret.new_action("Contact").connect('activated', on_contact)
 
