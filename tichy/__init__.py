@@ -38,6 +38,7 @@ from image import Image
 from message import Message
 from contact import Contact
 from time import Time
+from persistance import Persistance
 
 from dialog import Dialog
 
