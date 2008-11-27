@@ -32,6 +32,6 @@ from screen import Screen
 from window import Window
 from spring import Spring
 from sdl_painter import SdlPainter as Painter
-from sdl_painter import SdlEventsLoop as EventsLoop
+from mainloop import EventsLoop
 from surf_widget import SurfWidget
 from xwindow import XWindow

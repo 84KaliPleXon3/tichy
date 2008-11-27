@@ -35,6 +35,6 @@ from .spring import Spring
 from .widget import Widget
 from .frame import Frame
 from .sdl_painter import SdlPainter as Painter
-from .sdl_painter import SdlEventsLoop as EventsLoop
+from .mainloop import EventsLoop
 from .surf_widget import SurfWidget
 from .xwindow import XWindow
