@@ -82,42 +82,24 @@ sys.path.insert(0, '../')
 # Import all the stuffs we need...
 import tichy
 import tichy.gui as gui
-from tichy.style import Style
-from tichy.tasklet import Tasklet, Wait
-from tichy.application import Application
-import tichy.plugins as plugins
 from tichy.gui import Vect, Rect
-from tichy.service import Service
-from tichy.text import Text
-from tichy.list import ActorList
 
 
-class RunTopBarClock(Tasklet):
-
-    def run(self, clock_display):
-        time_service = Service('Time')
-        while True:
-            yield Wait(time_service, 'time-changed')
-            clock_display.value = time.strftime("%H:%M:%S", time.localtime())
-
-
-class AutoAnswerCall(Application):
+class AutoAnswerCall(tichy.Application):
 
     def run(self, window):
         # We don't create any window, just run in the background...
-        gsm_service = Service('GSM')
+        gsm_service = tichy.Service('GSM')
         while True:
-            call = yield Wait(gsm_service, 'incoming-call')
-            caller_service = Service('Caller')
+            call = yield tichy.Wait(gsm_service, 'incoming-call')
+            caller_service = tichy.Service('Caller')
             yield caller_service.call(window, call)
 
 
-class TopBar(Application):
+class TopBar(tichy.Application):
     """This is the application that is going to run on the top window"""
 
     def run(self, parent):
-        from tichy.phone import GSMService
-
         # The top window application need to print various informations...
         hbox = gui.Box(parent, axis=0)
 
@@ -128,10 +110,10 @@ class TopBar(Application):
         tichy.Gadget.find_by_name('Battery')(hbox).start()
         tichy.Gadget.find_by_name('Clock')(hbox).start()
 
-        yield Wait(parent, 'destroyed')
+        yield tichy.Wait(parent, 'destroyed')
 
 
-class Main(Application):
+class Main(tichy.Application):
 
     def run(self, window):
         vbox = gui.Box(window, axis=1, border=0, spacing=0)
@@ -143,7 +125,7 @@ class Main(Application):
         AutoAnswerCall(content_window).start()
         TopBar(top_window).start()
         logger.info("start launcher")
-        launcher = Application.find_by_name('Launcher')
+        launcher = tichy.Application.find_by_name('Launcher')
         yield launcher(content_window)
         logger.info("quit main app")
 
@@ -154,13 +136,13 @@ if __name__ == '__main__':
                         '/usr/tichy/plugins']:
         try:
             logger.info("try to load plugins in %s", plugins_dir)
-            plugins.import_all(plugins_dir)
+            tichy.plugins.import_all(plugins_dir)
             break
         except IOError:
             logger.info("failed to load plugins in %s", plugins_dir)
 
     # TODO: at least remove the create invocation !
-    style = Style.find_by_name("cool style").create()
+    style = tichy.Style.find_by_name("cool style").create()
 
     # We set the default design
     tichy.Service.set_default('Design', 'Default')
