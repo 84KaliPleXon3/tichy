@@ -35,15 +35,19 @@ class TextEdit(tichy.Application):
         super(TextEdit, self).__init__(*args, **kargs)
 
     def run(self, parent, text="", name=None, input_method=None):
-        if isinstance(text, (str, unicode)): # TODO use a correct test
-            text = tichy.Text(text)
+        """Edit a text object
+
+        The actual value of the text object will be modifed only when
+        we quit the app.
+        """
+        text = tichy.Text.as_type(text)
         w = gui.Window(parent, modal=True)
 
         title = "Edit %s" % name if name else "Edit Text"
-        frame = self.view(w, title=title, back_button=True)
+        frame = self.view(w, title=title, back_button="OK")
         vbox = gui.Box(frame, axis=1, border=0, spacing=0)
 
-        self.text = text
+        self.text = tichy.Text(text)
         self.text.view(vbox, editable=True, auto_keyboard=False,
                        expand=True)
 
@@ -55,6 +59,8 @@ class TextEdit(tichy.Application):
 
         yield tichy.Wait(frame, 'back')
         w.destroy()
+
+        text.value = self.text.value
         yield self.text.value
 
     def on_set_input(self, action, item, w, input):
