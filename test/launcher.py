@@ -93,6 +93,28 @@ if options.gui_backend:
 import tichy
 
 
+class InitAll(tichy.Tasklet):
+
+    def run(self):
+        gsm_service = tichy.Service('GSM')
+        yield gsm_service.register()
+        logger.info("start AutoAnswerCall")
+        yield AutoAnswerCall()
+
+
+class AutoAnswerCall(tichy.Tasklet):
+
+    def run(self):
+        # We don't create any window, just run in the background...
+        # warning; that would only work with gtk or etk backend...
+        gsm_service = tichy.Service('GSM')
+        while True:
+            call = yield tichy.Wait(gsm_service, 'incoming-call')
+            logger.info("got incoming call")
+            caller_service = tichy.Service('Caller')
+            yield caller_service.call(None, call)
+
+
 class Launcher(dbus.service.Object):
     """Launch applets via DBus call
 
@@ -116,7 +138,7 @@ class Launcher(dbus.service.Object):
                 break
 
     @tichy.tasklet.tasklet
-    def _launch(self, app):
+    def launch(self, app):
         """Actually launch the application"""
         kill_on_close = False
         if not self.screen:
@@ -174,6 +196,9 @@ if __name__ == '__main__':
 
     # We set the default design
     tichy.Service.set_default('Design', 'Default')
+
+    logger.info("start InitAll")
+    InitAll().start()
 
     logger.info("start launcher service")
     launcher = Launcher(bus, '/Launcher')
