@@ -114,9 +114,8 @@ class DrawingApp(tichy.Application):
     def __init__(self, *args):
         super(DrawingApp, self).__init__(*args)
 
-    def run(self, parent):
-        self.window = gui.Window(parent, modal=True)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1)
 
@@ -155,7 +154,6 @@ class DrawingApp(tichy.Application):
         gui.Spring(vbox, axis=1)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_save(self, action, item, w):
         service = tichy.Service('FileBrowser')

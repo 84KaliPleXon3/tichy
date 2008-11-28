@@ -109,8 +109,7 @@ class DictApp(tichy.Application):
     category = 'main/chinese'
 
     def run(self, window):
-        self.window = gui.Window(window, modal=True)
-        frame = self.view(self.window, back_button=True)
+        frame = self.view(window, back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         # The search entry
         text = tichy.Text('')
@@ -124,7 +123,6 @@ class DictApp(tichy.Application):
         self.dict = Dict(self.path())
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_text_modified(self, text):
         self.results.clear()

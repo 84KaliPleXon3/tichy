@@ -35,9 +35,8 @@ class Player(tichy.Application):
 
     player = None # The gstreamer player instance
 
-    def run(self, parent):
-        self.window = gui.Window(parent, modal=True)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1)
 
@@ -67,7 +66,6 @@ class Player(tichy.Application):
 
         frame.actor.new_action("Open").connect('activated', self.on_open)
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_sync_message(self, bus, message):
         logger.debug("sync message : %s", message)
@@ -126,11 +124,11 @@ class Player(tichy.Application):
     def on_pause(self, b):
         self.pause()
 
-    def on_open(self, *args):
+    def on_open(self, b):
         # Unfortunately The XWindow won't hide by itself
         self.x_window.hide()
         service = tichy.Service('FileBrowser')
-        path = yield service.get_load_path(self.window)
+        path = yield service.get_load_path(b.window)
         self.x_window.show()
         logger.info("opening %s", path)
         self.play(path)

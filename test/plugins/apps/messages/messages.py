@@ -30,8 +30,7 @@ class Message(tichy.Application):
     category = 'main'
 
     def run(self, window):
-        w = gui.Window(window, modal=True)   # We run into a new modal window
-        frame = self.view(w, back_button=True)
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -44,7 +43,6 @@ class Message(tichy.Application):
         list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
 
 class Edit(tichy.Application):
@@ -52,9 +50,8 @@ class Edit(tichy.Application):
     name = 'Edit'
     icon = 'icon.png'
 
-    def run(self, parent, sms):
-        self.window = gui.Window(parent, modal=True)
-        frame = self.view(self.window, title="Message", back_button=True)
+    def run(self, window, sms):
+        frame = self.view(window, title="Message", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         self.sms = sms
 
@@ -69,7 +66,6 @@ class Edit(tichy.Application):
         frame.actor.new_action("Send").connect('activated', self.on_send)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_send(self, action, item, view):
         yield Sender(self.window, self.sms)
@@ -79,9 +75,8 @@ class Sender(tichy.Application):
     """Application that runs while we wait for the message to be sent.
     """
 
-    def run(self, parent, sms):
-        w = gui.Window(parent, modal=True)
-        frame = self.view(w, title="Sending...")
+    def run(self, window, sms):
+        frame = self.view(window, title="Sending...")
         vbox = gui.Box(frame, axis=1, expand=True)
         try:
             yield sms.send()
@@ -89,7 +84,6 @@ class Sender(tichy.Application):
         except Exception, e:
             logger.error("Error: %s", e)
             yield tichy.Dialog(w, "Error", e)
-        w.destroy()
 
 
 class New(tichy.Application):
@@ -110,9 +104,8 @@ class Inbox(tichy.Application):
     icon = 'inbox_icon.png'
     design = 'Default'
 
-    def run(self, parent):
-        w = gui.Window(parent, modal=True)   # We run into a new modal window
-        frame = self.view(w, title="Inbox", back_button=True)
+    def run(self, window):
+        frame = self.view(window, title="Inbox", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
 
         messages_service = tichy.Service('Messages')
@@ -120,7 +113,6 @@ class Inbox(tichy.Application):
         messages_service.inbox.actors_view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
 
 class Outbox(tichy.Application):
@@ -129,17 +121,13 @@ class Outbox(tichy.Application):
     icon = 'outbox_icon.png'
     design = 'Default'
 
-    def run(self, parent):
-        w = gui.Window(parent, modal=True)   # We run into a new modal window
-        frame = self.view(w, title="Outbox", back_button=True)
+    def run(self, window):
+        frame = self.view(window, title="Outbox", back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
-
         messages_service = tichy.Service('Messages')
         # We create a view on actors of every items in the outbox
         messages_service.outbox.actors_view(vbox)
-
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
 
 class Details(tichy.Application):
@@ -147,13 +135,11 @@ class Details(tichy.Application):
     name = "Details"
 
     def run(self, window, msg):
-        w = gui.Window(window, modal=True)
-        frame = self.view(w, back_button=True)
+        frame = self.view(window, back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
         msg.peer.view(vbox)
         msg.timestamp.view(vbox)
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
 
 class EditMessageService(tichy.Service):

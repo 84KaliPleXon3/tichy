@@ -57,9 +57,8 @@ class FileBrowser(tichy.Application):
         super(FileBrowser, self).__init__(*args)
         self.list = tichy.List()
 
-    def run(self, parent):
-        w = gui.Window(parent, modal=True)
-        frame = self.view(w, back_button="Load")
+    def run(self, window):
+        frame = self.view(window, back_button="Load")
         vbox = gui.Box(frame, axis=1, expand=True)
 
         list_view = self.list.view(vbox)
@@ -67,7 +66,6 @@ class FileBrowser(tichy.Application):
         self.select_path(os.path.expanduser('~/'))
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
     def select_path(self, path):
         if not os.path.isdir(path):
@@ -87,10 +85,9 @@ class SelectFileBrowser(FileBrowser):
     def __init__(self, *args):
         super(SelectFileBrowser, self).__init__(*args)
 
-    def run(self, parent, file_name='', can_create=False):
-        w = gui.Window(parent, modal=True)
+    def run(self, window, file_name='', can_create=False):
         msg = can_create and 'Save' or 'Load'
-        frame = self.view(w, title='Select File', back_button=msg)
+        frame = self.view(window, title='Select File', back_button=msg)
         vbox = gui.Box(frame, axis=1, expand=True)
 
         self.file_name_item = tichy.Text(file_name, editable=can_create)
@@ -101,7 +98,6 @@ class SelectFileBrowser(FileBrowser):
         self.select_path(os.path.expanduser('~/'))
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
         # Return the result
         yield os.path.join(self.dir, self.file_name_item.value)

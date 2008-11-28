@@ -51,8 +51,7 @@ class Answer(tichy.Application):
 
     def run(self, window, card, correct):
         self.name = "Correct" if correct else "Wrong"
-        self.window = gui.Window(window, modal=True)
-        frame = self.view(self.window)
+        frame = self.view(window)
 
         vbox = gui.Box(frame, axis=1)
         gui.Label(vbox, card.q, font_size=58)
@@ -70,7 +69,6 @@ class Answer(tichy.Application):
         gui.Label(next_button, "OK")
 
         yield tichy.tasklet.Wait(next_button, 'clicked')
-        self.window.destroy()
 
     def on_read(self, b, msg):
         speak = tichy.Service('Speak')
@@ -84,8 +82,8 @@ class Learn(tichy.Application):
     icon = 'icon.png'
 
     def run(self, window):
-        self.window = gui.Window(window, modal=True)
-        frame = self.view(self.window, back_button=True)
+        self.window = window
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
         self.question_text = tichy.Text("Question")
@@ -112,9 +110,6 @@ class Learn(tichy.Application):
                 yield self.task
             except GeneratorExit:
                 break
-
-        self.window.destroy()
-        yield None
 
     def on_quit(self, *args):
         self.task.exit()

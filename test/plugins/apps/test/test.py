@@ -27,9 +27,8 @@ class Test(tichy.Application):
     icon = None
     category = 'main'
 
-    def run(self, parent):
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
 
         button = gui.Button(vbox)
@@ -38,7 +37,6 @@ class Test(tichy.Application):
 
         # Wait until the quit button is clicked
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_fake_sms(self, b):
         sms_service = tichy.Service('SMS', 'Test')

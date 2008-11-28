@@ -32,9 +32,8 @@ class Conf(tichy.Application):
     icon = 'icon.png'
     category = 'main'
 
-    def run(self, parent):
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
 
         # We create a list of the sub applications actors
@@ -47,16 +46,14 @@ class Conf(tichy.Application):
 
         # Wait until the quit button is clicked
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
 
 class StyleConf(tichy.Application):
 
     name = 'Style'
 
-    def run(self, parent):
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
         styles = [s.create() for s in tichy.Style.subclasses]
@@ -70,7 +67,6 @@ class StyleConf(tichy.Application):
         styles_list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_use_style(self, action, style, window):
         screen = window.screen

@@ -30,8 +30,7 @@ class Logs(tichy.Application):
     category = 'main'
 
     def run(self, window):
-        w = gui.Window(window, modal=True)
-        frame = self.view(w, back_button=True)
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -44,7 +43,6 @@ class Logs(tichy.Application):
         list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()
 
 
 class All(tichy.Application):
@@ -53,8 +51,7 @@ class All(tichy.Application):
     design = 'Default'
 
     def run(self, window):
-        w = gui.Window(window, modal=True)
-        frame = self.view(w, back_button=True)
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -62,4 +59,3 @@ class All(tichy.Application):
         gsm_service.logs.actors_view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        w.destroy()

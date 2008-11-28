@@ -85,7 +85,7 @@ import tichy.gui as gui
 from tichy.gui import Vect, Rect
 
 
-class AutoAnswerCall(tichy.Application):
+class AutoAnswerCall(tichy.Tasklet):
 
     def run(self, window):
         # We don't create any window, just run in the background...
@@ -96,7 +96,7 @@ class AutoAnswerCall(tichy.Application):
             yield caller_service.call(window, call)
 
 
-class TopBar(tichy.Application):
+class TopBar(tichy.Tasklet):
     """This is the application that is going to run on the top window"""
 
     def run(self, parent):
@@ -113,7 +113,7 @@ class TopBar(tichy.Application):
         yield tichy.Wait(parent, 'destroyed')
 
 
-class Main(tichy.Application):
+class Main(tichy.Tasklet):
 
     def run(self, window):
         vbox = gui.Box(window, axis=1, border=0, spacing=0)

@@ -31,10 +31,9 @@ class ScreenLockConf(tichy.Application):
 
     name = 'Screen Lock'
 
-    def run(self, parent):
+    def run(self, window):
         self.srvc = tichy.Service('ScreenLock')
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -53,7 +52,6 @@ class ScreenLockConf(tichy.Application):
         patterns_list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_use_pattern(self, action, pattern, window):
         self.srvc.pattern = pattern.name

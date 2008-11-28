@@ -46,9 +46,8 @@ class PhoneConf(tichy.Application):
 
     name = 'Phone'
 
-    def run(self, parent):
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -64,4 +63,3 @@ class PhoneConf(tichy.Application):
         self.params_list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()

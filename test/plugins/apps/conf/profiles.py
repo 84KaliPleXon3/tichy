@@ -33,9 +33,8 @@ class ProfilesConf(tichy.Application):
 
     name = 'Profiles'
 
-    def run(self, parent):
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, back_button=True)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
 
@@ -57,7 +56,6 @@ class ProfilesConf(tichy.Application):
         profiles_list.view(vbox)
 
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_set_profile(self, action, profile, window):
         logger.info("set profile to %s", profile.name)

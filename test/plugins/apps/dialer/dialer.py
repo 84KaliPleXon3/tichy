@@ -53,11 +53,11 @@ class DialerApp(tichy.Application):
     icon = 'icon.png'
     category = 'main'
 
-    def run(self, parent, text=""):
+    def run(self, window, text=""):
         if isinstance(text, str):
             text = tichy.Text(text)
-        self.window = gui.Window(parent, modal=True)
-        frame = self.view(self.window, back_button=True)
+        self.window = window
+        frame = self.view(window, back_button=True)
 
         vbox = gui.Box(frame, axis=1, expand=True)
         self.text = text
@@ -75,13 +75,10 @@ class DialerApp(tichy.Application):
         gui.Label(del_button, "Del")
         del_button.connect('clicked', self.on_del)
 
-        # quit_item = frame.actor.new_action('Quit')
-
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()   # Don't forget to close the window
 
     def on_key(self, w, k):
-        self.text.value += k  # The view will automatically be updated
+        self.text.value += k
 
     def on_del(self, w):
         self.text.value = self.text.value[:-1]
@@ -101,11 +98,10 @@ class Caller(tichy.Application):
     """This is the application that deal with the calling sequence
     """
 
-    def run(self, parent, number):
+    def run(self, window, number):
         """number can be a string or an incoming call object"""
         # We open a new window for a call
-        self.window = gui.Window(parent)
-        frame = self.view(self.window, title='Dialer')
+        frame = self.view(window, title='Dialer')
         vbox = gui.Box(frame, axis=1)
 
         text = tichy.Text("Initialization")
@@ -150,9 +146,7 @@ class Caller(tichy.Application):
         except Exception, e:
             import traceback
             logger.error("%s, %s", e, traceback.format_exc())
-            yield tichy.Dialog(self.window, "Error", e.message)
-
-        self.window.destroy()
+            yield tichy.Dialog(window, "Error", e.message)
 
 
 class MyCallerService(tichy.Service):

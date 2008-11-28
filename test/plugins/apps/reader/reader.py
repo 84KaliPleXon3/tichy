@@ -47,8 +47,7 @@ class Reader(tichy.Application):
         self.speed = 120
         self.voice = 'm1'
 
-        self.window = gui.Window(window, modal=True)
-        frame = self.view(self.window, back_button=True)
+        frame = self.view(window, back_button=True)
 
         # create the app menu
         actor = frame.actor
@@ -83,7 +82,6 @@ class Reader(tichy.Application):
 
         # Wait till we quit
         yield tichy.Wait(frame, 'back')
-        self.window.destroy()
 
     def on_set_speed(self, action, item, w, speed):
         logger.info("set speed to %d", speed)
@@ -95,7 +93,7 @@ class Reader(tichy.Application):
 
     def on_open(self, action, item, view):
         service = tichy.Service('FileBrowser')
-        path = yield service.get_load_path(self.window)
+        path = yield service.get_load_path(view.window)
         logger.info("open file %s", path)
         try:
             # XXX: add checks that the file is a text file !
