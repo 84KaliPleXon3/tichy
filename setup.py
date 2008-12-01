@@ -90,7 +90,7 @@ setup(name='Tichy',
       # url='',
       packages = ['tichy', 'tichy.guic', 'tichy.guip',
                   'tichy.phone', 'tichy.prefs'],
-      scripts= ['test/tichy'],
+      scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
       data_files = [('share/applications', ['data/tichy.desktop']),
                     ('share/pixmaps', ['data/tichy.png']),
