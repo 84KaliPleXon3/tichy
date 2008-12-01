@@ -98,8 +98,12 @@ class Widget(tichy.Object):
 class Screen(Widget):
 
     def __init__(self, loop, painter, **kargs):
-        gtk_obj = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        super(Screen, self).__init__(None, gtk_obj=gtk_obj)
+        # gtk_obj = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        # super(Screen, self).__init__(None, gtk_obj=None)
+        pass
+
+    def add(self, child):
+        pass
 
 
 class Box(Widget):
