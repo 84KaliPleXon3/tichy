@@ -59,6 +59,15 @@ class Tasklet(object):
     """
 
     def __init__(self, *args, **kargs):
+        """Create a new tasklet
+
+        :Keywords:
+
+            generator
+                The generator that will be used as a task to run.  If
+                this is not defined we use the `run` method of the
+                tasklet.
+        """
         self.generator = kargs.get('generator', None) or \
             self.do_run(*args, **kargs)
         assert isinstance(self.generator,
@@ -75,25 +84,22 @@ class Tasklet(object):
         yield
 
     def start(self, callback=None, err_callback=None, *args, **kargs):
-        """
-        Start the tasklet, connected to a callback and an error
-        callback
+        """Start the tasklet, connected to a callback and an error callback
+
+        Every additional argument and keyword arguments will be passed
+        top the callback method.
 
         :Parameters:
 
-        - `callback`: a function that will be called with the returned
-          value as argument
+            callback
+                a function that will be called with the returned value
+                as argument
 
-        - `err_callback`: a function that is called if the tasklet
-          raises an exception.  The function take 3 arguments as
-          parameters, that are the standard python exception
-          arguments.
-
-        - `*args`: any argument that will be passed to the callback
-          function as well
-
-        - `**kargs`: any kargs argument that will be passed to the
-          callback function as well
+            err_callback
+                a function that is called if the tasklet raises an
+                exception.  The function take 3 arguments as
+                parameters, that are the standard python exception
+                arguments
         """
         self.callback = callback or self.default_callback
         self.err_callback = err_callback or self.default_err_callback

@@ -16,10 +16,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
 
-# tichy package
+"""tichy package"""
 
-from .object import Object
+from tichy.object import Object
 from tasklet import Tasklet, Wait, WaitFirst
 import gui
 

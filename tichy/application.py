@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 from tichy.tasklet import Tasklet
 from tichy.item import Item
 from tichy.service import Service
@@ -82,8 +84,12 @@ class Application(Tasklet, Item):
         return None
 
     def view(self, parent, **kargs):
-        """
-        Create a view of a frame for the application in the parent widget
+        """Create a view of a frame for the application in the parent widget
+
+        :Parameters:
+
+            parent : gui.Widget
+                The parent widget we create the view in
         """
         # The 'Design' service is in charge of creating the frame
         design = Service('Design')

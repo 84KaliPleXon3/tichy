@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 from object import Object
 
 from item import Item, ItemMetaClass
@@ -122,9 +124,10 @@ class Service(Item):
     def get_all(cls, name):
         """return all the service that have a given name
 
-        :Params:
+        :Parameters:
 
-        name - the name of the service
+            name : str
+                The name of the service
         """
         ret = []
         for service in Service.__all_services.get(name, []):
@@ -142,9 +145,11 @@ class Service(Item):
 
         :Parameters:
 
-        service : string giving the service name
+            service : str
+                The service name
 
-        name : if given, we specify the actual service namee we want
+            name : str or None
+                If given, specify the actual service name we want
         """
         logger.debug("try to get service %s", service)
 

@@ -18,6 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
 
 import logging
 logger = logging.getLogger('Contact')
@@ -56,13 +57,16 @@ class ContactField(object):
     def __init__(self, name, type, requiered=False):
         """Create a new field
 
-        Parameters:
+        :Parameters:
 
-        - name : the name of the field
+            name : str
+                The name of the field
 
-        - type : the type, it should be a tichy.Item class
+            type : `tichy.Item`
+                The requiered type of the field attribute
 
-        - requiered : If set to True then the field is compulsory
+            requiered : bool
+                If set to True then the field is compulsory
         """
         self.name = name
         self.type = type
@@ -135,7 +139,7 @@ class Contact(tichy.Item):
     """base class for tichy's contacts
 
     We have to redo this class better. So far a contact can only have
-    one backend. The backend method (import_) being a class method. If
+    one backend. The backend method (`import_`) being a class method. If
     we want to have several backends per contacts we need (and should)
     to change that...
     """

@@ -96,6 +96,13 @@ library. If it can't load it (c files no compliled), it will try to
 use tichy/guip.  There are also experimental backends for gtk and edje
 (guig end guie.) To try it out, edit tichy/gui.py file.
 
+                            DOCUMENTATION
+
+  Some documentation can be found in the doc directory. Most of the
+classes have embedded documentation using extended markup format. You
+can generate the doc with epydoc, from the doc directory :
+    epydoc ../tichy
+
                                AUTHORS
 
 - Guillaume "Charlie" Chereau, main developer. charlie@openmoko.org

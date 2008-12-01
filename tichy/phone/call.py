@@ -18,13 +18,43 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 import tichy
 
 
 class Call(tichy.Item):
+    """Class that represents a voice call"""
 
     def __init__(self, number, direction='out'):
-        self.number = tichy.TelNumber(number)
+        """Create a new call object
+
+        :Parameters:
+
+            number : `tichy.TelNumber` | str
+                The number of the peer
+
+            direction : str
+               'out' for outgoing call, 'in' for incoming call
+
+        Signals
+
+            initiating
+                The call is being initiated
+
+            outgoing
+                The call is outgoing
+
+            activated
+                The call has been activated
+
+            releasing
+                The call is being released
+
+            released
+                The call has been released
+        """
+        self.number = tichy.TelNumber.as_type(number)
         self.direction = direction
         self.status = 'inactive'
 
@@ -32,6 +62,11 @@ class Call(tichy.Item):
         return self.number.get_text()
 
     def initiate(self):
+        """Initiate the call
+
+        This will try to get the 'GSM' service and call its 'initiate'
+        method.
+        """
         gsm_service = tichy.Service('GSM')
         gsm_service.initiate(self)
         self.status = 'initiating'
@@ -46,6 +81,7 @@ class Call(tichy.Item):
         self.emit(self.status)
 
     def activate(self):
+        """Activate the call"""
         gsm_service = tichy.Service('GSM')
         gsm_service.activate(self)
         self.status = 'activating'

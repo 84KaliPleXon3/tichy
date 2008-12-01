@@ -67,7 +67,7 @@ class Item(tichy.Object):
        The subclasses class attribute of an Item class is a list of
        all its subclasses.
 
-       An Item can also create an Actor item acting on itself.
+       An Item can also create an `Actor` item acting on itself.
     """
     __metaclass__ = ItemMetaClass
 
@@ -86,7 +86,8 @@ class Item(tichy.Object):
         """Return the first class of that type that has the given name
 
         :Parameters:
-        - `name`: the name of the class we are looking for
+            name : str
+                the name of the class we are looking for
         """
         for s in cls.subclasses:
             if s.name == name:
@@ -97,11 +98,24 @@ class Item(tichy.Object):
         super(Item, self).__init__()
 
     def view(self, parent):
-        """Create a view of the Item"""
+        """Create a view of the Item
+
+        :Parameters:
+            `parent` : gui.Widget
+                The parent widget the view will be created in
+
+        :Returns: the widget that represent the item
+        """
         raise NotImplementedError
 
     def edit(self, parent):
         """return a tasklet that will edit the item value
+
+        :Parameters:
+            `parent` : gui.Widget
+                The parent widget the view will be created in
+
+        :Returns: a `tichy.Tasklet` that sill start the editing task
         """
         # TODO: now that we have a proper Actor system, we should be
         # able to remove this ?
@@ -112,15 +126,23 @@ class Item(tichy.Object):
 
         By default this method will check for the 'name' attribute of
         the item.  You need to override it for special item name.
+
+        :Returns: `tichy.Text` object
         """
         return tichy.Text(self.name)
 
     def get_sub_text(self):
-        """Return an optional sub text for the item"""
+        """Return an optional sub text for the item
+
+        :Returns: `tichy.Text` object
+        """
         return None
 
     def create_actor(self):
-        """Return an actor acting on this item"""
+        """Return an actor acting on this item
+
+        :Returns: `tichy.Actor`
+        """
         from actor import Actor
         return Actor(self)
 

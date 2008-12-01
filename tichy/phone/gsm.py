@@ -19,6 +19,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 import logging
 logger = logging.getLogger('GSM')
 
@@ -33,11 +35,13 @@ class GSMService(tichy.Service):
 
     """GSM Service base class
 
-    signals :
+    signals
 
-    provider-modified(string name)
+        provider-modified(string name)
+            emitted when the provider name has been  modified
 
-    incoming-call(call)
+        incoming-call(call)
+            indicate an incoming call. Pass the `Call` object
     """
 
     def register(self):

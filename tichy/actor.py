@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 """
 Define the Actor and Action classes
 
@@ -62,8 +64,12 @@ class Action(Object):
         method instead.
 
         :Parameters:
-        - `actor`: the parent actor
-        - `name`: the name of the action
+
+            actor : `Actor`
+                the parent actor
+
+            name : str
+                the name of the action
         """
         super(Action, self).__init__()
         self.actor = actor
@@ -75,9 +81,11 @@ class Action(Object):
         """trigger the action
 
         :Parameters:
-        - `view`: the widget from wich the action was activated.
-        It is useful to retreive the window if we want to start
-        new applications
+
+            view : gui.Widget
+                the widget from wich the action was activated.  It is
+                useful to retreive the window if we want to start new
+                applications
         """
         if self.sub_actor:
             # This mean that this action is in fact a menu of other
@@ -98,7 +106,7 @@ class Action(Object):
 
 class Actor(tichy.Item):
     """Special item that represent a list of action on an item OR an Item
-class
+    class
 
     It is very usefull, because it abstract all the mechanism to
     select an action on an item.  You just need to create a actor on
@@ -114,7 +122,9 @@ class
         Item.create_actor() method
 
         :Parameters:
-        - `item`: the item the actor represents
+
+            item : `Item`
+                The item the actor represents
         """
         super(Actor, self).__init__()
         self.item = item
@@ -135,7 +145,9 @@ class
         """Create a new action in the Actor
 
         :Parameters:
-        - `name`: the name of the action
+
+            name : str
+                the name of the action
         """
         return Action(self, name)
 

@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 from tichy.item import Item
 from tichy.service import Service
 
@@ -27,6 +29,12 @@ class List(list, Item):
     It is better to use this class instead of python list in the case
     we want to monitor the list modifications. We can also create
     actor on a list.
+
+    Signals
+        'modified' : emitted any time the list has been modified
+        'cleared' : emitted when the list has been cleared
+        'removed' : emitted when an item has been removed
+        'appened' : emitted when an item has been appened
     """
 
     def __init__(self, values=[]):
@@ -47,6 +55,14 @@ class List(list, Item):
         self.emit('modified')
 
     def insert(self, index, value):
+        """insert an item into the list at a given position
+
+        :Parameters:
+            index : int
+                The index where we insert the item
+            value
+                The inserted value
+        """
         list.insert(self, index, value)
         self.emit('inserted', index, value)
         self.emit('modified')
@@ -66,10 +82,14 @@ class List(list, Item):
         """Return a view that contains actors view to all the elements of this
         list
 
-        arguments:
+        :Parameters:
 
-        - can_delete : if true we add a "Delete" action to every
-          elements of the list
+            parent : gui.Widget
+                The parent widget
+
+            can_delete : bool
+                If True, add a "Delete" action to every element of the
+                list
         """
         # This method is tricky. Modify with care !
 

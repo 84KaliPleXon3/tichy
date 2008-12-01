@@ -17,8 +17,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-from .object import Object
-from .item import Item
+__docformat__ = 'reStructuredText'
+
+from tichy.object import Object
+from tichy.item import Item
 
 
 class Frame(object):

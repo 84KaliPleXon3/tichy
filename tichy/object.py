@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 import os
 
 from types import GeneratorType
@@ -42,6 +44,15 @@ class Object(object):
 
     @classmethod
     def path(cls, path=None):
+        """return the path of a file situated in the same directory than the
+        source code of the object.
+
+        :Parameters:
+
+            `path` : str or None
+                The name of the file, if set to None, then return
+                the directory of the object.
+        """
         # XXX: this path method sucks
         module_str = cls.__module__
         module = __import__(module_str)
@@ -58,10 +69,34 @@ class Object(object):
 
     @classmethod
     def open(cls, path):
+        """Open a file that is located in the same directory than the object
+        source code
+
+        :Parameters:
+
+            `path` : str
+                The file name
+        """
         return open(self.path(path))
 
     def connect(self, event, callback, *args):
-        """Connect the object to a given event"""
+        """Connect the object to a given event
+
+        This method has the same syntax than the gobject equivalent.
+
+        :Parameters:
+
+            `event` : str
+                the name of the vent we connect to
+
+            `callback` : callback method
+                the method called when the event is emitted. The first
+                argument of the method will be the calling object. All
+                arguments passed to the connect method will be passed
+                as well
+
+        :Returns: The id of the connection
+        """
         return self.connect_object(event, callback, self, *args)
 
     def connect_object(self, event, callback, obj, *args):
@@ -71,7 +106,13 @@ class Object(object):
         return id(connection)
 
     def disconnect(self, oid):
-        """remove a connection from the listeners"""
+        """remove a connection from the listeners
+
+        :Parameters:
+
+            oid : int
+                The id returned by `Object.connect` method
+        """
         for l in self.__listeners.itervalues():
             for c in l:
                 if id(c) == oid:
@@ -83,7 +124,14 @@ class Object(object):
     def emit(self, event, *args):
         """Emit a signal
 
-           All the listeners will be notified
+           All the listeners will be notified.
+
+           All extra arguments will be passed to the listeners
+           callback method.
+
+           :Parameters:
+               `event` : str
+                   The name of the event to emit.
         """
         for e in self.__listeners.get(event, []):
             eargs = args + e[2]

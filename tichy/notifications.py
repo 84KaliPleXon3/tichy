@@ -17,6 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+__docformat__ = 'reStructuredText'
+
 """Notifications module"""
 
 import logging
@@ -36,11 +38,13 @@ class Notification(tichy.Item):
 
     Signals:
 
-    - released : emitted when the notification is released and
-      shouldn't be taken care of anymore.
+        'released'
+            emitted when the notification is released and shouldn't be
+            taken care of anymore.
 
-    - modified : emitted when the message of a notification has beed
-      modified.
+        'modified'
+            emitted when the message of a notification has beed
+            modified
     """
 
     def __init__(self, service, msg, icon=None):
@@ -79,10 +83,10 @@ class Notifications(tichy.Service):
     The system can see all the pending notifications, and also be
     notified whenever a new notification arrives.
 
-    :Signals:
+    Signals
 
-    - new-notification(notification) : emitted when a new notification
-      arrives
+        'new-notification'
+            emitted when a new notification arrives
     """
     service = 'Notifications'
 
@@ -94,9 +98,11 @@ class Notifications(tichy.Service):
 
         :Parameters:
 
-        - msg : the message of the notification
+            msg : `Text` or unicode
+                the message of the notification
 
-        - icon : an optional icon for the notification
+            icon : `Image`
+                an optional icon for the notification
         """
         notification = Notification(self, msg, icon)
         self.notifications.append(notification)

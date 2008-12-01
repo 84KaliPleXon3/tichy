@@ -16,6 +16,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 
+__docformat__ = 'reStructuredText'
+
 """Message module"""
 
 import logging
@@ -33,20 +35,25 @@ class Message(tichy.Item):
 
         :Parameters:
 
-        - peer : the number / contact of the peer of the message. Its
-          __repr__ method will be used as the item's name.
+            peer : `TelNumber` | str
+                the number / contact of the peer of the message. Its
+                __repr__ method will be used as the item's name.
 
-        - text : the text of the message.
+            text : `Text` | unicode
+                The text of the message
 
-        - direction : the direction of the message. Cab be 'in' or
-          'out'.
+            direction : str
+                the direction of the message. Can be 'in' or 'out'
 
-        - status : the status of the message. Can be 'read' or
-          'unread'. If set to None, incoming message will have
-          'unread' status and outgoing message will have 'read' status
+            status : str
+                the status of the message. Can be 'read' or
+                'unread'. If set to None, incoming message will have
+                'unread' status and outgoing message will have 'read'
+                status
 
-        - timestamp : the time at which we received the message. If
-          set to None we use the current time
+            timestamp
+                the time at which we received the message. If set to
+                None we use the current time
         """
         self.peer = tichy.TelNumber.as_type(peer)
         self.text = tichy.Text.as_type(text)
@@ -60,6 +67,11 @@ class Message(tichy.Item):
         return tichy.Text("%s" % str(self.peer))
 
     def read(self):
+        """Mark the message as read
+
+        This will set the status of the message to 'read' and also
+        send the 'read' signal.
+        """
         if self.status == 'read':
             return
         self.status = 'read'
@@ -83,16 +95,32 @@ class Message(tichy.Item):
         return actor
 
     def edit(self, window):
+        """Return a `tasklet` that can be used to edit the message
+
+        :Parameters:
+
+            window : gui.Widget
+               The window where we start the edit application
+        """
         editor = tichy.Service('EditMessage')
         yield editor.edit(self, window)
 
     def view_details(self, window):
+        """return a `Tasklet` that can be used to view the message details
+
+        :Parameters:
+
+            window : gui.Widget
+               The window where we start the application
+        """
         editor = tichy.Service('EditMessage')
         yield editor.view_details(self, window)
 
 
 class MessagesService(tichy.Service):
     """The service that stores all the messages
+
+    This service provides access to the messages inbox and outbox
     """
 
     service = 'Messages'
@@ -106,6 +134,12 @@ class MessagesService(tichy.Service):
         self.notification = None
 
     def add_to_inbox(self, msg):
+        """Add a `Message` into the inbox
+
+        :Parameters:
+            msg : `Message`
+                The message we add
+        """
         logger.info("Add to inbox : %s", msg)
         assert(isinstance(msg, Message))
         self.inbox.insert(0, msg)
@@ -113,6 +147,13 @@ class MessagesService(tichy.Service):
         self._update()
 
     def add_to_outbox(self, msg):
+        """Add a `Message` into the outbox
+
+        :Parameters:
+            msg : `Message`
+                The message we add
+        """
+
         logger.info("Add to outbox : %s", msg)
         assert(isinstance(msg, Message))
         self.outbox.insert(0, msg)

@@ -105,10 +105,9 @@ class Screen(Window):
 
     def __init__(self, loop, painter, **kargs):
         pass
-    
+
     def add(self, child):
         pass
-
 
 
 class Box(Widget):
