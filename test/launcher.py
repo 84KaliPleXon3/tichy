@@ -134,7 +134,7 @@ class Launcher(dbus.service.Object):
         logger.info("launch %s", name)
         for app in tichy.Application.subclasses:
             if app.name == name:
-                self._launch(app).start()
+                self.launch(app).start()
                 break
 
     @tichy.tasklet.tasklet
