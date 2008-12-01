@@ -148,6 +148,10 @@ class Contact(tichy.Item):
 
     Field = ContactField        # Alias for the ContactField class
 
+    name = ContactField('name', tichy.Text, True)
+    tel = ContactField('tel', tichy.TelNumber)
+    fields = [name, tel]
+
     def __init__(self, **kargs):
         """Create a new contact
         """
@@ -196,7 +200,7 @@ class Contact(tichy.Item):
 
     def on_call(self, action, contact, view):
         if not self.tel:
-            yield gui.Message(view.window, "Contact has no tel")
+            yield tichy.Dialog(view.window, "Error", "Contact has no tel")
         else:
             caller = tichy.Service('Caller')
             yield caller.call(view.window, self.tel)

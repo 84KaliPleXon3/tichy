@@ -144,11 +144,6 @@ class Fixed(Widget):
 
 class Table(Widget):
 
-    pass
-
-
-class Table(Widget):
-
     def __init__(self, parent, nb=3, **kargs):
         self.nb = nb
         self.current = 0

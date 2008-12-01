@@ -58,12 +58,13 @@ class ServiceMetaClass(ItemMetaClass):
                 cls._Service__init = dict['__init__']
                 cls.__init__ = Service.__init__
             logger.debug("Register %s as service %s", cls, service_name)
-            Service._Service__all_services.setdefault(
+            Service.__dict__['_Service__all_services'].setdefault(
                 service_name, []).append(cls)
-            if service_name not in Service._Service__bases:
-                Service._Service__bases[service_name] = \
+            service_bases = Service.__dict__['_Service__bases']
+            if service_name not in service_bases:
+                service_bases[service_name] = \
                     BaseService(service_name)
-            cls.base = Service._Service__bases[service_name]
+            cls.base = service_bases[service_name]
         ItemMetaClass.__init__(cls, name, bases, dict)
 
 
@@ -187,3 +188,7 @@ class Service(Item):
             singleton.__init()
             cls.__singleton = singleton
         return cls.__singleton
+
+    def __getattr__(self, name):
+        """Only defined to quiet pylint"""
+        return self.__dict__[name]

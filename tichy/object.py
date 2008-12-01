@@ -77,7 +77,7 @@ class Object(object):
             `path` : str
                 The file name
         """
-        return open(self.path(path))
+        return open(cls.path(path))
 
     def connect(self, event, callback, *args):
         """Connect the object to a given event

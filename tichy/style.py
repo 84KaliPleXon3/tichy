@@ -133,6 +133,11 @@ class Style(dict, Item):
         self.parts = []
 
     @classmethod
+    def code(cls):
+        """return the dict of the style"""
+        return {}
+
+    @classmethod
     def create(cls):
         # TODO: this is not really good, we shouldn't have to call this
         return cls.from_dict(None, cls.code())

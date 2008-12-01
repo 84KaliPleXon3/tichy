@@ -17,6 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+import tichy
 import tichy.item as item
 from tichy.service import Service, ServiceUnusable
 
