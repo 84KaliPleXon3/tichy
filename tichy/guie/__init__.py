@@ -98,9 +98,17 @@ class Window(Widget):
 
 
 class Screen(Window):
+    """We don't use screen at all
+
+    It doesn't make sense with etk backend.
+    """
 
     def __init__(self, loop, painter, **kargs):
-        super(Screen, self).__init__(None)
+        pass
+    
+    def add(self, child):
+        pass
+
 
 
 class Box(Widget):
