@@ -144,11 +144,7 @@ class Launcher(dbus.service.Object):
         if not self.screen:
             self.screen = self.create_screen()
             kill_on_close = True
-        window = tichy.gui.Window(self.screen,
-                                  min_size=tichy.gui.Vect(480, 0),
-                                  modal=True, expand=True)
-        yield app(window)
-        window.destroy()
+        yield app(self.screen)
         if kill_on_close:
             self.screen.destroy()
             self.screen = None
