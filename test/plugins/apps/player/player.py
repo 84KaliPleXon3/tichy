@@ -64,7 +64,7 @@ class Player(tichy.Application):
         pause_button.connect('clicked', self.on_pause)
         open_button.connect('clicked', self.on_open)
 
-        frame.actor.new_action("Open").connect('activated', self.on_open)
+        frame.actor.new_action("Volume").connect('activated', self.on_volume)
         yield tichy.Wait(frame, 'back')
 
     def on_sync_message(self, bus, message):
@@ -113,6 +113,82 @@ class Player(tichy.Application):
     def pause(self):
         if Player.player:
             Player.player.set_state(gst.STATE_PAUSED)
+        self.status_name.value = "paused"
+
+    def on_stop(self, b):
+        self.stop()
+
+    def on_play(self, b):
+        self.play()
+
+    def on_pause(self, b):
+        self.pause()
+
+    def on_open(self, b):
+        # Unfortunately The XWindow won't hide by itself
+        self.x_window.hide()
+        service = tichy.Service('FileBrowser')
+        path = yield service.get_load_path(b.window)
+        self.x_window.show()
+        logger.info("opening %s", path)
+        self.play(path)
+
+    def on_volume(self, action, item, view):
+        # Unfortunately The XWindow won't hide by itself
+        self.x_window.hide()
+        sound_service = tichy.Service('SoundsSetting')
+        yield sound_service.start(view.window)
+        self.x_window.show()
+
+
+class MPlayer(tichy.Application):
+    """Same thing, but using mplayer instead of gstream"""
+
+    name = 'MPlayer'
+    icon = 'play.png'
+    category = 'main'
+
+    def run(self, window):
+        frame = self.view(window, back_button=True)
+
+        vbox = gui.Box(frame, axis=1)
+
+        self.file_name = tichy.Text("No file")
+        self.file_name.view(vbox)
+
+        self.x_window = gui.XWindow(vbox)
+
+        self.status_name = tichy.Text("")
+        self.status_name.view(vbox)
+
+        # We put a few buttons
+        box = gui.Box(vbox, axis=0)
+        play_button = gui.Button(box, optimal_size=gui.Vect(96, 96))
+        tichy.Image(self.path('play.png')).view(play_button)
+        pause_button = gui.Button(box, optimal_size=gui.Vect(96, 96))
+        tichy.Image(self.path('pause.png')).view(pause_button)
+        stop_button = gui.Button(box, optimal_size=gui.Vect(96, 96))
+        tichy.Image(self.path('stop.png')).view(stop_button)
+        open_button = gui.Button(box, optimal_size=gui.Vect(96, 96))
+        tichy.Image(self.path('open.png')).view(open_button)
+
+        stop_button.connect('clicked', self.on_stop)
+        play_button.connect('clicked', self.on_play)
+        pause_button.connect('clicked', self.on_pause)
+        open_button.connect('clicked', self.on_open)
+
+        yield tichy.Wait(frame, 'back')
+
+    def play(self, filepath=None):
+        import subprocess
+        subprocess.call(['mplayer', '-wid', str(self.x_window.id),
+                         filepath])
+        self.status_name.value = "play"
+
+    def stop(self):
+        self.status_name.value = "stop"
+
+    def pause(self):
         self.status_name.value = "paused"
 
     def on_stop(self, b):
