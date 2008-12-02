@@ -17,12 +17,18 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Object module
+
+This module define the Object class, that provides signal mechanism in
+a way similar to gobject.
+"""
+
 __docformat__ = 'reStructuredText'
 
 import os
 
 from types import GeneratorType
-from tasklet import Tasklet
+from tichy.tasklet import Tasklet
 
 
 class Object(object):
@@ -113,10 +119,10 @@ class Object(object):
             oid : int
                 The id returned by `Object.connect` method
         """
-        for l in self.__listeners.itervalues():
-            for c in l:
-                if id(c) == oid:
-                    l.remove(c)
+        for listener in self.__listeners.itervalues():
+            for connection in listener:
+                if id(connection) == oid:
+                    listener.remove(connection)
                     return
 
         raise Exception("trying to disconnect a bad id")
@@ -133,34 +139,23 @@ class Object(object):
                `event` : str
                    The name of the event to emit.
         """
-        for e in self.__listeners.get(event, []):
-            eargs = args + e[2]
-            call = e[0](e[1], *eargs)
+        for callback, obj, extra_args in self.__listeners.get(event, []):
+            eargs = args + extra_args
+            call = callback(obj, *eargs)
             # Now in case the callback is a generator, we turn it into a task
             # This allow us to directly connect to generators
             if type(call) is GeneratorType:
                 Tasklet(generator=call).start()
 
-    def monitor(self, object, event, callback, *args):
+    def monitor(self, obj, event, callback, *args):
         """connect an object to a callback, and automatically disconnect it
         when this object is destroyed.
 
         WARNING: This is still experimental, and should only be used
         with objects that have a 'destroy' signal.
         """
-        connection = object.connect(event, callback, *args)
+        connection = obj.connect(event, callback, *args)
 
-        def on_destroyed(self, object, connection):
-            object.disconnect(connection)
-        self.connect('destroyed', on_destroyed, object, connection)
-
-
-if __name__ == '__main__':
-
-    def func(o, x):
-        print x
-
-    o = Object()
-    o.connect('test', func)
-
-    o.emit('test', 10)
+        def on_destroyed(self, obj, connection):
+            obj.disconnect(connection)
+        self.connect('destroyed', on_destroyed, obj, connection)
