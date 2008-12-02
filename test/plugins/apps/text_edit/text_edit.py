@@ -30,6 +30,7 @@ class TextEdit(tichy.Application):
     """A small application to test the keyboard widget"""
 
     name = 'TextEdit'
+    icon = 'icon.png'
 
     def __init__(self, *args, **kargs):
         super(TextEdit, self).__init__(*args, **kargs)

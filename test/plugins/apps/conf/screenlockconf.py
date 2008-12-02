@@ -30,6 +30,7 @@ class SettingItem(tichy.Item):
 class ScreenLockConf(tichy.Application):
 
     name = 'Screen Lock'
+    icon = 'screenlock.png'
 
     def run(self, window):
         self.srvc = tichy.Service('ScreenLock')

@@ -54,6 +54,7 @@ class Conf(tichy.Application):
 class StyleConf(tichy.Application):
 
     name = 'Style'
+    icon = 'style.png'
 
     def run(self, window):
         frame = self.view(window, back_button=True)

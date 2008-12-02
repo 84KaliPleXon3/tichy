@@ -45,6 +45,7 @@ class ParamItem(tichy.Item):
 class PhoneConf(tichy.Application):
 
     name = 'Phone'
+    icon = 'phone.png'
 
     def run(self, window):
         frame = self.view(window, back_button=True)
