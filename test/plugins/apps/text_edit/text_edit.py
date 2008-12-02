@@ -78,6 +78,6 @@ class MyTextEditService(tichy.Service):
 
     service = 'TextEdit'
 
-    def edit(self, parent, text, name=None, input_method=None):
+    def edit(self, parent, text="", name=None, input_method=None):
         """The only function defined in the TextEditService"""
         return TextEdit(parent, text, name=name, input_method=input_method)
