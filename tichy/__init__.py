@@ -46,6 +46,7 @@ from dialog import Dialog
 import phone
 import prefs
 import notifications
+import sound
 
 # The mainloop is defined here !
 # We can use it to access to the timeout_add method
