@@ -26,13 +26,13 @@ import sys
 import tichy
 
 # Set to true if we register experimental Items
-_experimental = False
+EXPERIMENTAL = False
 
 # Check the globale options for experimental support
 if hasattr(sys.modules['__main__'], 'options'):
     options = sys.modules['__main__'].options
     if getattr(options, 'experimental', None):
-        _experimental = True
+        EXPERIMENTAL = True
 
 
 class ItemMetaClass(type):
@@ -49,7 +49,7 @@ class ItemMetaClass(type):
             if base is tichy.Object:
                 return
             if issubclass(base, Item):
-                if cls.experimental and not _experimental:
+                if cls.experimental and not EXPERIMENTAL:
                     return
                 base.subclasses.append(cls)
 
@@ -89,9 +89,9 @@ class Item(tichy.Object):
             name : str
                 the name of the class we are looking for
         """
-        for s in cls.subclasses:
-            if s.name == name:
-                return s
+        for subclass in cls.subclasses:
+            if subclass.name == name:
+                return subclass
         raise KeyError(name)
 
     def __init__(self):
@@ -143,7 +143,7 @@ class Item(tichy.Object):
 
         :Returns: `tichy.Actor`
         """
-        from actor import Actor
+        from tichy.actor import Actor
         return Actor(self)
 
     def __unicode__(self):
