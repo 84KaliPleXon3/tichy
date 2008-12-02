@@ -24,7 +24,6 @@ import pygame.locals
 from geo import Vect, Rect, asvect, asrect
 from painter import Painter
 from tichy.tasklet import Tasklet, Wait
-from tichy.events_loop import MainLoop
 from tichy.object import Object
 
 from font import Font

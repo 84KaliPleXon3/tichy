@@ -24,7 +24,6 @@ from tichy.object import Object
 from tasklet import Tasklet, Wait, WaitFirst
 import gui
 
-import events_loop
 from application import Application, Gadget
 from service import Service, ServiceUnusable
 import plugins
