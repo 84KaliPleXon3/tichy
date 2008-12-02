@@ -138,6 +138,10 @@ class FreeSmartPhoneSim(tichy.Service):
         yield WaitDBus(self.gsm_sim.DeleteEntry, 'contacts',
                        contact.sim_index)
 
+    def send_pin(self, pin):
+        logger.info("sending pin")
+        yield WaitDBus(self.gsm_sim.SendAuthCode, pin)
+
 
 class TestSim(tichy.Service):
 
