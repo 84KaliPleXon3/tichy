@@ -99,9 +99,12 @@ class FreeSmartPhoneGSM(GSMService):
     def register(self, on_step=None):
         """Tasklet that registers on the network
 
-        on_step : a callback function that take a string argument that
-                  will be called at every step of the registration
-                  procedure.
+        :Parameters:
+
+            on_step : callback function | None
+                a callback function that take a string argument that
+                will be called at every step of the registration
+                procedure
         """
 
         def default_on_step(msg):
@@ -112,13 +115,7 @@ class FreeSmartPhoneGSM(GSMService):
             logger.info("Request the GSM resource")
             on_step("Request the GSM resource")
             yield WaitDBus(self.ousage.RequestResource, 'GSM')
-            logger.info("Check antenna power")
-            power = yield WaitDBus(self.gsm_device.GetAntennaPower)
-            logger.info("antenna power is %d", power)
-            if not power:
-                logger.info("turn on antenna power")
-                on_step("Turn on antenna power")
-                yield WaitDBus(self.gsm_device.SetAntennaPower, True)
+            yield self._turn_on(on_step)
             on_step("Register on the network")
             logger.info("register on the network")
             yield WaitDBus(self.gsm_network.Register)
@@ -127,6 +124,31 @@ class FreeSmartPhoneGSM(GSMService):
             logger.error("Error : %s", e)
             print type(e)
             raise
+
+    def _turn_on(self, on_step):
+        logger.info("Check antenna power")
+        power = yield WaitDBus(self.gsm_device.GetAntennaPower)
+        logger.info("antenna power is %d", power)
+        if power:
+            yield None
+        logger.info("turn on antenna power")
+        on_step("Turn on antenna power")
+        for i in range(3):
+            try:
+                yield WaitDBus(self.gsm_device.SetAntennaPower, True)
+            except dbus.exceptions.DBusException, e:
+                if e.get_dbus_name() != \
+                        'org.freesmartphone.GSM.SIM.AuthFailed':
+                    raise
+                # We ask for the PIN
+                yield self._ask_pin()
+
+    def _ask_pin(self):
+        window = tichy.Service("WindowsManager").get_app_parent()
+        editor = tichy.Service('TextEdit')
+        pin = yield editor.edit(window, name="Enter PIN",
+                                input_method='number')
+        yield tichy.Service('SIM').send_pin(pin)
 
     def on_call_status(self, call_id, status, properties):
         logger.info("call status %s %s %s", id, status, properties)
