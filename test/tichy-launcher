@@ -83,12 +83,10 @@ os.environ['SDL_VIDEODRIVER'] = 'x11'
 # test directory
 sys.path.insert(0, '../')
 
-
 # We select the gui backend before importing tichy
+tichy_gui_backends = ['paroli', 'csdl', 'sdl']
 if options.gui_backend:
-    global tichy_gui_backends
     tichy_gui_backends = [options.gui_backend]
-
 
 import tichy
 
