@@ -97,14 +97,14 @@ class Item(tichy.Object):
     def __init__(self):
         super(Item, self).__init__()
 
-    def view(self, parent):
+    def view(self, parent, **kargs):
         """Create a view of the Item
 
         :Parameters:
             `parent` : gui.Widget
                 The parent widget the view will be created in
 
-        :Returns: the widget that represent the item
+        :Returns: the widget that represents the item
         """
         raise NotImplementedError
 
@@ -134,7 +134,7 @@ class Item(tichy.Object):
     def get_sub_text(self):
         """Return an optional sub text for the item
 
-        :Returns: `tichy.Text` object
+        :Returns: `tichy.Text` | None
         """
         return None
 

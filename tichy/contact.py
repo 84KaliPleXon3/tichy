@@ -18,13 +18,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
+"""contact module"""
+
 __docformat__ = 'reStructuredText'
 
 import logging
-logger = logging.getLogger('Contact')
-
-from tichy.service import Service, ServiceUnusable
-from tichy.object import Object
+LOGGER = logging.getLogger('Contact')
 
 import tichy
 import tichy.gui as gui
@@ -54,7 +53,7 @@ class ContactField(object):
     attribute instead of the field itself.
     """
 
-    def __init__(self, name, type, requiered=False):
+    def __init__(self, name, type_, requiered=False):
         """Create a new field
 
         :Parameters:
@@ -62,17 +61,17 @@ class ContactField(object):
             name : str
                 The name of the field
 
-            type : `tichy.Item`
+            type_ : `tichy.Item`
                 The requiered type of the field attribute
 
             requiered : bool
                 If set to True then the field is compulsory
         """
         self.name = name
-        self.type = type
+        self.type = type_
         self.requiered = requiered
 
-    def __get__(self, obj, type=None):
+    def __get__(self, obj, type_=None):
         return obj.attributes[self.name].value
 
     def __set__(self, obj, value):
@@ -91,6 +90,7 @@ class ContactAttr(tichy.Item):
     """
 
     def __init__(self, contact, field):
+        super(ContactAttr, self).__init__()
         self.contact = contact
         self.field = field
 
@@ -103,7 +103,15 @@ class ContactAttr(tichy.Item):
     def __unicode__(self):
         return unicode(self.field.name)
 
-    def view(self, parent):
+    def view(self, parent, **kargs):
+        """Create a view of the Item
+
+        :Parameters:
+            `parent` : gui.Widget
+                The parent widget the view will be created in
+
+        :Returns: the widget that represents the item
+        """
         ret = gui.Box(parent, axis=0, border=0)
         gui.Label(ret, "%s:" % self.field.name)
         if self.value:
@@ -111,8 +119,12 @@ class ContactAttr(tichy.Item):
         return ret
 
     def create_actor(self):
+        """Return an actor acting on this item
+
+        :Returns: `tichy.Actor`
+        """
         actor = super(ContactAttr, self).create_actor()
-        actor.new_action('Edit').connect('activated', self.on_edit)
+        actor.new_action('Edit').connect('activated', self._on_edit)
         return actor
 
     def __get_value(self):
@@ -130,7 +142,7 @@ class ContactAttr(tichy.Item):
     def _on_value_modified(self, value):
         self.emit('modified')
 
-    def on_edit(self, action, attr, view):
+    def _on_edit(self, action, attr, view):
         assert self.value
         yield self.value.edit(view.window, name=self.field.name)
 
@@ -158,63 +170,78 @@ class Contact(tichy.Item):
         super(Contact, self).__init__()
         self.attributes = dict((x.name, ContactAttr(self, x)) \
                                    for x in self.fields)
-        for k, a in self.attributes.items():
-            if k in kargs:
-                a.value = kargs[k]
-            a.connect('modified', self._on_attr_modified)
+        for key, attr in self.attributes.items():
+            if key in kargs:
+                attr.value = kargs[key]
+            attr.connect('modified', self._on_attr_modified)
 
     def _on_attr_modified(self, attr):
         self.emit('modified')
 
     def get_text(self):
+        """Return the name of the item as a tichy.Text object
+        """
         return self.name
 
     def get_sub_text(self):
+        """Return an optional sub text for the item"""
         return getattr(self, 'tel', None)
 
     def view(self, parent, **kargs):
+        """Create a view of the Item
+
+        :Parameters:
+            `parent` : gui.Widget
+                The parent widget the view will be created in
+
+        :Returns: the widget that represent the item
+        """
         return self.name.view(parent, **kargs)
 
     def create_actor(self):
+        """Return an actor acting on this contact
+
+        :Returns: `tichy.Actor`
+        """
         actor = tichy.Item.create_actor(self)
-        actor.new_action("Call").connect('activated', self.on_call)
-        actor.new_action("Edit").connect('activated', self.on_edit)
-        actor.new_action("Delete").connect('activated', self.on_delete)
+        actor.new_action("Call").connect('activated', self._on_call)
+        actor.new_action("Edit").connect('activated', self._on_edit)
+        actor.new_action("Delete").connect('activated', self._on_delete)
 
         for cls in Contact.subclasses:
             if isinstance(self, cls):
                 continue
             import_ = actor.new_action("Copy to %s" % cls.storage)
-            import_.connect('activated', self.on_copy_to, cls)
+            import_.connect('activated', self._on_copy_to, cls)
 
         return actor
 
-    def on_copy_to(self, action, contact, view, cls):
+    def _on_copy_to(self, action, contact, view, cls):
         try:
             contact = yield cls.import_(self)
             tichy.Service('Contacts').add(contact)
-        except Exception, e:
-            logger.error("can't import contact : %s", e)
+        except Exception, ex:
+            LOGGER.error("can't import contact : %s", ex)
             yield tichy.Dialog(view.window, "Error",
                                "can't import the contact")
 
-    def on_call(self, action, contact, view):
+    def _on_call(self, _action, contact, view):
         if not self.tel:
             yield tichy.Dialog(view.window, "Error", "Contact has no tel")
         else:
             caller = tichy.Service('Caller')
-            yield caller.call(view.window, self.tel)
+            yield caller.call(view.window, contact.tel)
 
-    def on_edit(self, item, contact, view):
+    def _on_edit(self, item, contact, view):
         editor = tichy.Service('EditContact')
-        return editor.edit(self, view.window)
+        yield editor.edit(self, view.window)
 
-    def on_delete(self, item, contact, view):
+    def _on_delete(self, item, contact, view):
         try:
             yield contact.delete()
             tichy.Service('Contacts').remove(contact)
-        except Exception, e:
-            logger.error("can't delete contact : %s", e)
+        except Exception, ex:
+            LOGGER.error("can't delete contact : %s", ex)
             yield tichy.Dialog(view.window, "Error",
                                "can't delete the contact")
 
@@ -253,7 +280,7 @@ class PhoneContact(Contact):
         self.connect('modified', self._on_modified)
 
     def _on_modified(self, contact):
-        logger.info("Phone contact modified")
+        LOGGER.info("Phone contact modified")
         yield self.save()
 
     @classmethod
@@ -265,7 +292,7 @@ class PhoneContact(Contact):
     @classmethod
     def save(cls):
         """Save all the phone contacts"""
-        logger.info("Saving phone contacts")
+        LOGGER.info("Saving phone contacts")
         contacts = tichy.Service('Contacts').contacts
         data = [c.to_dict() for c in contacts if isinstance(c, PhoneContact)]
         tichy.Persistance('contacts/phone').save(data)
@@ -277,7 +304,7 @@ class PhoneContact(Contact):
 
         Return a list of all the contacts
         """
-        logger.info("Loading phone contacts")
+        LOGGER.info("Loading phone contacts")
         ret = []
         data = tichy.Persistance('contacts/phone').load()
         for kargs in data:
@@ -286,11 +313,13 @@ class PhoneContact(Contact):
         yield ret
 
 
-class ContactsService(Service):
+class ContactsService(tichy.Service):
+    """Allow to add and get the phone or sim contacts"""
 
     service = 'Contacts'
 
     def __init__(self):
+        super(ContactsService, self).__init__()
         self.contacts = tichy.List()
 
     @tichy.tasklet.tasklet
@@ -300,24 +329,26 @@ class ContactsService(Service):
         We need to call this before we can access the contacts
         """
         for cls in Contact.subclasses:
-            logger.info("loading contacts from %s" % cls.storage)
+            LOGGER.info("loading contacts from %s" % cls.storage)
             try:
                 contacts = yield cls.load()
-            except Exception, e:
-                logger.warning("can't get contacts : %s", e)
+            except Exception, ex:
+                LOGGER.warning("can't get contacts : %s", ex)
                 continue
-            for c in contacts:
-                assert isinstance(c, Contact), type(c)
-                self.contacts.append(c)
-        logger.info("got %d contacts", len(self.contacts))
+            for contact in contacts:
+                assert isinstance(contact, Contact), type(contact)
+                self.contacts.append(contact)
+        LOGGER.info("got %d contacts", len(self.contacts))
 
     def add(self, contact):
+        """Add a contact into the contact list"""
         self.contacts.append(contact)
 
     def remove(self, contact):
+        """Remove a contact from the contact list"""
         self.contacts.remove(contact)
 
-    def new_name(self):
+    def _new_name(self):
         name = 'new'
         i = 2
         while name in [unicode(c.name) for c in self.contacts]:
@@ -326,10 +357,19 @@ class ContactsService(Service):
         return name
 
     def find_by_number(self, number):
-        for c in self.contacts:
-            if c.tel == number:
-                return c
+        """Return the first contact having a givne number
+
+        :Parameters:
+            number : str
+               The number of the contact
+
+        :Returns: `Contact` | None
+        """
+        for contact in self.contacts:
+            if contact.tel == number:
+                return contact
 
     def create(self):
-        name = self.new_name()
+        """Create a new `PhoneContact`"""
+        name = self._new_name()
         return PhoneContact(name=name)
