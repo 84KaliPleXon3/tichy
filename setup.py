@@ -93,7 +93,7 @@ setup(name='Tichy',
       scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
       data_files = [('share/applications', ['data/tichy.desktop']),
-                    ('share/pixmaps', ['data/tichy.png']),
+                    ('share/pixmaps/tichy', ['data/tichy.png']),
                     ('share/tichy/pics', ['tichy/pics/sim.png'])] + \
           plugins_files(),
       ext_package='tichy.guic',
