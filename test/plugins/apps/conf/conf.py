@@ -24,6 +24,7 @@ import tichy.gui as gui
 from profiles import ProfilesConf
 from phone import PhoneConf
 from screenlockconf import ScreenLockConf
+from sound import SoundConf
 
 
 class Conf(tichy.Application):
@@ -31,6 +32,7 @@ class Conf(tichy.Application):
     name = 'Config'
     icon = 'icon.png'
     category = 'main'
+    design = 'Grid'
 
     def run(self, window):
         frame = self.view(window, back_button=True)
@@ -38,7 +40,8 @@ class Conf(tichy.Application):
 
         # We create a list of the sub applications actors
         list = tichy.ActorList()
-        for app in [ProfilesConf, StyleConf, PhoneConf, ScreenLockConf]:
+        for app in [ProfilesConf, StyleConf, PhoneConf, ScreenLockConf,
+                    SoundConf]:
             actor = app.create_actor()
             list.append(actor)
 
