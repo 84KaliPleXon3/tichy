@@ -44,9 +44,9 @@ class Contacts(tichy.Application):
 
         yield tichy.Wait(frame, 'back')
 
-    def on_new(self, *args):
+    def on_new(self, action, item, view):
         contact = self.contacts_service.create()
-        yield Contact(self.window, contact)
+        yield Contact(view.window, contact)
         self.contacts_service.add(contact)
 
 
@@ -69,7 +69,7 @@ class Contact(tichy.Application):
 
     def on_add_attr(self, action, item, view, attr):
         value = attr.field.type()
-        yield value.edit(self.window, name=attr.field.name)
+        yield value.edit(view.window, name=attr.field.name)
         attr.value = value
         self.update()
 
