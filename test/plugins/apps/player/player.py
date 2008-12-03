@@ -23,7 +23,7 @@ import tichy
 import tichy.gui as gui
 
 import logging
-logger = logging.getLogger('App.Player')
+logger = logging.getLogger('app.mplayer')
 logger.setLevel(logging.DEBUG)
 
 
@@ -153,6 +153,7 @@ class MPlayer(tichy.Application):
 
         vbox = gui.Box(frame, axis=1)
 
+        self.proc = None
         self.file_name = tichy.Text("No file")
         self.file_name.view(vbox)
 
@@ -178,17 +179,35 @@ class MPlayer(tichy.Application):
         open_button.connect('clicked', self.on_open)
 
         yield tichy.Wait(frame, 'back')
+        self.stop()
 
     def play(self, filepath=None):
-        import subprocess
-        subprocess.call(['mplayer', '-wid', str(self.x_window.id),
-                         filepath])
+        if not filepath:
+            self.pause()
+        else:
+            if self.proc:
+                self.stop()
+            import subprocess
+            self.proc = subprocess.Popen(
+                ['mplayer', '-wid', str(self.x_window.id), filepath],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            self.file_name.value = os.path.basename(filepath)
         self.status_name.value = "play"
 
     def stop(self):
+        if not self.proc or self.proc.poll() is not None:
+            self.proc = None
+            return
+        logger.info("Stopping mplayer")
+        self.proc.stdin.write('q')
+        self.proc = None
         self.status_name.value = "stop"
 
     def pause(self):
+        if not self.proc or self.proc.poll() is not None:
+            return
+        logger.info("Pausing mplayer")
+        self.proc.stdin.write(' ')
         self.status_name.value = "paused"
 
     def on_stop(self, b):
