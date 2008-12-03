@@ -18,7 +18,7 @@
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-logger = logging.getLogger('XWindow')
+logger = logging.getLogger('xwindow')
 
 from widget import Widget
 try:
@@ -43,6 +43,7 @@ class XWindow(Widget):
     def __init__(self, parent, expand=True, **kargs):
         super(XWindow, self).__init__(parent, expand=expand, **kargs)
         self.x_window = None
+        self.watch = None
 
     def __get_id(self):
         return self.x_window.id
@@ -135,31 +136,55 @@ class XWindow(Widget):
         return True
 
     def start_app(self, *cmd):
-        # XXX: This only works if we run with NO windows manager I
-        #      need to find a way to make it work even with a window
-        #      manager, Or at least write a warning if there is a WM
-        #      running.
         import subprocess
 
+        self.enable_wm()
+        process = subprocess.Popen(*cmd)
+        return process
+
+    def enable_wm(self):
+        """Make the window automatically swallow every new created X window
+        that have root as a parent
+
+        This effectively turns the window into a windows manager.
+        """
+        # XXX: need to put `watch` method into tichy.mainloop
+        import gobject
+
+        logger.info("listening to display socket %s",
+                    self.x_display.fileno())
+        self.watch = gobject.io_add_watch(self.x_display.fileno(),
+                                          gobject.IO_IN,
+                                          self._on_x_display_socket_ready)
         self.x_screen.root.change_attributes(
             event_mask=Xlib.X.SubstructureNotifyMask)
         self.x_display.sync()
 
-        process = subprocess.Popen(*cmd)
+    def disable_wm(self):
+        if self.watch:
+            # XXX: need to put `watch` method into tichy.mainloop
+            import gobject
+            gobject.source_remove(self.watch)
+            self.watch = None
+            self.x_screen.root.change_attributes(event_mask=Xlib.X.NONE)
 
-        while True:
-            event = self.x_display.next_event()
-            if event.type == Xlib.X.CreateNotify and \
-                    event.parent == self.x_screen.root:
-                event.window.reparent(self.x_window, 0, 0)
-                event.window.map()
-                self.x_display.sync()
-                # TODO: We shouldn't give the focus to this XWindow We
-                #       should send the vent in the key_down method
-                self.x_display.set_input_focus(
-                    event.window, Xlib.X.RevertToParent, Xlib.X.CurrentTime)
-                break
+    def _on_x_display_socket_ready(self, source, cond):
+        logger.debug("display socket ready")
+        event = self.x_display.next_event()
+        logger.debug("got event: %s", event)
+        # We only reparent windows that are child of the root window
+        # and that didn't set there overide attribute
+        if event.type == Xlib.X.CreateNotify and \
+                event.parent == self.x_screen.root and \
+                not event.override:
+            self._reparent(event.window, event.x, event.y)
+        return True
 
-        self.x_screen.root.change_attributes(event_mask=Xlib.X.NONE)
-
-        return process
+    def _reparent(self, window, x, y):
+        window.reparent(self.x_window, x, y)
+        window.map()
+        self.x_display.sync()
+        # TODO: We shouldn't give the focus to this XWindow We
+        #       should send the event in the key_down method
+        self.x_display.set_input_focus(
+            window, Xlib.X.RevertToParent, Xlib.X.CurrentTime)
