@@ -102,7 +102,7 @@ class Application(Tasklet, Item):
         if self.design:
             old_design = tichy.Service('Design')
             tichy.Service.set_default('Design', self.design)
-        window = tichy.gui.Window(parent, modal=True)
+        window = tichy.gui.Window(parent, modal=True, expand=True)
         ret = yield super(Application, self).do_run(window, *args, **kargs)
         window.destroy()
         if self.design:
