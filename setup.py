@@ -46,6 +46,8 @@ def plugins_files():
             dirs[:] = []
             continue
         # XXX: Where is the best place to put the plugins files ???
+        # TODO: this [15:] id here to remove the ./test/plugins/,
+        # clean that.
         dest = 'share/tichy/plugins/%s' % root[15:]
         src = []
         for file in files:
@@ -81,6 +83,9 @@ def make_extension(name):
                      sources=['tichy/guic/%s.c' % name],
                      **kargs)
 
+dbus_data = [
+    ('share/dbus-1/system-services/', ['data/dbus/org.tichy.Launcher.service']),
+    ('/etc/dbus-1/system.d/', ['data/dbus/tichy.conf'])]
 
 setup(name='Tichy',
       version='0.1',
@@ -94,8 +99,8 @@ setup(name='Tichy',
       # XXX: Those locations may not work on the neo !
       data_files = [('share/applications', ['data/tichy.desktop']),
                     ('share/pixmaps/tichy', ['data/tichy.png']),
-                    ('share/tichy/pics', ['tichy/pics/sim.png'])] + \
-          plugins_files(),
+                    ('share/tichy/pics', ['tichy/pics/sim.png'])] \
+          + plugins_files() + dbus_data,
       ext_package='tichy.guic',
       ext_modules=[make_extension(x) for x in [
             'geo', 'cobject', 'widget', 'frame', 'painter', 'sdl_painter',
