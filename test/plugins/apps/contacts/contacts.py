@@ -47,7 +47,7 @@ class Contacts(tichy.Application):
     def on_new(self, action, item, view):
         contact = self.contacts_service.create()
         yield Contact(view.window, contact)
-        self.contacts_service.add(contact)
+        yield self.contacts_service.add(contact)
 
 
 class Contact(tichy.Application):

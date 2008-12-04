@@ -239,7 +239,7 @@ class Contact(tichy.Item):
     def _on_delete(self, item, contact, view):
         try:
             yield contact.delete()
-            tichy.Service('Contacts').remove(contact)
+            yield tichy.Service('Contacts').remove(contact)
         except Exception, ex:
             LOGGER.error("can't delete contact : %s", ex)
             yield tichy.Dialog(view.window, "Error",
@@ -280,7 +280,7 @@ class PhoneContact(Contact):
         self.connect('modified', self._on_modified)
 
     def _on_modified(self, contact):
-        LOGGER.info("Phone contact modified")
+        LOGGER.info("Phone contact modified %s contact", contact)
         yield self.save()
 
     @classmethod
@@ -343,10 +343,12 @@ class ContactsService(tichy.Service):
     def add(self, contact):
         """Add a contact into the contact list"""
         self.contacts.append(contact)
+        yield contact.save()    # TODO: clean that
 
     def remove(self, contact):
         """Remove a contact from the contact list"""
         self.contacts.remove(contact)
+        yield contact.save()    # TODO: clean that
 
     def _new_name(self):
         name = 'new'
