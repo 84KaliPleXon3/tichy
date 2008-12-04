@@ -200,7 +200,7 @@ class FreeSmartPhoneGSM(GSMService):
     def create_call(self, number, direction='out'):
         logger.info("create call %s" % number)
         call = Call(number, direction=direction)
-        self.logs.append(call)
+        self.logs.insert(0, call)
         return call
 
     def initiate(self, call):
@@ -242,7 +242,9 @@ class TestGsm(tichy.Service):
         yield None
 
     def create_call(self, number, direction='out'):
-        return Call(number, direction=direction)
+        call = Call(number, direction=direction)
+        self.logs.insert(0, call)
+        return call
 
     def initiate(self, call):
 
