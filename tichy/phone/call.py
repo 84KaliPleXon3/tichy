@@ -26,7 +26,7 @@ import tichy
 class Call(tichy.Item):
     """Class that represents a voice call"""
 
-    def __init__(self, number, direction='out'):
+    def __init__(self, number, direction='out', timestamp=None):
         """Create a new call object
 
         :Parameters:
@@ -36,6 +36,10 @@ class Call(tichy.Item):
 
             direction : str
                'out' for outgoing call, 'in' for incoming call
+
+            timestamp
+                the time at which we created the call. If set to None
+                we use the current time
 
         Signals
 
@@ -56,6 +60,7 @@ class Call(tichy.Item):
         """
         self.number = tichy.TelNumber.as_type(number)
         self.direction = direction
+        self.timestamp = tichy.Time.as_time(timestamp)
         self.status = 'inactive'
 
     def get_text(self):
