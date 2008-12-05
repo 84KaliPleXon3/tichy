@@ -48,13 +48,12 @@ class Launcher(tichy.Application):
 
     name = "Launcher"
 
-    design = 'Grid'
+    # design = 'Grid'
 
     def run(self, window, category='main'):
         self.category = category
         main = self.category == 'main'
-        self.window = tichy.gui.Window(window, modal=True)
-        frame = self.view(self.window, title=self.category,
+        frame = self.view(window, title=self.category,
                           back_button=not main)
         # We populate the frame with all the applications
         self.list_view = None
@@ -79,7 +78,6 @@ class Launcher(tichy.Application):
         quit_item = frame.actor.new_action('Quit')
         yield tichy.WaitFirst(tichy.Wait(quit_item, 'activated'),
                               tichy.Wait(frame, 'back'))
-        self.window.destroy()
 
     def _is_sub_category(self, category):
         """Return true if the category is a sub category of the launcher
