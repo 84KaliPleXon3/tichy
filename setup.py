@@ -84,8 +84,10 @@ def make_extension(name):
                      **kargs)
 
 dbus_data = [
-    ('share/dbus-1/system-services/', ['data/dbus/org.tichy.Launcher.service']),
-    ('/etc/dbus-1/system.d/', ['data/dbus/tichy.conf'])]
+    ('share/dbus-1/system-services/',
+     ['data/dbus/org.tichy.Launcher.service']),
+    ('/etc/dbus-1/system.d/',
+     ['data/dbus/tichy.conf'])]
 
 setup(name='Tichy',
       version='0.1',
