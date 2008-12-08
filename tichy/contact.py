@@ -345,6 +345,18 @@ class ContactsService(tichy.Service):
                 self.contacts.append(contact)
         LOGGER.info("got %d contacts", len(self.contacts))
 
+    @tichy.tasklet.tasklet
+    def copy_all(self):
+        """copy all the contacts into the phone"""
+        for contact in self.contacts:
+            if isinstance(contact, PhoneContact):
+                continue
+            if any([isinstance(c, PhoneContact) for c in \
+                        self.find_by_number(contact.tel)]):
+                continue
+            contact = yield PhoneContact.import_(contact)
+            yield self.add(contact)
+
     def add(self, contact):
         """Add a contact into the contact list"""
         self.contacts.append(contact)
