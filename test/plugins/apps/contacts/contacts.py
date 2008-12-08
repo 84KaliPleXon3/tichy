@@ -39,15 +39,25 @@ class Contacts(tichy.Application):
         self.contacts = self.contacts_service.contacts
         self.contacts.actors_view(vbox)
 
-        new_menu = frame.actor.new_action('New')
-        new_menu.connect('activated', self.on_new)
+        new_action = frame.actor.new_action('New')
+        new_action.connect('activated', self._on_new)
+        copy_all_action = frame.actor.new_action('Copy All')
+        copy_all_action.connect('activated', self._on_copy_all)
 
         yield tichy.Wait(frame, 'back')
 
-    def on_new(self, action, item, view):
+    def _on_new(self, action, item, view):
         contact = self.contacts_service.create()
         yield Contact(view.window, contact)
         yield self.contacts_service.add(contact)
+
+    def _on_copy_all(self, action, item, view):
+        logger.info("Copy all contacts")
+        # TODO: we should have a waiting window here. But since we
+        #       have this all the time, we should make it
+        #       generic. Someting like "tichy.WaitDialog("copy all the
+        #       contacts", self.contact.copy_all)"
+        yield self.contacts_service.copy_all()
 
 
 class Contact(tichy.Application):
