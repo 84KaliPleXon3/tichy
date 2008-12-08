@@ -50,6 +50,7 @@ class List(list, Item):
 
     def append(self, value):
         """Add a new item in the list"""
+        assert isinstance(value, Item), type(value)
         list.append(self, value)
         self.emit('appened', value)
         self.emit('modified')
