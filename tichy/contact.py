@@ -166,6 +166,11 @@ class Contact(tichy.Item):
 
     def __init__(self, **kargs):
         """Create a new contact
+
+        Every contact class can specify the `ContactField` it
+        accepts. All the keyword arguments passed to the method will
+        be checked to match an available field. If the keyword doesn't
+        match, then it is ignored.
         """
         super(Contact, self).__init__()
         self.attributes = dict((x.name, ContactAttr(self, x)) \
@@ -371,7 +376,17 @@ class ContactsService(tichy.Service):
             if contact.tel == number:
                 return contact
 
-    def create(self):
-        """Create a new `PhoneContact`"""
-        name = self._new_name()
-        return PhoneContact(name=name)
+    def create(self, name=None, **kargs):
+        """Create a new `Contact` instance
+
+        This will create a contact using the most appropriate
+        storage. (For the moment is is always a `PhoneContact`)
+
+        :Parameters:
+
+            kargs: dict
+                The attributes used for the contact. If 'name' is not
+                given, a new name will be generated.
+        """
+        name = name or self._new_name()
+        return PhoneContact(name=name, **kargs)
