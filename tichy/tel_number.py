@@ -23,8 +23,21 @@ import tichy
 
 
 class TelNumber(tichy.Text):
+    """Telephone number class"""
 
-    def __init__(self, text='', **kargs):
+    def __init__(self, text='', type_="mobile", **kargs):
+        """Create a new TelNumber instance
+
+        :Parameters:
+
+            text : `Text`
+                The number itself
+
+            type_ : `Text`
+                String that represents the type of the number. e.g :
+                'mobile', 'home', 'fax'
+        """
+
         super(TelNumber, self).__init__(text, **kargs)
         # This is the text that is used for the view of the number It
         # can be either the number, either the name of the contact
@@ -32,6 +45,7 @@ class TelNumber(tichy.Text):
         # get_text method return a basestring object and then connect
         # the actor view to the modified signal
         self.view_text = tichy.Text(text)
+        self.type = tichy.Text.as_type(type_)
         self.connect('modified', TelNumber.update_view_text)
 
     def input_method(self):
