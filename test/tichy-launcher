@@ -84,6 +84,8 @@ os.environ['SDL_VIDEODRIVER'] = 'x11'
 sys.path.insert(0, '../')
 
 # We select the gui backend before importing tichy
+#
+# XXX: that is an ugly hack. We should use an `init` methid instead
 tichy_gui_backends = ['paroli', 'csdl', 'sdl']
 if options.gui_backend:
     tichy_gui_backends = [options.gui_backend]
@@ -92,10 +94,17 @@ import tichy
 
 
 class InitAll(tichy.Tasklet):
-
+    """Perform all basic initialization of services"""
     def run(self):
+        # Register on the GSM Network
         gsm_service = tichy.Service('GSM')
         yield gsm_service.register()
+        # Get all the contacts
+        contacts = tichy.Service('Contacts')
+        yield contacts.load_all()
+        yield contacts.copy_all()
+
+        # Finally we can start to listen for incoming calls
         logger.info("start AutoAnswerCall")
         yield AutoAnswerCall()
 
