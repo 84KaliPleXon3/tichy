@@ -44,6 +44,12 @@ class GSMService(tichy.Service):
             indicate an incoming call. Pass the `Call` object
     """
 
+    def __init__(self):
+        super(GSMService, self).__init__()
+        self.logs = tichy.List()
+        self.logs.connect('modified', self._on_logs_modified)
+        self._load_logs()
+
     def register(self, on_step=None):
         """This must return a Tasklet"""
         raise NotImplementedError
@@ -51,6 +57,24 @@ class GSMService(tichy.Service):
     def create_call(self, number, direction):
         """create a new call to a given number"""
         raise NotImplementedError
+
+    def _on_logs_modified(self, logs):
+        self._save_logs()
+
+    def _save_logs(self):
+        """Save the logs into a file"""
+        LOGGER.info("Saving call logs")
+        data = [c.to_dict() for c in self.logs]
+        tichy.Persistance('calls/logs').save(data)
+
+    def _load_logs(self):
+        """Load all the logs"""
+        LOGGER.info("Loading call logs")
+        data = tichy.Persistance('calls/logs').load()
+        for kargs in data:
+            call = Call(**kargs)
+            # XXX: we should all insert in one shot
+            self.logs.append(call)
 
 
 class FreeSmartPhoneGSM(GSMService):
@@ -91,7 +115,6 @@ class FreeSmartPhoneGSM(GSMService):
         self.lines = {}
         self.provider = None
         self.network_strength = None
-        self.logs = tichy.List()
 
     def get_provider(self):
         """Return the current provider of GSM network
@@ -237,7 +260,7 @@ class FreeSmartPhoneGSM(GSMService):
         self.gsm_call.Release(call.__id)
 
 
-class TestGsm(tichy.Service):
+class TestGsm(GSMService):
     """Fake service that can be used to test without GSM drivers
     """
 
@@ -245,7 +268,7 @@ class TestGsm(tichy.Service):
 
     def __init__(self):
         super(TestGsm, self).__init__()
-        self.logs = tichy.List([Call('0478657392'), Call('93847298')])
+        self.logs.append(Call('0478657392'))
 
     def register(self, on_step=None):
         """register on the network"""
