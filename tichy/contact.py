@@ -326,6 +326,10 @@ class ContactsService(tichy.Service):
     def __init__(self):
         super(ContactsService, self).__init__()
         self.contacts = tichy.List()
+        self.contacts.connect('modified', self._on_contacts_modified)
+
+    def _on_contacts_modified(self, contacts):
+        yield PhoneContact.save()
 
     @tichy.tasklet.tasklet
     def load_all(self):
@@ -340,14 +344,14 @@ class ContactsService(tichy.Service):
             except Exception, ex:
                 LOGGER.warning("can't get contacts : %s", ex)
                 continue
-            for contact in contacts:
-                assert isinstance(contact, Contact), type(contact)
-                self.contacts.append(contact)
+            assert all(isinstance(x, Contact) for x in contacts)
+            self.contacts.extend(contacts)
         LOGGER.info("got %d contacts", len(self.contacts))
 
     @tichy.tasklet.tasklet
     def copy_all(self):
         """copy all the contacts into the phone"""
+        to_add = []
         for contact in self.contacts:
             if isinstance(contact, PhoneContact):
                 continue
@@ -355,17 +359,16 @@ class ContactsService(tichy.Service):
                         self.find_by_number(contact.tel)]):
                 continue
             contact = yield PhoneContact.import_(contact)
-            yield self.add(contact)
+            to_add.append(contact)
+        self.contacts.extend(to_add)
 
     def add(self, contact):
         """Add a contact into the contact list"""
         self.contacts.append(contact)
-        yield contact.save()    # TODO: clean that
 
     def remove(self, contact):
         """Remove a contact from the contact list"""
         self.contacts.remove(contact)
-        yield contact.save()    # TODO: clean that
 
     def _new_name(self):
         name = 'new'
