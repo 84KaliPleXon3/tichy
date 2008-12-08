@@ -376,17 +376,15 @@ class ContactsService(tichy.Service):
         return name
 
     def find_by_number(self, number):
-        """Return the first contact having a givne number
+        """Return all the contacts having a given number
 
         :Parameters:
             number : str
                The number of the contact
 
-        :Returns: `Contact` | None
+        :Returns: list of `Contact`
         """
-        for contact in self.contacts:
-            if contact.tel == number:
-                return contact
+        return [x for x in self.contacts if x.tel == number]
 
     def create(self, name=None, **kargs):
         """Create a new `Contact` instance

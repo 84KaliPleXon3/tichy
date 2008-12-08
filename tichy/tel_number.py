@@ -59,9 +59,9 @@ class TelNumber(tichy.Text):
         # We check if the number is from a contact.  If so we set the
         # view text
         contacts_service = tichy.Service('Contacts')
-        contact = contacts_service.find_by_number(self.value)
-        if contact:
-            self.view_text.value = contact.get_text()
+        contacts = contacts_service.find_by_number(self.value)
+        if contacts:
+            self.view_text.value = contacts[0].get_text()
         else:
             self.view_text.value = self.value
 
