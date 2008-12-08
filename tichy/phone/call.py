@@ -73,7 +73,7 @@ class Call(tichy.Item):
         method.
         """
         gsm_service = tichy.Service('GSM')
-        gsm_service.initiate(self)
+        gsm_service._initiate(self)
         self.status = 'initiating'
         self.emit(self.status)
 
@@ -81,14 +81,14 @@ class Call(tichy.Item):
         if self.status in ['releasing', 'released']:
             return
         gsm_service = tichy.Service('GSM')
-        gsm_service.release(self)
+        gsm_service._release(self)
         self.status = 'releasing'
         self.emit(self.status)
 
     def activate(self):
         """Activate the call"""
         gsm_service = tichy.Service('GSM')
-        gsm_service.activate(self)
+        gsm_service._activate(self)
         self.status = 'activating'
         self.emit(self.status)
 

@@ -22,7 +22,7 @@
 __docformat__ = 'reStructuredText'
 
 import logging
-logger = logging.getLogger('GSM')
+LOGGER = logging.getLogger('GSM')
 
 import dbus
 
@@ -44,11 +44,11 @@ class GSMService(tichy.Service):
             indicate an incoming call. Pass the `Call` object
     """
 
-    def register(self):
+    def register(self, on_step=None):
         """This must return a Tasklet"""
         raise NotImplementedError
 
-    def create_call(self, number):
+    def create_call(self, number, direction):
         """create a new call to a given number"""
         raise NotImplementedError
 
@@ -59,7 +59,7 @@ class FreeSmartPhoneGSM(GSMService):
     service = 'GSM'
 
     def __init__(self):
-        logger.info("connecting to freesmartphone.GSM dbus interface")
+        LOGGER.info("connecting to freesmartphone.GSM dbus interface")
         try:
             # We create the dbus interfaces to org.freesmarphone
             self.bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
@@ -81,10 +81,10 @@ class FreeSmartPhoneGSM(GSMService):
             self.gsm_call = dbus.Interface(
                 self.gsm,
                 'org.freesmartphone.GSM.Call')
-            self.gsm.connect_to_signal("Status", self.on_status)
-            self.gsm.connect_to_signal("CallStatus", self.on_call_status)
-        except Exception, e:
-            logger.warning("can't use freesmartphone GSM : %s", e)
+            self.gsm.connect_to_signal("Status", self._on_status)
+            self.gsm.connect_to_signal("CallStatus", self._on_call_status)
+        except Exception, ex:
+            LOGGER.warning("can't use freesmartphone GSM : %s", ex)
             self.gsm = None
             raise tichy.ServiceUnusable
 
@@ -94,6 +94,10 @@ class FreeSmartPhoneGSM(GSMService):
         self.logs = tichy.List()
 
     def get_provider(self):
+        """Return the current provider of GSM network
+
+        :Returns: str
+        """
         return self.provider
 
     def register(self, on_step=None):
@@ -112,32 +116,31 @@ class FreeSmartPhoneGSM(GSMService):
         on_step = on_step or default_on_step
 
         try:
-            logger.info("Request the GSM resource")
+            LOGGER.info("Request the GSM resource")
             on_step("Request the GSM resource")
             yield WaitDBus(self.ousage.RequestResource, 'GSM')
             yield self._turn_on(on_step)
             on_step("Register on the network")
-            logger.info("register on the network")
+            LOGGER.info("register on the network")
             yield WaitDBus(self.gsm_network.Register)
             yield tichy.Wait(self, 'provider-modified')
-        except Exception, e:
-            logger.error("Error : %s", e)
-            print type(e)
+        except Exception, ex:
+            LOGGER.error("Error : %s", ex)
             raise
 
     def _turn_on(self, on_step):
-        logger.info("Check antenna power")
+        LOGGER.info("Check antenna power")
         power = yield WaitDBus(self.gsm_device.GetAntennaPower)
-        logger.info("antenna power is %d", power)
+        LOGGER.info("antenna power is %d", power)
         if power:
             yield None
-        logger.info("turn on antenna power")
+        LOGGER.info("turn on antenna power")
         on_step("Turn on antenna power")
         for i in range(3):
             try:
                 yield WaitDBus(self.gsm_device.SetAntennaPower, True)
-            except dbus.exceptions.DBusException, e:
-                if e.get_dbus_name() != \
+            except dbus.exceptions.DBusException, ex:
+                if ex.get_dbus_name() != \
                         'org.freesmartphone.GSM.SIM.AuthFailed':
                     raise
                 # We ask for the PIN
@@ -150,16 +153,16 @@ class FreeSmartPhoneGSM(GSMService):
                                 input_method='number')
         yield tichy.Service('SIM').send_pin(pin)
 
-    def on_call_status(self, call_id, status, properties):
-        logger.info("call status %s %s %s", id, status, properties)
+    def _on_call_status(self, call_id, status, properties):
+        LOGGER.info("call status %s %s %s", id, status, properties)
         call_id = int(call_id)
         status = str(status)
 
         if status == 'incoming':
-            logger.info("incoming call")
+            LOGGER.info("incoming call")
             # XXX: should use an assert, but it doesn't work on neo :O
             if call_id in self.lines:
-                logger.warning("WARNING : line already present %s %s",
+                LOGGER.warning("WARNING : line already present %s %s",
                                call_id, self.lines)
                 # XXX : I just ignore the message, because the
                 # framework send it twice !! Bug in the framework ?
@@ -182,10 +185,10 @@ class FreeSmartPhoneGSM(GSMService):
             self.lines[call_id].released()
             del self.lines[call_id]
         else:
-            logger.warning("Unknown status : %s", status)
+            LOGGER.warning("Unknown status : %s", status)
 
-    def on_status(self, status):
-        logger.debug("status %s", status)
+    def _on_status(self, status):
+        LOGGER.debug("status %s", status)
         if 'provider' in status:
             provider = str(status['provider'])
             if provider != self.provider:
@@ -198,45 +201,62 @@ class FreeSmartPhoneGSM(GSMService):
                 self.emit('network-strength', self.network_strength)
 
     def create_call(self, number, direction='out'):
-        logger.info("create call %s" % number)
+        """create a new Call
+
+        :Parameters:
+
+            number : `TelNumber` | str
+                The peer number of the call
+
+            direction : str
+                Indicate the direction of the call. Can be 'in' or
+                'out'
+        """
+        LOGGER.info("create call %s" % number)
         call = Call(number, direction=direction)
         self.logs.insert(0, call)
         return call
 
-    def initiate(self, call):
-        logger.info("initiate call to %s", str(call.number))
+    def _initiate(self, call):
+        """Initiate a given call
+        """
+        LOGGER.info("initiate call to %s", str(call.number))
         call_id = int(self.gsm_call.Initiate(str(call.number), "voice"))
-        logger.info("call id : %d", call_id)
+        LOGGER.info("call id : %d", call_id)
         self.lines[call_id] = call
-        # TODO: mabe not good idea to store this in the call itself
+        # TODO: mabe not good idea to store this in the call itself,
+        #       beside, it makes pylint upset.
         call.__id = call_id
 
-    def activate(self, call):
-        logger.info("activate call %s", str(call.number))
+    def _activate(self, call):
+        LOGGER.info("activate call %s", str(call.number))
         self.gsm_call.Activate(call.__id)
 
-    def release(self, call):
-        logger.info("release call %s", str(call.number))
+    def _release(self, call):
+        LOGGER.info("release call %s", str(call.number))
         self.gsm_call.Release(call.__id)
 
 
 class TestGsm(tichy.Service):
-    """Fake service that can be use to test without GSM drivers"""
+    """Fake service that can be used to test without GSM drivers
+    """
 
     service = 'GSM'
 
     def __init__(self):
+        super(TestGsm, self).__init__()
         self.logs = tichy.List([Call('0478657392'), Call('93847298')])
 
     def register(self, on_step=None):
+        """register on the network"""
 
         def default_on_step(msg):
             pass
         on_step = on_step or default_on_step
 
-        logger.info("Turn on antenna power")
+        LOGGER.info("Turn on antenna power")
         on_step("Turn on antenna power")
-        logger.info("Register on the network")
+        LOGGER.info("Register on the network")
         on_step("Register on the network")
         self.emit('provider-modified', "Charlie Telecom")
         yield None
@@ -246,13 +266,13 @@ class TestGsm(tichy.Service):
         self.logs.insert(0, call)
         return call
 
-    def initiate(self, call):
+    def _initiate(self, call):
 
         def after_a_while():
             call.active()
         tichy.mainloop.timeout_add(1000, after_a_while)
 
-    def release(self, call):
+    def _release(self, call):
 
         def after_a_while():
             call.released()
