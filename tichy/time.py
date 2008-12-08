@@ -27,7 +27,9 @@ class Time(tichy.Item):
     """Item that represent a time"""
 
     def __init__(self, value=None):
-        self.__value = value or time.time()
+        if isinstance(value, str):
+            value = time.strptime(value)
+        self.__value = value or time.gmtime()
 
     @classmethod
     def as_time(self, value):
@@ -36,7 +38,7 @@ class Time(tichy.Item):
         return Time(value)
 
     def __str__(self):
-        return time.ctime(self.__value)
+        return time.asctime(self.__value)
 
     def get_text(self):
         return tichy.Text(str(self))
