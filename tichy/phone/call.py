@@ -26,7 +26,8 @@ import tichy
 class Call(tichy.Item):
     """Class that represents a voice call"""
 
-    def __init__(self, number, direction='out', timestamp=None):
+    def __init__(self, number, direction='out', timestamp=None,
+                 status='inactive'):
         """Create a new call object
 
         :Parameters:
@@ -40,6 +41,16 @@ class Call(tichy.Item):
             timestamp
                 the time at which we created the call. If set to None
                 we use the current time
+
+            status : str | None
+                Can be any of :
+                    - 'inactive'
+                    - 'outoing'
+                    - 'activaing'
+                    - 'active'
+                    - 'releasing'
+                    - 'released'
+                (default to 'inactive')
 
         Signals
 
@@ -61,7 +72,7 @@ class Call(tichy.Item):
         self.number = tichy.TelNumber.as_type(number)
         self.direction = direction
         self.timestamp = tichy.Time.as_time(timestamp)
-        self.status = 'inactive'
+        self.status = status
 
     def get_text(self):
         return self.number.get_text()
@@ -103,3 +114,31 @@ class Call(tichy.Item):
     def released(self):
         self.status = 'released'
         self.emit('released')
+
+
+    # TODO: In the long run we should really use a system similar to
+    #       PEAK, where we can define all the Items attributes and
+    #       every atomic value has a save and load method.  So that we
+    #       don't have to create all those `to_dict` and `from_dict`
+    #       methods. We could use a Struct Item for this kind of
+    #       things.
+
+    def to_dict(self):
+        """return all the attributes in a python dict"""
+        return {'number': str(self.number),
+                'status': str(self.status),
+                'direction': self.direction,
+                'timestamp': str(self.timestamp)}
+
+    @classmethod
+    def from_dict(self, kargs):
+        """return a new Call object from a dictionary
+
+        This should be compatible with the `to_dict` method
+        """
+        number = kargs['number']
+        status = kargs['status']
+        direction = kargs['direction']
+        timestamp = kargs['timestamp']
+        return Call(number, direction=direction, timestamp=timestamp,
+                    status=status)
