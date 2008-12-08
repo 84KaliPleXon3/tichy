@@ -23,6 +23,9 @@ from tichy.item import Item
 from tichy.service import Service
 
 
+# XXX: We need to remove the removed, appened and cleared signal
+
+
 class List(list, Item):
     """Base class for list
 
@@ -66,6 +69,14 @@ class List(list, Item):
         """
         list.insert(self, index, value)
         self.emit('inserted', index, value)
+        self.emit('modified')
+
+    def __setitem__(self, key, value):
+        list.__setitem__(self, key, value)
+        self.emit('modified')
+
+    def extend(self, values):
+        list.extend(self, values)
         self.emit('modified')
 
     def remove(self, value):
