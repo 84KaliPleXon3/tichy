@@ -20,15 +20,23 @@
 
 """Persistance module"""
 
+# TODO: turn the save and load methods into a `Tasklet`. Saving into a
+#       file can take a lot of time.
+
 import os
 import yaml
 
 import logging
-logger = logging.getLogger('persistance')
+LOGGER = logging.getLogger('persistance')
 
 
 class Persistance(object):
-    """Use this class to save and load data from file"""
+    """Use this class to save and load data from file
+
+    All the data will be placed into ~/.tichy directory. They are
+    stored using yaml format, but we could modify this cause the
+    plugins are not suppoed to read the file directly.
+    """
 
     base_path = os.path.expanduser('~/.tichy/')
 
@@ -42,14 +50,27 @@ class Persistance(object):
             os.makedirs(dir)
         try:
             return open(path, mod)
-        except IOError, e:
-            logger.warning("can't open file : %s", e)
+        except IOError, ex:
+            LOGGER.warning("can't open file : %s", ex)
             raise
 
     def save(self, data):
+        """Save a data into the file
+
+        :Parameters:
+        
+            data
+                Any kind of python structure that can be
+                serialized. Usually dictionary or list.
+        """
         file = self._open('w')
         file.write(yaml.safe_dump(data, default_flow_style=False))
 
     def load(self):
+        """Load data from the file
+
+        :Returns: The structure previously saved into the file
+        """
+
         file = self._open()
         return yaml.safe_load(file)
