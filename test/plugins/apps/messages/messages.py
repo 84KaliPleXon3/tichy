@@ -68,7 +68,7 @@ class Edit(tichy.Application):
         yield tichy.Wait(frame, 'back')
 
     def on_send(self, action, item, view):
-        yield Sender(self.window, self.sms)
+        yield Sender(view.window, self.sms)
 
 
 class Sender(tichy.Application):
@@ -80,10 +80,10 @@ class Sender(tichy.Application):
         vbox = gui.Box(frame, axis=1, expand=True)
         try:
             yield sms.send()
-            yield tichy.Dialog(w, "Sent", "")
+            yield tichy.Dialog(window, "Sent", "")
         except Exception, e:
             logger.error("Error: %s", e)
-            yield tichy.Dialog(w, "Error", e)
+            yield tichy.Dialog(window, "Error", e)
 
 
 class New(tichy.Application):
