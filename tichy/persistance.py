@@ -58,7 +58,7 @@ class Persistance(object):
         """Save a data into the file
 
         :Parameters:
-        
+
             data
                 Any kind of python structure that can be
                 serialized. Usually dictionary or list.
@@ -71,6 +71,8 @@ class Persistance(object):
 
         :Returns: The structure previously saved into the file
         """
-
-        file = self._open()
+        try:
+            file = self._open()
+        except IOError, ex:
+            return None
         return yaml.safe_load(file)

@@ -47,8 +47,8 @@ class GSMService(tichy.Service):
     def __init__(self):
         super(GSMService, self).__init__()
         self.logs = tichy.List()
-        self.logs.connect('modified', self._on_logs_modified)
         self._load_logs()
+        self.logs.connect('modified', self._on_logs_modified)
 
     def register(self, on_step=None):
         """This must return a Tasklet"""
@@ -74,10 +74,11 @@ class GSMService(tichy.Service):
         if not data:
             return
         # TODO: add some checks for data consistency
+        logs = []
         for kargs in data:
             call = Call(**kargs)
-            # XXX: we should all insert in one shot
-            self.logs.append(call)
+            logs.append(call)
+        self.logs[:] = logs
 
 
 class FreeSmartPhoneGSM(GSMService):
