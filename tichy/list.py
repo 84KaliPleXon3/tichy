@@ -85,6 +85,11 @@ class List(list, Item):
         self.emit('removed', value)
         self.emit('modified')
 
+    def sort(self, *args, **kargs):
+        """Sort the list inplace"""
+        list.sort(*args, **kargs)
+        self.emit('modified')
+
     def view(self, parent, **kargs):
         """Return a view of the list"""
         design = Service('Design')
