@@ -326,6 +326,8 @@ class ContactsService(tichy.Service):
     def __init__(self):
         super(ContactsService, self).__init__()
         self.contacts = tichy.List()
+        # TODO: the problem here is that when we load the contacts we
+        # are going to rewrite them !
         self.contacts.connect('modified', self._on_contacts_modified)
 
     def _on_contacts_modified(self, contacts):
@@ -337,16 +339,20 @@ class ContactsService(tichy.Service):
 
         We need to call this before we can access the contacts
         """
+        all_contacts = []
         for cls in Contact.subclasses:
-            LOGGER.info("loading contacts from %s" % cls.storage)
+            LOGGER.info("loading contacts from %s", cls.storage)
             try:
                 contacts = yield cls.load()
+                LOGGER.info("Got %d contacts from %s", len(contacts),
+                            cls.storage)
             except Exception, ex:
                 LOGGER.warning("can't get contacts : %s", ex)
                 continue
             assert all(isinstance(x, Contact) for x in contacts)
-            self.contacts.extend(contacts)
-        LOGGER.info("got %d contacts", len(self.contacts))
+            all_contacts.extend(contacts)
+        self.contacts[:] = all_contacts
+        LOGGER.info("Totally got %d contacts", len(self.contacts))
 
     @tichy.tasklet.tasklet
     def copy_all(self):
