@@ -153,7 +153,10 @@ class Launcher(dbus.service.Object):
         if not self.screen:
             self.screen = self.create_screen()
             kill_on_close = True
-        yield app(self.screen)
+        try:
+            yield app(self.screen)
+        except Exception, ex:
+            logger.error("application %s failed : %s", app.name, ex)
         if kill_on_close:
             self.screen.destroy()
             self.screen = None
