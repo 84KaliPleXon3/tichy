@@ -143,6 +143,8 @@ class Launcher(dbus.service.Object):
             if app.name == name:
                 self.launch(app).start()
                 break
+        else:
+            logger.error("no application named  %s", name)
 
     @tichy.tasklet.tasklet
     def launch(self, app):
