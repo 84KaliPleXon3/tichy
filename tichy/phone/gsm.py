@@ -71,6 +71,9 @@ class GSMService(tichy.Service):
         """Load all the logs"""
         LOGGER.info("Loading call logs")
         data = tichy.Persistance('calls/logs').load()
+        if not data:
+            return
+        # TODO: add some checks for data consistency
         for kargs in data:
             call = Call(**kargs)
             # XXX: we should all insert in one shot
@@ -83,6 +86,8 @@ class FreeSmartPhoneGSM(GSMService):
     service = 'GSM'
 
     def __init__(self):
+        super(FreeSmartPhoneGSM, self).__init__()
+
         LOGGER.info("connecting to freesmartphone.GSM dbus interface")
         try:
             # We create the dbus interfaces to org.freesmarphone
