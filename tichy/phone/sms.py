@@ -36,7 +36,9 @@ class SMS(tichy.Message):
         return self.peer
     number = property(__get_number)
 
+    @tichy.tasklet.tasklet
     def send(self):
+        """Tasklet that will send the message"""
         sms_service = tichy.Service('SMS')
         yield sms_service.send(self)
 
@@ -81,6 +83,7 @@ class FreeSmartPhoneSMS(tichy.Service):
         text = tichy.Text(text)
         return SMS(number, text)
 
+    @tichy.tasklet.tasklet
     def send(self, sms):
         logger.info("Storing message to %s", sms.peer)
         message_id = yield WaitDBus(self.sim_iface.StoreMessage,
