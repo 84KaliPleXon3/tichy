@@ -62,6 +62,15 @@ class GSM(tichy.Gadget):
         except Exception, e:
             logger.error("Error: %s", e)
             gsm_status.value = 'SIM Error'
+
+        try:
+            gsm_status.value = 'Retreive Messages'
+            messages = tichy.Service('Messages')
+            yield messages.init()
+        except Exception, e:
+            logger.error("Error: %s", e)
+            gsm_status.value = 'Error'
+
         gsm_status.value = gsm_service.get_provider() or "No GSM"
 
 

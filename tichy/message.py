@@ -116,6 +116,19 @@ class Message(tichy.Item):
         editor = tichy.Service('EditMessage')
         yield editor.view_details(self, window)
 
+    @tichy.tasklet.tasklet
+    def send(self, sms):
+        """Tasklet that will send the message"""
+        raise NotImplementedError
+
+    def to_dict(self):
+        """return the message attributes in a python dict"""
+        return {'peer': str(self.peer),
+                'text': str(self.text),
+                'timestamp': str(self.timestamp),
+                'direction': self.direction,
+                'status': self.status}
+
 
 class MessagesService(tichy.Service):
     """The service that stores all the messages
@@ -133,6 +146,16 @@ class MessagesService(tichy.Service):
                                              (32, 32))
         self.notification = None
 
+    @tichy.tasklet.tasklet
+    def init(self):
+        yield self._load_all()
+        self.outbox.connect('modified', self._on_lists_modified)
+        self.inbox.connect('modified', self._on_lists_modified)
+
+    def _on_lists_modified(self, box):
+        print "TEST"
+        yield self._save_all()
+
     def add_to_inbox(self, msg):
         """Add a `Message` into the inbox
 
@@ -143,7 +166,8 @@ class MessagesService(tichy.Service):
         logger.info("Add to inbox : %s", msg)
         assert(isinstance(msg, Message))
         self.inbox.insert(0, msg)
-        msg.connect('read', self.on_message_read)
+        if msg.status != 'read':
+            msg.connect('read', self.on_message_read)
         self._update()
 
     def add_to_outbox(self, msg):
@@ -176,3 +200,31 @@ class MessagesService(tichy.Service):
                 "You have a new message", self.notification_icon)
         elif nb_unread > 0 and self.notification:
             self.notification.msg = "You have %d unread messages" % nb_unread
+
+    @tichy.tasklet.tasklet
+    def _load_all(self):
+        logger.info("load all messages")
+        """load all the messages from all sources"""
+        # TODO: make this coherent with contacts service method
+        data = tichy.Persistance('messages').load()
+        if not data:
+            yield None
+        # TODO: check for data coherence
+        all_messages = []
+        for kargs in data:
+            message = Message(**kargs)
+            all_messages.append(message)
+        logger.info("got %d messages", len(all_messages))
+        for m in all_messages:
+            # XXX: we need to rethink all this stuff...
+            if m.direction == 'in':
+                self.add_to_inbox(m)
+            elif m.direction == 'out':
+                self.add_to_outbox(m)
+
+    @tichy.tasklet.tasklet
+    def _save_all(self):
+        logger.info("save all messages")
+        data = [x.to_dict() for x in self.inbox + self.outbox]
+        tichy.Persistance('messages').save(data)
+        yield None
