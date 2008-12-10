@@ -278,7 +278,8 @@ class PhoneContact(Contact):
     name = ContactField('name', tichy.Text, True)
     tel = ContactField('tel', tichy.TelNumber)
     note = ContactField('note', tichy.Text)
-    fields = [name, tel, note]
+    tel_type = ContactField('tel_type', tichy.Text)
+    fields = [name, tel, note, tel_type]
 
     def __init__(self, **kargs):
         super(PhoneContact, self).__init__(**kargs)
