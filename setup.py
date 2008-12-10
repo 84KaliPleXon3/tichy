@@ -51,7 +51,8 @@ def plugins_files():
         dest = os.path.join(sys.prefix, 'share/tichy/plugins', root[15:])
         src = []
         for file in files:
-            if file.endswith((".py", ".ttf", ".png", ".dic", ".txt")):
+            if file.endswith((".py", ".ttf", ".png", ".dic", ".txt",
+                              ".edj", ".edc")):
                 path = '%s/%s' % (root, file)
                 src.append(path)
         ret.append((dest, src))
@@ -95,12 +96,16 @@ setup(name='Tichy',
       author="Guillaume 'charlie' Chereau",
       author_email='charlie@openmoko.org',
       # url='',
-      packages = ['tichy', 'tichy.guic', 'tichy.guip',
+      packages = ['tichy', 'tichy.guic', 'tichy.guip', 'tichy.gui_paroli',
                   'tichy.phone', 'tichy.prefs'],
       scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
       data_files = [(os.path.join(sys.prefix, 'share/applications'),
-                     ['data/tichy.desktop', 'data/tichy-launcher.desktop']),
+                     ['data/tichy.desktop', 'data/tichy-launcher.desktop',
+                      'data/paroli-io.desktop',
+                      'data/paroli-contacts.desktop',
+                      'data/paroli-msgs.desktop',
+                      'data/paroli-dialer.desktop']),
                     (os.path.join(sys.prefix, 'share/pixmaps/'),
                      ['data/tichy']),
                     (os.path.join(sys.prefix, 'share/tichy/pics'),
