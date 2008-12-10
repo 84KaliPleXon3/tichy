@@ -66,7 +66,7 @@ class Text(Item):
         return self.__value
 
     def __set_value(self, v):
-        self.__value = v
+        self.__value = unicode(v)
         self.emit('modified')
 
     value = property(__get_value, __set_value)
