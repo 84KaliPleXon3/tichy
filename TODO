@@ -1,5 +1,8 @@
 		      TODO List for TICHY
 
+* Simplify all init stuffs
+   many services (message, contact, ...) should have an `init` method
+   tichy should also have an init method, just for the gui
 * Clean all docstrings
 * Stop returing 'self' in item.get_text methods !!
 * Add tichy.Int item
