@@ -103,6 +103,9 @@ class InitAll(tichy.Tasklet):
         contacts = tichy.Service('Contacts')
         yield contacts.load_all()
         yield contacts.copy_all()
+        # Init messages
+        messages_service = tichy.Service('Messages')
+        yield messages_service.init()
 
         # Finally we can start to listen for incoming calls
         logger.info("start AutoAnswerCall")
