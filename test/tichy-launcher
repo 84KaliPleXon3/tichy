@@ -27,9 +27,9 @@ listening that we can use to start any application.
 It is still experimental.
 
 To use it, start it (./launcher.py), then use for example dbus-send to
-start an application, e.g. :
-  dbus-send --session --dest='org.tichy' /Launcher --print-reply \
-  org.tichy.Launcher.Launch string:Contacts
+start an application, e.g. : dbus-send --session   \
+--dest='org.tichy.launcher' /Launcher --print-reply \
+org.tichy.Launcher.Launch string:Contacts
 
 Note for neo : We need to remember to set DISPLAY=:0 even when we call
 the dbus method !
@@ -69,11 +69,24 @@ import dbus
 import dbus.service
 
 import logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(name)-8s %(levelname)-8s %(message)s')
-logger = logging.getLogger('launcher')
+logger = logging.getLogger('')
 
+def setup_logging():
+    """Set up two logging handlers, one in the log file, one in the
+    stdoutput"""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s %(name)-8s %(levelname)-8s %(message)s',
+        filename='/tmp/tichy.log', filemode='w')
+
+    formatter = logging.Formatter(
+        '%(name)-8s %(levelname)-8s %(message)s')
+    stream_log = logging.StreamHandler()
+    stream_log.setFormatter(formatter)
+    stream_log.setLevel(logging.INFO)
+    logger.addHandler(stream_log)
+
+setup_logging()
 
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
 # XXX: we should solve the real issue instead of using this hack
@@ -182,21 +195,21 @@ if __name__ == '__main__':
         bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
     else:
         bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
-    bus_name = dbus.service.BusName('org.tichy', bus)
+    bus_name = dbus.service.BusName('org.tichy.launcher', bus)
 
     if options.launch:
         if options.bus == 'system':
             bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
         else:
             bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
-        launcher = bus.get_object('org.tichy', '/Launcher')
+        launcher = bus.get_object('org.tichy.launcher', '/Launcher')
         launcher = dbus.Interface(launcher, 'org.tichy.Launcher')
         launcher.Launch(options.launch)
         sys.exit(0)
 
 
     # We import all the modules into the plugin directory
-    for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
+    for plugins_dir in ['/usr/share/tichy/plugins',
                         '/usr/tichy/plugins']:
         try:
             logger.info("try to load plugins in %s", plugins_dir)
