@@ -48,7 +48,7 @@ def plugins_files():
         # XXX: Where is the best place to put the plugins files ???
         # TODO: this [15:] id here to remove the ./test/plugins/,
         # clean that.
-        dest = 'share/tichy/plugins/%s' % root[15:]
+        dest = os.path.join(sys.prefix, 'share/tichy/plugins', root[15:])
         src = []
         for file in files:
             if file.endswith((".py", ".ttf", ".png", ".dic", ".txt")):
@@ -84,14 +84,14 @@ def make_extension(name):
                      **kargs)
 
 dbus_data = [
-    ('share/dbus-1/system-services/',
+    (os.path.join(sys.prefix, 'share/dbus-1/system-services/'),
      ['data/dbus/org.tichy.Launcher.service']),
-    ('/etc/dbus-1/system.d/',
+    ('../../etc/dbus-1/system.d/',
      ['data/dbus/tichy.conf'])]
 
 setup(name='Tichy',
       version='0.1',
-      description='Python Applet Manager for OpenMoko',
+      description='Python Applet Manager for Openmoko',
       author="Guillaume 'charlie' Chereau",
       author_email='charlie@openmoko.org',
       # url='',
@@ -99,9 +99,12 @@ setup(name='Tichy',
                   'tichy.phone', 'tichy.prefs'],
       scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
-      data_files = [('share/applications', ['data/tichy.desktop']),
-                    ('share/pixmaps/tichy', ['data/tichy.png']),
-                    ('share/tichy/pics', ['tichy/pics/sim.png'])] \
+      data_files = [(os.path.join(sys.prefix, 'share/applications'),
+                     ['data/tichy.desktop']),
+                    (os.path.join(sys.prefix, 'share/pixmaps/tichy'),
+                     ['data/tichy.png']),
+                    (os.path.join(sys.prefix, 'share/tichy/pics'),
+                     ['tichy/pics/sim.png'])] \
           + plugins_files() + dbus_data,
       ext_package='tichy.guic',
       ext_modules=[make_extension(x) for x in [
