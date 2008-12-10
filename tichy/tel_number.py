@@ -43,6 +43,15 @@ class TelNumber(tichy.Text):
         self.view_text = tichy.Text(text)
         self.connect('modified', TelNumber.update_view_text)
 
+    def get_contact(self):
+        """Return the `Contact` that has this number
+
+        :Returns: `Contact` | None
+        """
+        contacts_service = tichy.Service('Contacts')
+        contacts = contacts_service.find_by_number(self.value)
+        return contacts[0] if contacts else None
+
     def input_method(self):
         return 'number'
 
@@ -53,10 +62,9 @@ class TelNumber(tichy.Text):
     def update_view_text(self):
         # We check if the number is from a contact.  If so we set the
         # view text
-        contacts_service = tichy.Service('Contacts')
-        contacts = contacts_service.find_by_number(self.value)
-        if contacts:
-            self.view_text.value = contacts[0].get_text()
+        contact = self.get_contact()
+        if contact:
+            self.view_text.value = contact.get_text()
         else:
             self.view_text.value = self.value
 
