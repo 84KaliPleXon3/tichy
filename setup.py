@@ -85,7 +85,7 @@ def make_extension(name):
 
 dbus_data = [
     (os.path.join(sys.prefix, 'share/dbus-1/system-services/'),
-     ['data/dbus/org.tichy.Launcher.service']),
+     ['data/dbus/org.tichy.launcher.service']),
     ('../../etc/dbus-1/system.d/',
      ['data/dbus/tichy.conf'])]
 
@@ -100,9 +100,9 @@ setup(name='Tichy',
       scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
       data_files = [(os.path.join(sys.prefix, 'share/applications'),
-                     ['data/tichy.desktop']),
-                    (os.path.join(sys.prefix, 'share/pixmaps/tichy'),
-                     ['data/tichy.png']),
+                     ['data/tichy.desktop', 'data/tichy-launcher.desktop']),
+                    (os.path.join(sys.prefix, 'share/pixmaps/'),
+                     ['data/tichy']),
                     (os.path.join(sys.prefix, 'share/tichy/pics'),
                      ['tichy/pics/sim.png'])] \
           + plugins_files() + dbus_data,

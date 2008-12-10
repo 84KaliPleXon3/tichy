@@ -1,11 +1,11 @@
 [Desktop Entry]
-Name=Tichy
-TryExec=tichy
+Name=TLauncher
+TryExec=tichy-launcher
 Icon=tichy
 GenericName=tichy --fullscreen
-Comment=Python Applets Manager
+Comment=Tichy Launcher
 StartupNotify=false
-Exec=tichy --fullscreen
+Exec=tichy-launcher
 Terminal=false
 Type=Application
 Categories=Office;
