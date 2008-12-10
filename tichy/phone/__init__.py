@@ -18,5 +18,5 @@
 
 from gsm import GSMService
 import sim
-import sms
+from sms import SMS
 from call import Call
