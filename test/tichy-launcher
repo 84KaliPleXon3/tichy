@@ -212,7 +212,7 @@ if __name__ == '__main__':
 
 
     # We import all the modules into the plugin directory
-    for plugins_dir in ['/usr/share/tichy/plugins',
+    for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
                         '/usr/tichy/plugins']:
         try:
             logger.info("try to load plugins in %s", plugins_dir)
