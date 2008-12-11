@@ -48,7 +48,7 @@ def plugins_files():
         # XXX: Where is the best place to put the plugins files ???
         # TODO: this [15:] id here to remove the ./test/plugins/,
         # clean that.
-        dest = os.path.join(sys.prefix, 'share/tichy/plugins', root[15:])
+        dest = os.path.join('tichy/plugins', root[15:])
         src = []
         for file in files:
             if file.endswith((".py", ".ttf", ".png", ".dic", ".txt",
@@ -100,7 +100,7 @@ setup(name='Tichy',
                   'tichy.phone', 'tichy.prefs'],
       scripts= ['test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
-      data_files = [(os.path.join(sys.prefix, 'share/applications'),
+      data_files = [('applications',
                      ['data/tichy-launcher.desktop',
                       'data/paroli-io.desktop',
                       'data/paroli-contacts.desktop',
