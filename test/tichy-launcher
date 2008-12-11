@@ -173,6 +173,9 @@ class Launcher(dbus.service.Object):
             yield app(self.screen)
         except Exception, ex:
             logger.error("application %s failed : %s", app.name, ex)
+            # TODO: make the print into a logging info
+            import traceback
+            traceback.print_exc()
         if kill_on_close:
             self.screen.destroy()
             self.screen = None
