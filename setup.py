@@ -98,10 +98,10 @@ setup(name='Tichy',
       # url='',
       packages = ['tichy', 'tichy.guic', 'tichy.guip', 'tichy.gui_paroli',
                   'tichy.phone', 'tichy.prefs'],
-      scripts= ['test/tichy', 'test/tichy-launcher'],
+      scripts= ['test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
       data_files = [(os.path.join(sys.prefix, 'share/applications'),
-                     ['data/tichy.desktop', 'data/tichy-launcher.desktop',
+                     ['data/tichy-launcher.desktop',
                       'data/paroli-io.desktop',
                       'data/paroli-contacts.desktop',
                       'data/paroli-msgs.desktop',
@@ -112,6 +112,4 @@ setup(name='Tichy',
                      ['tichy/pics/sim.png'])] \
           + plugins_files() + dbus_data,
       ext_package='tichy.guic',
-      ext_modules=[make_extension(x) for x in [
-            'geo', 'cobject', 'widget', 'frame', 'painter', 'sdl_painter',
-            'window', 'surf_widget', 'image']])
+)
