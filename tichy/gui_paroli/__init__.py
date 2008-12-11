@@ -76,17 +76,38 @@ class Widget(tichy.Object):
         pass
         
 class Window(Widget):
+    #def __init__(self, parent, **kargs):
+        #etk_obj = etk.Window(w=480, h=640)
+        #Widget.__init__(self, None, etk_obj=etk_obj)
+    #def show(self):
+        #self.etk_obj.show()
+        #super(Window, self).show()
+
     def __init__(self, parent, **kargs):
-        etk_obj = etk.Window(w=480, h=640)
+        #etk_obj = etk.Window(w=480, h=640)
+        etk_obj = ecore.evas.SoftwareX11(w=480, h=575)
         Widget.__init__(self, None, etk_obj=etk_obj)
+    
     def show(self):
         self.etk_obj.show()
         super(Window, self).show()
 
+    def destroy(self):
+        pass
+
         
 class Screen(Window):
+    """We don't use screen at all
+
+    It doesn't make sense with etk backend.
+    """
+
     def __init__(self, loop, painter, **kargs):
-        super(Screen, self).__init__(None)
+        pass
+ 
+    def add(self, child):
+        pass
+
 
 class Box(Widget):
     def __init__(self, parent, axis=0, **kargs):
@@ -238,34 +259,61 @@ class edje_box:
         
 class contact_list:
     
-    def __init__(self,items,box,main,edje_file,item_group,app_window):
-        print items
+    def __init__(self,items,box,main,edje_file,item_group,app_window,kind='contacts', arbit_window=None):
+        #print items
+        self.items = items
         self.item_list = []
         self.edje_file = edje_file
         self.app_window = app_window
         self.item_group = item_group
         self.main = main
         self.box = box
-        for i in items:
-            print dir(i)
-            name = i.name
-            tel = i.tel
-            self.generate_single_item_obj(name,tel)
+        self.arbit_window = arbit_window
+        
+        if kind == 'contacts':
+            for i in items:
+                #print dir(i)
+                name = i.name
+                tel = i.tel
+                self.generate_single_item_obj(name,tel,i)
+        elif kind == 'msgs':
+            for i in items:
+                #print dir(i)
+                #if i[1] in ['read','unread']:
+                name = str(i.peer).encode('utf8')
+                #elif i[1] in ['sent','unsent']  :
+                  #name = i[2]
+                if str(i.status) == 'unread' and str(i.direction) == 'in':
+                    tel = 'NEW! ' + str((i.text)).encode('utf8')
+                elif str(i.status) == 'read' and str(i.direction) == 'out':
+                    tel = '> ' + str((i.text)).encode('utf8')
+                else :
+                    tel = str((i.text)).encode('utf8')
+                #[0:30]
+                self.generate_single_item_obj(name,tel,i)
+        elif kind == 'history':
+            for i in items:
+                #print dir(i)
+                name = i
+                tel = i.timestamp
+                self.generate_single_item_obj(name,tel,i)
+
 
         box.box.show()
         #return item_list
 
-    def generate_single_item_obj(self,name,tel):
+    def generate_single_item_obj(self,title,subtitle,contact):
+        print "generate_single_item_obj called"
         #if self.app_window.name == 'Paroli-Contacts':
           #label_list = [(unicode(name),'name-text'),(str(tel),'tel-mobile-text')]
         #else:
-        label_list = [(unicode(name),'label'),(str(tel),'label-number')]
+        label_list = [(unicode(title),'label'),(str(subtitle),'label-number')]
         
         canvas_obj = etk.Canvas()
         edje_obj = edje.Edje(self.main, file=self.edje_file, group=self.item_group)
         canvas_obj.object_add(edje_obj)
         
-        print str(tel)
+        #print str(tel)
         
         for e,i in label_list:
           edje_obj.part_text_set(i,e)
@@ -274,13 +322,29 @@ class contact_list:
 
         #edje_obj.signal_callback_add("*", "*", self.app_window.self_test)
         if self.app_window.name == 'Paroli-Contacts':
-          edje_obj.signal_callback_add("contact_details", "*", self.app_window.show_details)
+          edje_obj.signal_callback_add("contact_details", "*", self.app_window.show_details, contact, [canvas_obj,edje_obj])
+          
+        elif self.app_window.name == 'Paroli-Msgs':
+            if self.item_group == 'message-contacts_item':
+              edje_obj.signal_callback_add("add_contact", "*", self.app_window.add_recipient, contact, self.arbit_window)
+            else:
+              edje_obj.signal_callback_add("contact_details", "*", self.app_window.show_details, contact, canvas_obj)
+          
+        elif self.app_window.name == 'Paroli-I/O':
+            #import 
+            edje_obj.signal_callback_add("call_contact", "*", self.app_window.call_contact, contact)
+            #edje_obj.signal_callback_add("remove_self", "*", )
+            #canvas_obj.on_destroyed(self.app_window.remove_entry, contact)
         else:
-          edje_obj.signal_callback_add("call_contact", "*", self.app_window.start_call)
+          edje_obj.signal_callback_add("call_contact", "*", self.app_window.call_contact)
           
         edje_obj.layer_set(5)
         edje_obj.show()
-        self.item_list.append([unicode(name),edje_obj,canvas_obj])
+        
+        if self.app_window.name == 'Paroli-I/O':
+            self.item_list.append([unicode(title),edje_obj,canvas_obj,contact])
+        else:
+            self.item_list.append([unicode(title),edje_obj,canvas_obj])
         
         
 class lists:
@@ -374,6 +438,7 @@ class edje_window():
         self.phone_book = phone_book
         self.extra_child = None
         self.text_field = None
+        self.name = 'none'
         if group == "tele.psd":
           self.edje_file = '../test/plugins/apps/paroli-dialer/dialer/tele.edj'
         else:
@@ -695,7 +760,7 @@ class edje_gui():
         self.edj.size = parent.etk_obj.evas.size
         parent.etk_obj.data["edje"] = self.edj
         edje.frametime_set(1.0/30)
-    
+        
     def get_evas(self):
         return self.parent.etk_obj.evas
     
@@ -755,6 +820,9 @@ class edje_gui():
         data[1].signal_emit(data[0],"*")
         return 0
     
+    def delete(self,emission, source, param):
+        self.edj.delete()
+        
     def close_extra_child(self,emission, source, param):
         print "close extra child"
         if param != 'none':
