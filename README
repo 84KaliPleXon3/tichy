@@ -54,7 +54,7 @@ each other.
   python object with a defined interface.
 
 - All the plugins share the same mainloop. They can't block and have
-  to use callback instead. To eas things, I implemented a tasklet
+  to use callback instead. To ease things, I implemented a tasklet
   system that allow us to use the yield syntax of python to write
   callback code that looks like threaded code.
 
