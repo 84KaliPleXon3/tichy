@@ -146,6 +146,7 @@ class FreeSmartPhoneSim(tichy.Service):
 class TestSim(tichy.Service):
 
     service = 'SIM'
+    name = 'Test'
 
     @tichy.tasklet.tasklet
     def get_contacts(self):
