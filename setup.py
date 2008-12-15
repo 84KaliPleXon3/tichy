@@ -109,7 +109,8 @@ setup(name='Tichy',
                     (os.path.join(sys.prefix, 'share/pixmaps/'),
                      ['data/tichy']),
                     (os.path.join(sys.prefix, 'share/tichy/pics'),
-                     ['tichy/pics/sim.png'])] \
+                     ['tichy/pics/sim.png']),
+                    ('../../etc/tichy/', ['data/tichy.cfg'])] \
           + plugins_files() + dbus_data,
       ext_package='tichy.guic',
 )

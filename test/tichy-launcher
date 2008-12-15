@@ -40,6 +40,7 @@ import sys
 import dbus
 import dbus.service
 from optparse import OptionParser
+import ConfigParser
 import logging
 
 # This is to make sure that we use the local tichy lib if run from the
@@ -97,6 +98,24 @@ def setup_logging():
     stream_log.setFormatter(formatter)
     stream_log.setLevel(logging.INFO)
     logger.addHandler(stream_log)
+
+
+def parse_config():
+    """parse the config files
+
+    We look into 3 locations : first the local dir, then /etc/tichy/,
+    then the home directory
+
+    :Returns: the ConfigParser object
+    """
+    config = ConfigParser.SafeConfigParser()
+    local_path = "./tichy.cfg"
+    system_path = "/etc/tichy/tichy.cfg"
+    home_path = os.path.expanduser("~/.tichy/tichy.cfg")
+    for path in [local_path, system_path, home_path]:
+        logger.info("read config file %s", path)
+        config.read(path)
+    return config
 
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
 # XXX: we should solve the real issue instead of using this hack
@@ -189,10 +208,28 @@ class Launcher(dbus.service.Object):
         tichy.mainloop.quit()
 
 
+def launch(name, options):
+    """Use dbus to call the launcher"""
+    if options.bus == 'system':
+        bus = dbus.SystemBus()
+    else:
+        bus = dbus.SessionBus()
+    launcher = bus.get_object('org.tichy.launcher', '/Launcher')
+    launcher = dbus.Interface(launcher, 'org.tichy.Launcher')
+    launcher.Launch(options.launch)
+
+
 if __name__ == '__main__':
-    setup_logging()
     options = parse_options()
 
+    if options.launch:
+        launch(options.launch, options)
+        sys.exit(0)
+
+    setup_logging()
+    config = parse_config()
+
+    logger.info("init gui")
     tichy.init_gui(options.gui_backend)
 
     logger.info("connect to dbus")
@@ -202,26 +239,23 @@ if __name__ == '__main__':
         bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
     bus_name = dbus.service.BusName('org.tichy.launcher', bus)
 
-    if options.launch:
-        if options.bus == 'system':
-            bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)
-        else:
-            bus = dbus.SessionBus(mainloop=tichy.mainloop.dbus_loop)
-        launcher = bus.get_object('org.tichy.launcher', '/Launcher')
-        launcher = dbus.Interface(launcher, 'org.tichy.Launcher')
-        launcher.Launch(options.launch)
-        sys.exit(0)
-
-
     # We import all the modules into the plugin directory
-    for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
-                        '/usr/tichy/plugins']:
+    plugins_dir = config.get('plugins', 'path', '/usr/share/tichy/plugins')
+    plugins_dirs = plugins_dir.split(':')
+    for plugins_dir in plugins_dirs:
         try:
             logger.info("try to load plugins in %s", plugins_dir)
             tichy.plugins.import_all(plugins_dir)
             break
         except IOError:
             logger.info("failed to load plugins in %s", plugins_dir)
+
+    # Set all the default services
+    defaults =  config.get('services', 'defaults').split(',')
+    for default in defaults:
+        service, name = default.strip().split(':')
+        logger.info("set service %s to %s", service, name)
+        tichy.Service.set_default(service, name)
 
     # We set the default design
     tichy.Service.set_default('Design', 'Default')
