@@ -264,7 +264,6 @@ class Caller(tichy.Application):
         print "in caller: ", name
         self.gsm_service = tichy.Service('GSM')
         
-        calls_list_one =  self.gsm_service.gsm_call.ListCalls()
         #print parent
         #print dir(parent)
         main = parent
