@@ -131,9 +131,7 @@ class InitAll(tichy.Tasklet):
         yield gsm_service.register()
         # Get all the contacts
         contacts = tichy.Service('Contacts')
-        yield contacts.load_all()
-        # yield contacts.copy_all()
-        # Init messages
+        yield contacts.init()
         messages_service = tichy.Service('Messages')
         yield messages_service.init()
 

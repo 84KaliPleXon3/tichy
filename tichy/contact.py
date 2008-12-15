@@ -333,7 +333,12 @@ class ContactsService(tichy.Service):
         yield PhoneContact.save()
 
     @tichy.tasklet.tasklet
-    def load_all(self):
+    def init(self):
+        """init the service"""
+        yield self._load_all()
+
+    @tichy.tasklet.tasklet
+    def _load_all(self):
         """load all the contacts from all the sources
 
         We need to call this before we can access the contacts
