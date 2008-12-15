@@ -21,20 +21,19 @@
 
 from tichy.tasklet import Tasklet, Wait
 import tichy
-import tichy.gui as gui
 
 
 class Dialog(tichy.Application):
     """This application shows a message on the screen"""
 
     def run(self, parent, title, msg):
-        w = gui.Window(parent)
+        w = tichy.gui.Window(parent)
 
         frame = self.view(w, title=title)
-        vbox = gui.Box(frame, axis=1, expand=True)
-        gui.Label(vbox, msg, expand=True)
+        vbox = tichy.gui.Box(frame, axis=1, expand=True)
+        tichy.gui.Label(vbox, msg, expand=True)
 
         b = gui.Button(vbox)
-        gui.Label(b, 'OK')
+        tichy.gui.Label(b, 'OK')
         yield Wait(b, 'clicked')
         w.destroy()

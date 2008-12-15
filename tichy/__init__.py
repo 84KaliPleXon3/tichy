@@ -51,6 +51,8 @@ import sound
 
 # XXX: use the same trick than with gui
 mainloop = None
+gui = None
+
 
 def init_gui(backends=None):
     """Initialize tichy gui
@@ -61,12 +63,13 @@ def init_gui(backends=None):
     This has to be called once before we can import tichy.gui
 
     :Parameters:
-    
-    backends : list | str
-        backend name or list of backends names that we want to try
+
+        backends : list | str
+            backend name or list of backends names that we want to try
     """
     global mainloop
-    
+    global gui
+
     import logging
     logger = logging.getLogger('')
 
@@ -77,24 +80,30 @@ def init_gui(backends=None):
     for backend in backends:
         try:
             if backend == 'csdl':
-                import guic as gui
+                import gui
+                gui = guic
             elif backend == 'sdl':
-                import guip as gui
+                import guip
+                gui = guip
             elif backend == 'gtk':
-                import guig as gui
+                import guig
+                gui = guig
             elif backend == 'etk':
-                import guie as gui
+                import guie
+                gui = guie
             elif backend == 'paroli':
-                import gui_paroli as gui
+                import gui_paroli
+                gui = gui_paroli
             elif backend == 'edje':
-                import gui_edje as gui
+                import gui_edje
+                gui = gui_edje
             logger.info("using backend %s", backend)
+            sys.modules['tichy.gui'] = gui
+            mainloop = gui.EventsLoop()
+
         except Exception, e:
             logger.warning("can't use backend %s : %s", backend, e)
             if backend == backends[-1]:
                 raise
         else:
             break
-
-    sys.modules['tichy.gui'] = gui
-    mainloop = gui.EventsLoop()

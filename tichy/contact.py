@@ -26,8 +26,6 @@ import logging
 LOGGER = logging.getLogger('Contact')
 
 import tichy
-import tichy.gui as gui
-
 
 # TODO: Redo the whole contact things. We should have a single contact
 # class, no subclass for different backends, instead we have
@@ -112,8 +110,8 @@ class ContactAttr(tichy.Item):
 
         :Returns: the widget that represents the item
         """
-        ret = gui.Box(parent, axis=0, border=0)
-        gui.Label(ret, "%s:" % self.field.name)
+        ret = tichy.gui.Box(parent, axis=0, border=0)
+        tichy.gui.Label(ret, "%s:" % self.field.name)
         if self.value:
             self.value.view(ret)
         return ret
