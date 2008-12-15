@@ -35,41 +35,53 @@ Note for neo : We need to remember to set DISPLAY=:0 even when we call
 the dbus method !
 """
 
-from optparse import OptionParser
-
-# Parse the command line options
-parser = OptionParser()
-parser.add_option("", "--gui-backend", dest="gui_backend",
-                  help="select a specific gui backend",
-                  metavar="BACKEND",
-                  choices=["sdl", "csdl", "gtk", "etk", "paroli"],
-                  default=None)
-parser.add_option("", "--fullscreen",
-                  action='store_true', dest="fullscreen",
-                  help="run tichy in fullscreen",
-                  default=False)
-parser.add_option("", "--experimental",
-                  action='store_true', dest="experimental",
-                  help="Use experimental features",
-                  default=False)
-parser.add_option("", "--session",
-                  action='store_const', dest='bus',
-                  help="Connect to the session bus",
-                  const='session', default='system')
-parser.add_option("", "--launch", dest='launch',
-                  help="launch an applet using DBus",
-                  metavar="APPLICATION",
-                  default=None)
-
-(options, args) = parser.parse_args()
-
 import os
 import sys
 import dbus
 import dbus.service
-
+from optparse import OptionParser
 import logging
+
+# This is to make sure that we use the local tichy lib if run from the
+# test directory
+sys.path.insert(0, '../')
+
+import tichy
+
 logger = logging.getLogger('')
+
+
+def parse_options():
+    """Parse the command line options
+
+    :Returns: the OptionParser result object
+    """
+    parser = OptionParser()
+    parser.add_option("", "--gui-backend", dest="gui_backend",
+                      help="select a specific gui backend",
+                      metavar="BACKEND",
+                      choices=["sdl", "csdl", "gtk", "etk", "paroli"],
+                      default=None)
+    parser.add_option("", "--fullscreen",
+                      action='store_true', dest="fullscreen",
+                      help="run tichy in fullscreen",
+                      default=False)
+    parser.add_option("", "--experimental",
+                      action='store_true', dest="experimental",
+                      help="Use experimental features",
+                      default=False)
+    parser.add_option("", "--session",
+                      action='store_const', dest='bus',
+                      help="Connect to the session bus",
+                      const='session', default='system')
+    parser.add_option("", "--launch", dest='launch',
+                      help="launch an applet using DBus",
+                      metavar="APPLICATION",
+                      default=None)
+
+    (options, args) = parser.parse_args()
+    return options
+
 
 def setup_logging():
     """Set up two logging handlers, one in the log file, one in the
@@ -86,28 +98,14 @@ def setup_logging():
     stream_log.setLevel(logging.INFO)
     logger.addHandler(stream_log)
 
-setup_logging()
-
 # This is to solve a bug in neo where sdl on the framebuffer doesn't work
 # XXX: we should solve the real issue instead of using this hack
 os.environ['SDL_VIDEODRIVER'] = 'x11'
 
-# This is to make sure that we use the local tichy lib if run from the
-# test directory
-sys.path.insert(0, '../')
-
-# We select the gui backend before importing tichy
-#
-# XXX: that is an ugly hack. We should use an `init` methid instead
-tichy_gui_backends = ['paroli', 'csdl', 'sdl']
-if options.gui_backend:
-    tichy_gui_backends = [options.gui_backend]
-
-import tichy
-
 
 class InitAll(tichy.Tasklet):
     """Perform all basic initialization of services"""
+
     def run(self):
         # Register on the GSM Network
         gsm_service = tichy.Service('GSM')
@@ -192,6 +190,11 @@ class Launcher(dbus.service.Object):
 
 
 if __name__ == '__main__':
+    setup_logging()
+    options = parse_options()
+
+    tichy.init_gui(options.gui_backend)
+
     logger.info("connect to dbus")
     if options.bus == 'system':
         bus = dbus.SystemBus(mainloop=tichy.mainloop.dbus_loop)

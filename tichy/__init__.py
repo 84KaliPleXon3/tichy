@@ -20,9 +20,10 @@ __docformat__ = 'reStructuredText'
 
 """tichy package"""
 
+import sys
+
 from tichy.object import Object
 from tasklet import Tasklet, Wait, WaitFirst
-import gui
 
 from application import Application, Gadget
 from service import Service, ServiceUnusable
@@ -48,6 +49,52 @@ import prefs
 import notifications
 import sound
 
-# The mainloop is defined here !
-# We can use it to access to the timeout_add method
-mainloop = gui.EventsLoop()
+# XXX: use the same trick than with gui
+mainloop = None
+
+def init_gui(backends=None):
+    """Initialize tichy gui
+
+    This method will manually set tichy.gui module as the proper gui
+    backend.
+
+    This has to be called once before we can import tichy.gui
+
+    :Parameters:
+    
+    backends : list | str
+        backend name or list of backends names that we want to try
+    """
+    global mainloop
+    
+    import logging
+    logger = logging.getLogger('')
+
+    backends = backends or ['paroli', 'csdl', 'sdl']  # default backends
+    if isinstance(backends, str):
+        backends = [backends]
+
+    for backend in backends:
+        try:
+            if backend == 'csdl':
+                import guic as gui
+            elif backend == 'sdl':
+                import guip as gui
+            elif backend == 'gtk':
+                import guig as gui
+            elif backend == 'etk':
+                import guie as gui
+            elif backend == 'paroli':
+                import gui_paroli as gui
+            elif backend == 'edje':
+                import gui_edje as gui
+            logger.info("using backend %s", backend)
+        except Exception, e:
+            logger.warning("can't use backend %s : %s", backend, e)
+            if backend == backends[-1]:
+                raise
+        else:
+            break
+
+    sys.modules['tichy.gui'] = gui
+    mainloop = gui.EventsLoop()
