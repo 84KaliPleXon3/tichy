@@ -24,7 +24,13 @@
 #       file can take a lot of time.
 
 import os
+
 import yaml
+try:
+    from yaml import CLoader as Loader
+    from yaml import CDumper as Dumper
+except ImportError: 
+    from yaml import Loader, Dumper
 
 import logging
 LOGGER = logging.getLogger('persistance')
@@ -64,7 +70,9 @@ class Persistance(object):
                 serialized. Usually dictionary or list.
         """
         file = self._open('w')
-        file.write(yaml.safe_dump(data, default_flow_style=False))
+        file.write(yaml.dump(data,
+                             default_flow_style=False,
+                             Dumper=Dumper))
 
     def load(self):
         """Load data from the file
@@ -75,4 +83,4 @@ class Persistance(object):
             file = self._open()
         except IOError, ex:
             return None
-        return yaml.safe_load(file)
+        return yaml.load(file, Loader=Loader)
