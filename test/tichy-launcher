@@ -249,11 +249,12 @@ if __name__ == '__main__':
             logger.info("failed to load plugins in %s", plugins_dir)
 
     # Set all the default services
-    defaults =  config.get('services', 'defaults').split(',')
-    for default in defaults:
-        service, name = default.strip().split(':')
-        logger.info("set service %s to %s", service, name)
-        tichy.Service.set_default(service, name)
+    if config.has_option('services', 'defaults'):
+        defaults = config.get('services', 'defaults').split(',')
+        for default in defaults:
+            service, name = default.strip().split(':')
+            logger.info("set service %s to %s", service, name)
+            tichy.Service.set_default(service, name)
 
     # We set the default design
     tichy.Service.set_default('Design', 'Default')
