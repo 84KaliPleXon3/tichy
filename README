@@ -73,13 +73,30 @@ all the plugins, then wait for DBus calls on org.tichy.launcher (type
 without being installed first. When started from an ssh connection,
 remember to set DISPLAY to :0 first.
 
+For the DBus connection to succedd, we need to make sure than the
+proper dbus configurations file are installed in the filesystem. That
+is the file ./data/dbus/org.tichy.launcher.service should go into
+/usr/share/dbus-1/system-services/ and the file ./data/dbus/tichy.conf
+should go in /etc/dbus-1/system.d/
+
 To start a application send a dbus call to org.tichy.launcher, object
 /Launcher method org.tichy.Launcher.Launch(s). The parameter being the
 name of the application we want to start.
 
-See the tichy.cfg file to see how to configure the plugin path or the
-default services.
+You can use dbus-send to make the call :
 
+dbus-send --system --dest='org.tichy.launcher' /Launcher \
+ --print-reply org.tichy.Launcher.Launch string:Contacts
+
+Also see the tichy.cfg file to see how to configure the plugin path or
+the default services.
+
+
+                          RUN ON THE DESKTOP
+
+[To complete : Can we actually run tichy on the desktop since paroli
+merge ?] It should be possible, but we need to check if python etk
+binding works.
     
                            GRAPHIC BACKENDS
     
