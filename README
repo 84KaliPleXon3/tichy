@@ -94,9 +94,14 @@ the default services.
 
                           RUN ON THE DESKTOP
 
-[To complete : Can we actually run tichy on the desktop since paroli
-merge ?] It should be possible, but we need to check if python etk
-binding works.
+It is also possible to run tichy/paroli directly on the desktop. To do
+so we need to install last python-etk binding first, from
+enlightenment. Then it works the same, tichy will automatically
+recognize that the framework is not there and will revert to using
+dummy services.
+
+To avoid running as root, we can use the --session command line
+argument when starting tichy-launcher.
     
                            GRAPHIC BACKENDS
     
