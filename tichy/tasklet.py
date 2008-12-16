@@ -117,13 +117,12 @@ class Tasklet(object):
         """The default error call back if None is specified"""
         if type is GeneratorExit:
             return
-        # If a task generates a exception without having an error
-        # callback we kill tichy.  It is not very nice, but the only
-        # way to avoid blocking tichy.
         import traceback as tb
-        import sys
-        tb.print_exception(*sys.exc_info())
-        sys.exit(-1)
+        logger.error("Got error from unconnected tasklet : %s", value)
+        lines = tb.format_tb(traceback)
+        lines = '\n'.join(lines).split('\n')
+        for line in lines:
+            logger.error(line)
 
     def close(self):
         if self.closed:
