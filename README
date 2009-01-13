@@ -24,6 +24,12 @@ for more details.
 along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 
+                               WARNING
+
+  Tichy is curently unmaintained.  People should have a look at paroli
+project instead (http://paroli-project.org/).  The paroli project is
+mainly based on tichy.
+
                                 ABOUT
 
   This is a python applets manager.  My goal is to make a very simple
