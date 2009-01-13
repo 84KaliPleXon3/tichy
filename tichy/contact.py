@@ -26,6 +26,8 @@ import logging
 LOGGER = logging.getLogger('Contact')
 
 import tichy
+import tichy.gui as gui
+
 
 # TODO: Redo the whole contact things. We should have a single contact
 # class, no subclass for different backends, instead we have
@@ -110,8 +112,8 @@ class ContactAttr(tichy.Item):
 
         :Returns: the widget that represents the item
         """
-        ret = tichy.gui.Box(parent, axis=0, border=0)
-        tichy.gui.Label(ret, "%s:" % self.field.name)
+        ret = gui.Box(parent, axis=0, border=0)
+        gui.Label(ret, "%s:" % self.field.name)
         if self.value:
             self.value.view(ret)
         return ret
@@ -333,12 +335,7 @@ class ContactsService(tichy.Service):
         yield PhoneContact.save()
 
     @tichy.tasklet.tasklet
-    def init(self):
-        """init the service"""
-        yield self._load_all()
-
-    @tichy.tasklet.tasklet
-    def _load_all(self):
+    def load_all(self):
         """load all the contacts from all the sources
 
         We need to call this before we can access the contacts

@@ -172,7 +172,7 @@ class Service(Item):
                 return ret
             except ServiceUnusable:
                 logger.warning("service %s unusable, skipped", service_cls)
-        raise KeyError("can't find any service '%s:%s'" % (service, name))
+        raise KeyError("can't find any service '%s'" % service)
 
     def __init__(self, service=None, name=None):
         super(Service, self).__init__()

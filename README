@@ -8,25 +8,25 @@
 
                                 Tichy 
 
-copyright 2008 Guillaume Chereau <charlie@openmoko.org>
+  copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 
-Tichy is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your
+  Tichy is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
 option) any later version.
 
-Tichy is distributed in the hope that it will be useful, but WITHOUT
+  Tichy is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 for more details.
 
-You should have received a copy of the GNU General Public License
+  You should have received a copy of the GNU General Public License
 along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                 ABOUT
 
-This is a python applets manager.  My goal is to make a very simple
+  This is a python applets manager.  My goal is to make a very simple
 environment for people who want to write applications for OpenMoko.
 The approach is very different from what we can get in the currents
 available images for OM.  I came to the conclusion that the current
@@ -54,7 +54,7 @@ each other.
   python object with a defined interface.
 
 - All the plugins share the same mainloop. They can't block and have
-  to use callback instead. To ease things, I implemented a tasklet
+  to use callback instead. To eas things, I implemented a tasklet
   system that allow us to use the yield syntax of python to write
   callback code that looks like threaded code.
 
@@ -64,67 +64,46 @@ each other.
   same applications.
 
 
+                               INSTALL
+
+  If you just want to try tichy on your destop, the simpler is to
+directly run it from the location where it has been downoaded. That
+is: cd into "test/", and run "python tichy"
+
+  To make it run faster, you can compile the cython version of the gui
+module : Go into ./tichy/guic and type: "make"
+    
+  That should create all the .so files, then the execution is much
+faster.
+    
                            RUN ON OPENMOKO
 
-Since paroli integration, the only way to start tichy is to use
-'tichy-launcher' script in the test repository. This script will load
-all the plugins, then wait for DBus calls on org.tichy.launcher (type
-./tichy-launcher --help for more information). Tichy can run locally
-without being installed first. When started from an ssh connection,
-remember to set DISPLAY to :0 first.
+  This is a little bit tricky, I won't explain the steps in details,
+contact me if you have problems
 
-For the DBus connection to succedd, we need to make sure than the
-proper dbus configurations file are installed in the filesystem. That
-is the file ./data/dbus/org.tichy.launcher.service should go into
-/usr/share/dbus-1/system-services/ and the file ./data/dbus/tichy.conf
-should go in /etc/dbus-1/system.d/
-
-To start a application send a dbus call to org.tichy.launcher, object
-/Launcher method org.tichy.Launcher.Launch(s). The parameter being the
-name of the application we want to start.
-
-You can use dbus-send to make the call :
-
-dbus-send --system --dest='org.tichy.launcher' /Launcher \
- --print-reply org.tichy.Launcher.Launch string:Contacts
-
-Also see the tichy.cfg file to see how to configure the plugin path or
-the default services.
-
-
-                          RUN ON THE DESKTOP
-
-It is also possible to run tichy/paroli directly on the desktop. To do
-so we need to install last python-etk binding first, from
-enlightenment. Then it works the same, tichy will automatically
-recognize that the framework is not there and will revert to using
-dummy services.
-
-To avoid running as root, we can use the --session command line
-argument when starting tichy-launcher.
+1- Get the FSO image
+2- Install python-pygame 
+3- Compile the files in guic using OM Toolchain
+4- Copy everything on the OM
+5- export DISPLAY=:0
+6- go into tichy/test
+7- run it : ./tichy
     
                            GRAPHIC BACKENDS
     
-By default tichy will try to use tichy/gui_paroli as the widgets
-library.
-
-                             CONFIG FILE
-
-Tichy will try to load configuration files in three locations, in this
-order : ./tichy.cfg, /etc/tichy/tichy.cfg, ~/.tichy/tichy.cfg.  The
-files are in format used by python ConfigParser library. See the file
-'configuration.txt' in the doc driectory for more information about
-the possible configurations.
+  By default tichy will try to use tichy/guic as the widgets
+library. If it can't load it (c files no compliled), it will try to
+use tichy/guip.  There are also experimental backends for gtk and edje
+(guig end guie.) To try it out, edit tichy/gui.py file.
 
                             DOCUMENTATION
 
-Some documentation can be found in the doc directory. Most of the
+  Some documentation can be found in the doc directory. Most of the
 classes have embedded documentation using extended markup format. You
 can generate the doc with epydoc, from the doc directory :
-
-epydoc ../tichy
+    epydoc ../tichy
 
                                AUTHORS
 
-- Guillaume "Charlie" Chereau, main developer <charlie@openmoko.org>
-- Mirko Lindler <mmirko@penmoko.com>
+- Guillaume "Charlie" Chereau, main developer. charlie@openmoko.org
+- Michael "Goodwill", openmoko /a/ webhippo.org

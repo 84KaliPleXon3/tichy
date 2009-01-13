@@ -1,0 +1,173 @@
+#!/usr/bin/python
+#
+#    Tichy
+#
+#    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
+#
+#    This file is part of Tichy.
+#
+#    Tichy is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Tichy is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+import sys
+import time
+from optparse import OptionParser
+import logging
+logger = logging.getLogger('')
+
+
+def setup_logging():
+    """Set up two logging handlers, one in the log file, one in the
+    stdoutput"""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s %(name)-8s %(levelname)-8s %(message)s',
+        filename='/tmp/tichy.log', filemode='w')
+
+    formatter = logging.Formatter(
+        '%(name)-8s %(levelname)-8s %(message)s')
+    stream_log = logging.StreamHandler()
+    stream_log.setFormatter(formatter)
+    stream_log.setLevel(logging.INFO)
+    logger.addHandler(stream_log)
+
+# We do it before importing tichy modules, cause some import may have
+# logging info.
+#
+# XXX: is it normal ?
+setup_logging()
+
+# Parse the command line options
+parser = OptionParser()
+parser.add_option("", "--gui-backend", dest="gui_backend",
+                  help="select a specific gui backend",
+                  metavar="BACKEND",
+                  choices=["sdl", "csdl", "gtk", "etk", "paroli", "edje"],
+                  default=None)
+parser.add_option("", "--fullscreen",
+                  action='store_true', dest="fullscreen",
+                  help="run tichy in fullscreen",
+                  default=False)
+parser.add_option("", "--experimental",
+                  action='store_true', dest="experimental",
+                  help="Use experimental features",
+                  default=False)
+
+(options, args) = parser.parse_args()
+
+# We select the gui backend before importing tichy
+if options.gui_backend:
+    global tichy_gui_backends
+    tichy_gui_backends = [options.gui_backend]
+
+# This is to solve a bug in neo where sdl on the framebuffer doesn't work
+# XXX: we should solve the real issue instead of using this hack
+os.environ['SDL_VIDEODRIVER'] = 'x11'
+
+# This is so that we can start tichy from the test dir without having
+# to set PYTHONPATH
+sys.path.insert(0, '../')
+
+# Import all the stuffs we need...
+import tichy
+import tichy.gui as gui
+from tichy.gui import Vect, Rect
+
+
+class AutoAnswerCall(tichy.Tasklet):
+
+    def run(self, window):
+        # We don't create any window, just run in the background...
+        gsm_service = tichy.Service('GSM')
+        while True:
+            call = yield tichy.Wait(gsm_service, 'incoming-call')
+            caller_service = tichy.Service('Caller')
+            yield caller_service.call(window, call)
+
+
+class TopBar(tichy.Tasklet):
+    """This is the application that is going to run on the top window"""
+
+    def run(self, parent):
+        # The top window application need to print various informations...
+        hbox = gui.Box(parent, axis=0)
+
+        # Add a few 'Gadgets'
+        tichy.Gadget.find_by_name('GSM')(hbox).start()
+        tichy.Gadget.find_by_name('Network')(hbox).start()
+        tichy.Gadget.find_by_name('Notifications')(hbox).start()
+        tichy.Gadget.find_by_name('Battery')(hbox).start()
+        tichy.Gadget.find_by_name('Clock')(hbox).start()
+
+        yield tichy.Wait(parent, 'destroyed')
+
+
+class Main(tichy.Tasklet):
+    content_window = None
+
+    def run(self, window):
+        vbox = gui.Box(window, axis=1, border=0, spacing=0)
+        # The main application
+        top_window = gui.Window(vbox, optimal_size=gui.Vect(480, 64),
+                                modal=False)
+        Main.content_window = gui.Window(vbox, min_size=gui.Vect(480, 0),
+                                         modal=False, expand=True)
+        AutoAnswerCall(Main.content_window).start()
+        TopBar(top_window).start()
+        logger.info("start launcher")
+        launcher = tichy.Application.find_by_name('Launcher')
+        yield launcher(Main.content_window)
+        logger.info("quit main app")
+
+
+class WindowsManager(tichy.Service):
+
+    service = 'WindowsManager'
+
+    def get_app_parent(self):
+        return Main.content_window
+
+if __name__ == '__main__':
+
+    # We import all the modules into the plugin directory
+    for plugins_dir in ['plugins', '/usr/share/tichy/plugins',
+                        '/usr/tichy/plugins']:
+        try:
+            logger.info("try to load plugins in %s", plugins_dir)
+            tichy.plugins.import_all(plugins_dir)
+            break
+        except IOError:
+            logger.info("failed to load plugins in %s", plugins_dir)
+
+    # TODO: at least remove the create invocation !
+    style = tichy.Style.find_by_name("cool style").create()
+
+    # We set the default design
+    tichy.Service.set_default('Design', 'Default')
+    # tichy.Service.set_default('Design', 'Grid')
+
+    # The backend SDL painter
+    painter = gui.Painter((480, 640), fullscreen=options.fullscreen)
+
+    # Create the screen
+    screen = gui.Screen(tichy.mainloop, painter, style=style)
+
+    def on_quit(v):
+        logger.info("quit mainloop")
+        tichy.mainloop.quit()
+
+    # Start the application, and attach a callback on it
+    Main(screen).start(on_quit)
+    tichy.mainloop.run()
+    logger.info("quit")

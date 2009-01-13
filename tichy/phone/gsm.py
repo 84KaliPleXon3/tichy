@@ -271,7 +271,6 @@ class TestGsm(GSMService):
     """
 
     service = 'GSM'
-    name = 'Test'
 
     def __init__(self):
         super(TestGsm, self).__init__()

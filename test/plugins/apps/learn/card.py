@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 #    Tichy
 #
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
@@ -17,24 +19,25 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Dialog module"""
-
-from tichy.tasklet import Tasklet, Wait
-import tichy
-import tichy.gui as gui
+import re
 
 
-class Dialog(tichy.Application):
-    """This application shows a message on the screen"""
+class Card(object):
 
-    def run(self, parent, title, msg):
-        w = gui.Window(parent)
+    def __init__(self, q, a, comment=None):
+        self.q = q
+        self.a = a
+        self.comment = comment
 
-        frame = self.view(w, title=title)
-        vbox = gui.Box(frame, axis=1, expand=True)
-        gui.Label(vbox, msg, expand=True)
+    def __repr__(self):
+        return '%s -> %s' % (self.q, self.a)
 
-        b = gui.Button(vbox)
-        gui.Label(b, 'OK')
-        yield Wait(b, 'clicked')
-        w.destroy()
+    reg = re.compile(r"\s*(.*?)\s*"  \
+                         r"->\s*(.*?)\s*"  \
+                         r"(?:\[(.*)\])?\s*$")
+
+    @staticmethod
+    def read(line):
+        ret = Card.reg.match(line)
+        q, a, c = ret.group(1, 2, 3)
+        return Card(q, a, c)

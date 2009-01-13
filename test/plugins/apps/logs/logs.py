@@ -1,5 +1,4 @@
 #    Tichy
-#
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
 #
 #    This file is part of Tichy.
@@ -17,24 +16,46 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Dialog module"""
-
-from tichy.tasklet import Tasklet, Wait
 import tichy
 import tichy.gui as gui
 
+import logging
+logger = logging.getLogger('App.Logs')
 
-class Dialog(tichy.Application):
-    """This application shows a message on the screen"""
 
-    def run(self, parent, title, msg):
-        w = gui.Window(parent)
+class Logs(tichy.Application):
 
-        frame = self.view(w, title=title)
+    name = "Logs"
+    icon = 'icon.png'
+    category = 'main'
+
+    def run(self, window):
+        frame = self.view(window, back_button=True)
+
         vbox = gui.Box(frame, axis=1, expand=True)
-        gui.Label(vbox, msg, expand=True)
 
-        b = gui.Button(vbox)
-        gui.Label(b, 'OK')
-        yield Wait(b, 'clicked')
-        w.destroy()
+        # We create a list of the sub applications actors
+        list = tichy.ActorList()
+        for app in [All]:
+            actor = app.create_actor()
+            list.append(actor)
+
+        list.view(vbox)
+
+        yield tichy.Wait(frame, 'back')
+
+
+class All(tichy.Application):
+
+    name = 'All'
+    design = 'Default'
+
+    def run(self, window):
+        frame = self.view(window, back_button=True)
+
+        vbox = gui.Box(frame, axis=1, expand=True)
+
+        gsm_service = tichy.Service('GSM')
+        gsm_service.logs.actors_view(vbox)
+
+        yield tichy.Wait(frame, 'back')

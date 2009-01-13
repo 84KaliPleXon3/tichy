@@ -48,11 +48,10 @@ def plugins_files():
         # XXX: Where is the best place to put the plugins files ???
         # TODO: this [15:] id here to remove the ./test/plugins/,
         # clean that.
-        dest = os.path.join('tichy/plugins', root[15:])
+        dest = os.path.join(sys.prefix, 'share/tichy/plugins', root[15:])
         src = []
         for file in files:
-            if file.endswith((".py", ".ttf", ".png", ".dic", ".txt",
-                              ".edj", ".edc")):
+            if file.endswith((".py", ".ttf", ".png", ".dic", ".txt")):
                 path = '%s/%s' % (root, file)
                 src.append(path)
         ret.append((dest, src))
@@ -96,21 +95,18 @@ setup(name='Tichy',
       author="Guillaume 'charlie' Chereau",
       author_email='charlie@openmoko.org',
       # url='',
-      packages = ['tichy', 'tichy.guic', 'tichy.guip', 'tichy.gui_paroli',
+      packages = ['tichy', 'tichy.guic', 'tichy.guip',
                   'tichy.phone', 'tichy.prefs'],
-      scripts= ['test/tichy-launcher'],
+      scripts= ['test/tichy', 'test/tichy-launcher'],
       # XXX: Those locations may not work on the neo !
-      data_files = [('applications',
-                     ['data/tichy-launcher.desktop',
-                      'data/paroli-io.desktop',
-                      'data/paroli-contacts.desktop',
-                      'data/paroli-msgs.desktop',
-                      'data/paroli-dialer.desktop']),
+      data_files = [(os.path.join(sys.prefix, 'share/applications'),
+                     ['data/tichy.desktop', 'data/tichy-launcher.desktop']),
                     (os.path.join(sys.prefix, 'share/pixmaps/'),
                      ['data/tichy']),
                     (os.path.join(sys.prefix, 'share/tichy/pics'),
-                     ['tichy/pics/sim.png']),
-                    ('../../etc/tichy/', ['data/tichy.cfg'])] \
+                     ['tichy/pics/sim.png'])] \
           + plugins_files() + dbus_data,
       ext_package='tichy.guic',
-)
+      ext_modules=[make_extension(x) for x in [
+            'geo', 'cobject', 'widget', 'frame', 'painter', 'sdl_painter',
+            'window', 'surf_widget', 'image']])

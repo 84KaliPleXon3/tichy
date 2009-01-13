@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Tichy
+TryExec=tichy
+Icon=tichy
+GenericName=tichy --fullscreen
+Comment=Python Applets Manager
+StartupNotify=false
+Exec=tichy --fullscreen
+Terminal=false
+Type=Application
+Categories=Office;

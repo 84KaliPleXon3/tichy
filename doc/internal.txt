@@ -1,17 +1,5 @@
 			    Tichy internal
 
-Tichy's internal may be a little bit hard to understand because of
-it's object oriented structure and the fact that is uses some patterns
-that couldn't be done with C++ (at least not without huge pain).
-
-The documentation can be auto-generated from the code using epydoc,
-[but we need to clean the code a little]
-
-In the doc directory, there is also a .dia file with the basic UML of
-a few important classes, and a .svg drawing of the same file.
-
-Here are the important classes of tichy's internal structure. Refer to
-the auto-generated doc or the code itself for more info.
 
 Object:
 
@@ -36,18 +24,11 @@ Actor:
 
   Every Item also have a `create_actor` method, that returns an Actor
   object. An Actor is a special Item that can be used to trigger
-  actions on an other item. 
+  actions on an other item. For example creating a view on an
+  Contact's Actor will show a representation of the contact plus a way
+  to trigger some default action on it (Edit, Call, etc.)
 
-  For example a contacts application doesn't want to show all the
-  contacts information in a single window, but rather shows a way for
-  the user to *select* one contact and then trigger some action on
-  it. On of the action could be to view the full contact.
-
-  The usual approach would have been to create a list of buttons, one
-  per contact. But this doesn't allow the Deign service to choose an
-  other way to let the user select a contact. The solution is to use a
-  list of actor on item, and let the Design service shows it the way
-  it wants.
+  The way the actor are represented depends on the Design.
 
   Most applications in Tichy simply retrieve a list of Item and then
   show actors on those items.

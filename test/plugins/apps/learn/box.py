@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 #    Tichy
 #
 #    copyright 2008 Guillaume Chereau (charlie@openmoko.org)
@@ -17,24 +19,36 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Dialog module"""
-
-from tichy.tasklet import Tasklet, Wait
-import tichy
-import tichy.gui as gui
+from card import Card
 
 
-class Dialog(tichy.Application):
-    """This application shows a message on the screen"""
+class Box(list):
 
-    def run(self, parent, title, msg):
-        w = gui.Window(parent)
+    def __init__(self, size):
+        self.size = size
 
-        frame = self.view(w, title=title)
-        vbox = gui.Box(frame, axis=1, expand=True)
-        gui.Label(vbox, msg, expand=True)
+    def __repr__(self):
+        ret = StringIO()
+        self.write(ret)
+        return ret.getvalue()
 
-        b = gui.Button(vbox)
-        gui.Label(b, 'OK')
-        yield Wait(b, 'clicked')
-        w.destroy()
+    def write(self, file):
+        print >>file, "%i/%i" % (len(self), self.size)
+        for c in self:
+            print >>file, c.q
+
+    def full(self):
+        return len(self) >= self.size
+
+    def append(self, c):
+        assert not self.full()
+        super(Box, self).append(c)
+
+    @staticmethod
+    def read(file, dic):
+        l, s = [int(x) for x in file.readline().split("/")]
+        ret = Box(s)
+        for c in xrange(l):
+            q = file.readline().strip()
+            ret.append(dic[q])
+        return ret

@@ -17,24 +17,27 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Tichy.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Dialog module"""
-
-from tichy.tasklet import Tasklet, Wait
 import tichy
 import tichy.gui as gui
 
 
-class Dialog(tichy.Application):
-    """This application shows a message on the screen"""
+class Test(tichy.Application):
 
-    def run(self, parent, title, msg):
-        w = gui.Window(parent)
+    name = 'Test'
+    icon = None
+    category = 'main'
 
-        frame = self.view(w, title=title)
+    def run(self, window):
+        frame = self.view(window, back_button=True)
         vbox = gui.Box(frame, axis=1, expand=True)
-        gui.Label(vbox, msg, expand=True)
 
-        b = gui.Button(vbox)
-        gui.Label(b, 'OK')
-        yield Wait(b, 'clicked')
-        w.destroy()
+        button = gui.Button(vbox)
+        gui.Label(button, "fake SMS")
+        button.connect('clicked', self.on_fake_sms)
+
+        # Wait until the quit button is clicked
+        yield tichy.Wait(frame, 'back')
+
+    def on_fake_sms(self, b):
+        sms_service = tichy.Service('SMS', 'Test')
+        sms_service.fake_incoming_message("hello")
